@@ -1,0 +1,28 @@
+using MediatR;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Families.GetFamilyByParent;
+using Wesal.Contracts.Families;
+using Wesal.Presentation.EndpointResults;
+using Wesal.Presentation.Endpoints;
+using Wesal.Presentation.Extensions;
+
+namespace Wesal.Presentation.Families;
+
+internal sealed class GetFamilyByParent : IEndpoint
+{
+    public void MapEndpoint(IEndpointRouteBuilder app)
+    {
+        app.MapGet(ApiEndpoints.Families.GetByParent, async (Guid parentId, ISender sender) =>
+        {
+            var result = await sender.Send(new GetFamilyByParentQuery(parentId));
+
+            return result.MatchResponse(Results.Ok, ApiResults.Problem);
+        })
+        .WithTags(Tags.Families)
+        .Produces<FamilyResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
+        .WithOpenApiName(nameof(GetFamilyByParent));
+    }
+}

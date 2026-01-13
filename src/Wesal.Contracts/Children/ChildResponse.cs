@@ -1,0 +1,9 @@
+namespace Wesal.Contracts.Children;
+
+public record struct ChildResponse(
+    Guid Id,
+    string FullName,
+    Guid? SchoolId,
+    string Gender,
+    DateTime BirthDate,
+    int Age);

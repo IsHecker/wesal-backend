@@ -1,0 +1,9 @@
+using Wesal.Application.Messaging;
+
+namespace Wesal.Application.Payments.MakeAlimonyPayment;
+
+public record struct MakeAlimonyPaymentCommand(
+    Guid PayerId,
+    Guid AlimonyId,
+    long Amount,
+    string PaymentMethod) : ICommand<Guid>;

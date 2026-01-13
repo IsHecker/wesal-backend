@@ -1,11 +1,17 @@
 using Wesal.Application.Data;
 using Microsoft.EntityFrameworkCore;
+using Wesal.Contracts.Common;
 
 namespace Wesal.Application.Extensions;
 
 public static class QueryableExtensions
 {
     public static IQueryable<T> Paginate<T>(this IQueryable<T> query, Pagination pagination)
+    {
+        return query.Skip(pagination.PageSize * (pagination.PageNumber - 1)).Take(pagination.PageSize);
+    }
+
+    public static IEnumerable<T> Paginate<T>(this IEnumerable<T> query, Pagination pagination)
     {
         return query.Skip(pagination.PageSize * (pagination.PageNumber - 1)).Take(pagination.PageSize);
     }

@@ -759,3 +759,174 @@ Notifications: 2 unread
 - Alimony payment on-time rates
 - Violation rate over time
 - **Export Analytics Reports as PDF** which can be used for court hearings
+
+
+---
+
+# All Features/Use Cases from the Document
+
+## 1. User Management
+- Create Court Admin account (by Platform Admin)
+- Create Court Staff account (by Court Admin)
+- Create Parent user accounts (by Court Staff)
+- Create School accounts (by Court Staff/System auto-generation)
+- Force password change on first login (School accounts)
+- Role-based access control enforcement
+
+## 2. Family Enrollment
+- Create new family
+- Create Parent A user account with temporary password
+- Create Parent B user account with temporary password
+- Create Child Profile(s)
+- Link family to Court Case ID
+
+## 3. Court Case Setup
+- Create new court case
+- Enter case metadata
+- Link case to Family ID
+- Enter Custody Decision
+- Upload court order document (optional)
+- Define Visitation Schedules
+- Define Alimony Obligations (optional)
+- Validate and save case data
+
+## 4. Parent Interactions - View Access
+- View basic family information
+- View children information
+- View custody decision
+- View current court case status and details
+- View visitation schedules (upcoming and past)
+- View alimony obligations/schedules
+- View payment history and receipts
+- View notifications and alerts
+- View receipts history for evidence
+
+## 5. Parent Interactions - Actions
+- Make alimony payments
+- File complaints (optional)
+- Confirm attendance for upcoming visit (optional)
+
+## 6. Automatic Visitation Generation
+- Read defined Visitation Schedules
+- Calculate next month/12 months of visitation dates
+- Create individual Visitation records based on frequency
+- Save Visitation sessions to database
+- Send notification to non-custodial parent with upcoming visits
+
+## 7. Visitation Attendance Recording
+- Send reminder notification 24 hours before visit
+- View "Today's Visitations" screen (Visit Center Staff)
+- Find scheduled session by national ID
+- Check in parent (record timestamp, change status to Checked-In)
+- Mark visitation as Completed (record end time)
+- Notify court automatically
+
+## 8. Alimony Payment Flow
+- Calculate next payment due date
+- Send reminder notification 7 days before due date
+- View alimony obligations
+- Process payment through gateway
+- Receive webhook from payment gateway
+- Log payment (success or failure)
+- Mark alimony as Paid
+- Send confirmation email with receipt
+- Send failure notification
+
+## 9. School Creation & Child-School Linking
+- Check if school exists in system
+- Register new school
+- Auto-generate school account credentials
+- Display school credentials to court staff
+- Link child to school
+- Save child-school relationship
+
+## 10. School Report Upload
+- School login with credentials
+- View only assigned students
+- Upload report (attendance, grades, behavior)
+- Enter report notes/description
+- Upload report file
+- Store report
+- Notify court staff and parents
+
+## 11. Violation Detection & Alert Notification
+- Detect missed visitation (30-minute grace period)
+- Mark parent as Absent
+- Generate violation alert for missed visitation
+- Check unpaid alimony past due date
+- Mark alimony as NotPaid
+- Generate violation alert for unpaid alimony
+- Send notification to court staff and payer parent
+- Review alert (mark as Under Review)
+- Add resolution notes
+- Mark alert as Resolved
+- Detect custody breach (optional)
+
+## 12. Visit Locations Management
+- Create visit location
+- Define court-approved places for visitations
+
+## 13. Notifications
+- Generate system notifications for events
+- Send notifications to users
+- Track notification status
+
+## 14. Parent Dashboard
+- Login with National ID
+- View family information
+- View court case summary
+- View upcoming and past visitations
+- View alimony obligations and payment history
+- View notifications
+
+## 15. Court Staff Dashboard
+- Login
+- View total families registered
+- View active court cases
+- View pending violation alerts
+- View today's scheduled visitations
+- Navigate to create family
+- Navigate to create case
+- Navigate to view violations
+- Navigate to manage users
+
+## 16. Multi-Court & Court Isolation Support
+- Create new court instances (Platform Admin)
+- Ensure court data isolation
+- Prevent courts from seeing each other's data
+
+## 17. Platform Admin Features
+- Maintain system
+- Manage courts
+- Configure system-wide settings
+
+## 18. Custody Request (Beyond MVP)
+- Non-custodial parent issues custody request
+- Specify custody period
+- Provide reason for request
+- Court reviews custody request
+- Accept/Decline request with court decision note
+- Update custody decision with effective date
+
+## 19. Document Management (Beyond MVP - Optional)
+- Upload documents by any role
+- Secure file storage
+- Audit trail for document uploads
+- Court staff view all documents per case
+- Parents view relevant documents
+- Schools view documents for their students
+
+## 20. Complaint System (Beyond MVP - Optional)
+- File complaint against other parent
+- Select complaint type
+- Upload evidence
+- Court staff review complaints
+- Investigate and gather information
+- Mark complaint as resolved with notes
+- Track complaint history per case
+
+## 21. Compliance Analytics (Beyond MVP - Optional)
+- Calculate visitation attendance rates
+- Calculate alimony payment on-time rates
+- Track violation rate over time
+- Export analytics reports as PDF

@@ -10,6 +10,11 @@ public static class FluentValidationExtensions
     {
         return ruleBuilder
             .Must(value => Enum.TryParse<TEnum>(value, true, out _))
-            .WithMessage(EnumExtensions.AllowedValuesMessage<TEnum>());
+            .WithMessage(AllowedValuesMessage<TEnum>());
+    }
+
+    private static string AllowedValuesMessage<TEnum>() where TEnum : struct, Enum
+    {
+        return $"'{nameof(TEnum)}' must be one of: {string.Join(", ", Enum.GetNames(typeof(TEnum)))}";
     }
 }

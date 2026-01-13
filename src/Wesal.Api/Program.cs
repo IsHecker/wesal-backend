@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Serilog;
+using Wesal.Api.Extensions;
 using Wesal.Api.Middleware;
 using Wesal.Infrastructure;
 using Wesal.Presentation.Endpoints;
@@ -20,6 +21,9 @@ internal class Program
             opts.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
             opts.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerDocumentation();
 
         builder.Services.AddWesal(builder.Configuration);
 
