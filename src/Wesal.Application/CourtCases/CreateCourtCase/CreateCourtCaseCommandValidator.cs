@@ -4,7 +4,7 @@ using Wesal.Domain.Entities.CourtCases;
 
 namespace Wesal.Application.CourtCases.CreateCourtCase;
 
-public sealed class CreateCourtCaseCommandValidator : AbstractValidator<CreateCourtCaseCommand>
+internal sealed class CreateCourtCaseCommandValidator : AbstractValidator<CreateCourtCaseCommand>
 {
     public CreateCourtCaseCommandValidator()
     {

@@ -3,7 +3,7 @@ using Wesal.Application.Families.EnrollFamily.Dtos;
 
 namespace Wesal.Application.Families.EnrollFamily.Validators;
 
-public sealed class CreateChildDtoValidator : AbstractValidator<CreateChildDto>
+internal sealed class CreateChildDtoValidator : AbstractValidator<CreateChildDto>
 {
     public CreateChildDtoValidator()
     {

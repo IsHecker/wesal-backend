@@ -6,7 +6,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Parents.GetParentProfile;
 
-public sealed class GetParentProfileCommandHandler(IParentRepository parentRepository)
+internal sealed class GetParentProfileCommandHandler(IParentRepository parentRepository)
     : IQueryHandler<GetParentProfileQuery, ParentProfileResponse>
 {
     public async Task<Result<ParentProfileResponse>> Handle(

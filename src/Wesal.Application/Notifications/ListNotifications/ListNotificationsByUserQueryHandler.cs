@@ -7,7 +7,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Notifications.ListNotifications;
 
-public sealed class ListNotificationsByUserQueryHandler(INotificationRepository notificationRepository)
+internal sealed class ListNotificationsByUserQueryHandler(INotificationRepository notificationRepository)
     : IQueryHandler<ListNotificationsByUserQuery, ListNotificationsResponse>
 {
     public async Task<Result<ListNotificationsResponse>> Handle(

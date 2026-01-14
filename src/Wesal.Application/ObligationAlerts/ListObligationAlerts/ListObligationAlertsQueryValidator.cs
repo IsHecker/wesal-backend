@@ -1,0 +1,23 @@
+using FluentValidation;
+using Wesal.Application.Extensions;
+using Wesal.Domain.Entities.ObligationAlerts;
+
+namespace Wesal.Application.ObligationAlerts.ListObligationAlerts;
+
+internal sealed class ListObligationAlertsQueryValidator : AbstractValidator<ListObligationAlertsQuery>
+{
+    public ListObligationAlertsQueryValidator()
+    {
+        RuleFor(x => x.UserId)
+            .NotEmpty()
+            .WithMessage("User ID is required");
+
+        RuleFor(x => x.Status!)
+            .MustBeEnumValue<ListObligationAlertsQuery, AlertStatus>()
+            .When(x => !string.IsNullOrWhiteSpace(x.Status));
+
+        RuleFor(x => x.Type!)
+            .MustBeEnumValue<ListObligationAlertsQuery, AlertType>()
+            .When(x => !string.IsNullOrWhiteSpace(x.Status));
+    }
+}

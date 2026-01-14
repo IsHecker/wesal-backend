@@ -14,10 +14,12 @@ using Wesal.Infrastructure.Alimonies;
 using Wesal.Infrastructure.Caching;
 using Wesal.Infrastructure.Children;
 using Wesal.Infrastructure.CourtCases;
+using Wesal.Infrastructure.CourtStaffs;
 using Wesal.Infrastructure.Custodies;
 using Wesal.Infrastructure.Database;
 using Wesal.Infrastructure.Families;
 using Wesal.Infrastructure.Notifications;
+using Wesal.Infrastructure.ObligationAlerts;
 using Wesal.Infrastructure.Parents;
 using Wesal.Infrastructure.PaymentGateway;
 using Wesal.Infrastructure.Payments;
@@ -71,6 +73,8 @@ public static class DependencyInjection
         services.AddScoped<ICustodyRepository, CustodyRepository>();
         services.AddScoped<IAlimonyRepository, AlimonyRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<ICourtStaffRepository, CourtStaffRepository>();
+        services.AddScoped<IObligationAlertRepository, ObligationAlertRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
     }
 

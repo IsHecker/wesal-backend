@@ -4,7 +4,7 @@ using Wesal.Domain.Common;
 
 namespace Wesal.Application.Families.EnrollFamily.Validators;
 
-public sealed class CreateParentDtoValidator : AbstractValidator<CreateParentDto>
+internal sealed class CreateParentDtoValidator : AbstractValidator<CreateParentDto>
 {
     public CreateParentDtoValidator()
     {

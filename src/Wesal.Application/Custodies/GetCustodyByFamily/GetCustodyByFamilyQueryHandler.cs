@@ -7,7 +7,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Custodies.GetCustodyByFamily;
 
-public sealed class GetCustodyByFamilyQueryHandler(
+internal sealed class GetCustodyByFamilyQueryHandler(
     IFamilyRepository familyRepository,
     ICustodyRepository custodyRepository)
     : IQueryHandler<GetCustodyByFamilyQuery, CustodyResponse>

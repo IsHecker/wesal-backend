@@ -10,6 +10,7 @@ public static class ApiEndpoints
     private const string CustodiesBase = $"{ApiBase}/custodies";
     private const string visitationsBase = $"{ApiBase}/visitations";
     private const string PaymentsBase = $"{ApiBase}/payments";
+    private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
     private const string NotificationsBase = $"{ApiBase}/notifications";
 
     public static class Parents
@@ -48,5 +49,11 @@ public static class ApiEndpoints
     public static class Notifications
     {
         public const string ListByUser = $"{NotificationsBase}/me";
+    }
+
+    public static class ObligationAlerts
+    {
+        public const string List = ObligationAlertsBase;
+        public const string UpdateStatus = $"{ObligationAlertsBase}/{{alertId:guid}}/status";
     }
 }

@@ -4,7 +4,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Infrastructure.PaymentGateway;
 
-public sealed class PaymentGatewayService : IPaymentGatewayService
+internal sealed class PaymentGatewayService : IPaymentGatewayService
 {
     public async Task<Result> ProcessPaymentAsync(
         long amount,

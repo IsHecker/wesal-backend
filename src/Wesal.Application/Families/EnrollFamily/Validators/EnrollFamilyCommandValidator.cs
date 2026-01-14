@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace Wesal.Application.Families.EnrollFamily.Validators;
 
-public sealed class EnrollFamilyCommandValidator : AbstractValidator<EnrollFamilyCommand>
+internal sealed class EnrollFamilyCommandValidator : AbstractValidator<EnrollFamilyCommand>
 {
     public EnrollFamilyCommandValidator()
     {

@@ -9,7 +9,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Visitations.ListVisitationsByFamily;
 
-public sealed class ListVisitationsByFamilyQueryHandler(
+internal sealed class ListVisitationsByFamilyQueryHandler(
     IFamilyRepository familyRepository,
     IWesalDbContext context)
     : IQueryHandler<ListVisitationsByFamilyQuery, PagedResponse<VisitationResponse>>

@@ -12,8 +12,7 @@ namespace Wesal.Application.Families.EnrollFamily;
 internal sealed class EnrollFamilyCommandHandler(
     IParentRepository parentRepository,
     IFamilyRepository familyRepository,
-    IChildRepository childRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
+    IChildRepository childRepository) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
 {
     public async Task<Result<EnrollFamilyResponse>> Handle(
         EnrollFamilyCommand request,
@@ -66,8 +65,6 @@ internal sealed class EnrollFamilyCommandHandler(
 
             await childRepository.AddAsync(child, cancellationToken);
         }
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new EnrollFamilyResponse(family.Id, "", "");
     }

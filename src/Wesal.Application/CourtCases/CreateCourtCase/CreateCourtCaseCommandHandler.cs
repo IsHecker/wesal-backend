@@ -8,10 +8,9 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.CourtCases.CreateCourtCase;
 
-public sealed class CreateCourtCaseHandler(
+internal sealed class CreateCourtCaseHandler(
     ICourtCaseRepository courtCaseRepository,
-    IFamilyRepository familyRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<CreateCourtCaseCommand, Guid>
+    IFamilyRepository familyRepository) : ICommandHandler<CreateCourtCaseCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(
         CreateCourtCaseCommand request,
@@ -35,7 +34,6 @@ public sealed class CreateCourtCaseHandler(
             request.DecisionSummary);
 
         await courtCaseRepository.AddAsync(courtCase, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return courtCase.Id;
     }

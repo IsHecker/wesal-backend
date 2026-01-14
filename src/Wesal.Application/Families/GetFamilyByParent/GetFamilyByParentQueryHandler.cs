@@ -6,7 +6,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Families.GetFamilyByParent;
 
-public sealed class GetFamilyByParentQueryHandler(
+internal sealed class GetFamilyByParentQueryHandler(
     IFamilyRepository familyRepository)
     : IQueryHandler<GetFamilyByParentQuery, FamilyResponse>
 {

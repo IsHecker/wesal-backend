@@ -9,12 +9,11 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Payments.MakeAlimonyPayment;
 
-public sealed class MakeAlimonyPaymentCommandHandler(
+internal sealed class MakeAlimonyPaymentCommandHandler(
     IAlimonyRepository alimonyRepository,
     IPaymentRepository paymentRepository,
     IPaymentGatewayService paymentGateway,
-    INotificationService notificationService,
-    IUnitOfWork unitOfWork) : ICommandHandler<MakeAlimonyPaymentCommand, Guid>
+    INotificationService notificationService) : ICommandHandler<MakeAlimonyPaymentCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(
         MakeAlimonyPaymentCommand request,
@@ -65,8 +64,6 @@ public sealed class MakeAlimonyPaymentCommandHandler(
         await paymentRepository.AddAsync(payment, cancellationToken);
 
         // TODO: Record payment
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await notificationService.SendPaymentConfirmationAsync(
             alimony.PayerId,

@@ -9,7 +9,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Payments.ListPaymentsByFamily;
 
-public sealed class ListPaymentsByFamilyQueryHandler(
+internal sealed class ListPaymentsByFamilyQueryHandler(
     IFamilyRepository familyRepository,
     IAlimonyRepository alimonyRepository,
     IWesalDbContext context)

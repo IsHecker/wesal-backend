@@ -4,7 +4,7 @@ using Wesal.Domain.Entities.Payments;
 
 namespace Wesal.Application.Payments.MakeAlimonyPayment;
 
-public sealed class MakeAlimonyPaymentCommandValidator : AbstractValidator<MakeAlimonyPaymentCommand>
+internal sealed class MakeAlimonyPaymentCommandValidator : AbstractValidator<MakeAlimonyPaymentCommand>
 {
     public MakeAlimonyPaymentCommandValidator()
     {

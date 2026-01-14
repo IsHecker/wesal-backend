@@ -2,6 +2,7 @@ using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Parents;
+using Wesal.Domain.Results;
 
 namespace Wesal.Domain.Entities.ObligationAlerts;
 
@@ -56,5 +57,39 @@ public sealed class ObligationAlert : Entity
             ResolvedAt = resolvedAt,
             ResolutionNotes = resolutionNotes,
         };
+    }
+
+    public Result UpdateStatus(AlertStatus status, string? resolutionNotes)
+    {
+        return status switch
+        {
+            AlertStatus.UnderReview => MarkAsUnderReview(),
+            AlertStatus.Resolved => Resolve(resolutionNotes!, DateTime.UtcNow),
+            _ => Result.Success
+        };
+    }
+
+    private Result MarkAsUnderReview()
+    {
+        if (Status == AlertStatus.Resolved)
+            return ObligationAlertErrors.CannotModifyResolved();
+
+        if (Status == AlertStatus.UnderReview)
+            return ObligationAlertErrors.AlreadyUnderReview();
+
+        Status = AlertStatus.UnderReview;
+        return Result.Success;
+    }
+
+    private Result Resolve(string resolutionNotes, DateTime resolvedAt)
+    {
+        if (Status == AlertStatus.Resolved)
+            return ObligationAlertErrors.AlreadyResolved();
+
+        Status = AlertStatus.Resolved;
+        ResolutionNotes = resolutionNotes;
+        ResolvedAt = resolvedAt;
+
+        return Result.Success;
     }
 }

@@ -10,7 +10,7 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.CourtCases.ListCourtCasesByFamily;
 
-public sealed class ListCourtCasesByFamilyQueryHandler(
+internal sealed class ListCourtCasesByFamilyQueryHandler(
     IFamilyRepository familyRepository,
     IWesalDbContext context)
     : IQueryHandler<ListCourtCasesByFamilyQuery, PagedResponse<CourtCaseResponse>>
