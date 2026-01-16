@@ -48,7 +48,6 @@ internal sealed class ListObligationAlertsQueryHandler(
                 alert.Id,
                 alert.CourtId,
                 alert.ParentId,
-                alert.CourtCaseId,
                 alert.RelatedEntityId,
                 alert.Type.ToString(),
                 alert.Description,

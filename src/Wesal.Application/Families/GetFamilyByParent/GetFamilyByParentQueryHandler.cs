@@ -1,4 +1,5 @@
-using Wesal.Application.Abstractions.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
 using Wesal.Domain.Entities.Families;
@@ -7,7 +8,7 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Families.GetFamilyByParent;
 
 internal sealed class GetFamilyByParentQueryHandler(
-    IFamilyRepository familyRepository)
+    IWesalDbContext context)
     : IQueryHandler<GetFamilyByParentQuery, FamilyResponse>
 {
     public async Task<Result<FamilyResponse>> Handle(
@@ -16,7 +17,12 @@ internal sealed class GetFamilyByParentQueryHandler(
     {
         // TODO: support multiple families for Father.
 
-        var family = await familyRepository.GetByParentIdAsync(request.ParentId, cancellationToken);
+        var family = await context.Families
+            .Include(family => family.Father)
+            .Include(family => family.Mother)
+            .Include(family => family.Children)
+            .FirstOrDefaultAsync(family => family.FatherId == request.ParentId
+                || family.MotherId == request.ParentId, cancellationToken);
 
         if (family is null)
             return FamilyErrors.NotFoundByParent(request.ParentId);

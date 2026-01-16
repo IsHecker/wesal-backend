@@ -24,7 +24,7 @@ internal sealed class ListVisitationsByFamilyQueryHandler(
             return FamilyErrors.NotFound(request.FamilyId);
 
         var scheduledVisitations = context.Visitations
-            .Where(vistation => vistation.FamilyId == request.FamilyId);
+            .Where(vistation => vistation.CCFamilyId == request.FamilyId);
 
         _ = scheduledVisitations.TryGetNonEnumeratedCount(out var totalCount);
 
@@ -32,11 +32,13 @@ internal sealed class ListVisitationsByFamilyQueryHandler(
             .Paginate(request.Pagination)
             .Select(visitation => new VisitationResponse(
                 visitation.Id,
-                visitation.FamilyId,
-                visitation.ParentId,
-                visitation.LocationId,
-                visitation.VisitationScheduleId,
-                visitation.ScheduledVisitAt,
+                visitation.CCFamilyId,
+                visitation.CCParentId,
+                visitation.CCLocationId,
+                visitation.CCVisitationScheduleId,
+                visitation.Date,
+                visitation.StartTime,
+                visitation.EndTime,
                 visitation.VisitedAt,
                 visitation.Status.ToString(),
                 visitation.IsCheckedIn,

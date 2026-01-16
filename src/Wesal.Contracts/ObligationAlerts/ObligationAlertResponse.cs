@@ -4,7 +4,6 @@ public record struct ObligationAlertResponse(
     Guid Id,
     Guid CourtId,
     Guid ParentId,
-    Guid CourtCaseId,
     Guid RelatedEntityId,
     string Type,
     string Description,

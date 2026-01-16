@@ -5,6 +5,5 @@ public enum AlimonyFrequency
     Daily,
     Weekly,
     Monthly,
-    Quarterly,
     Yearly
 }

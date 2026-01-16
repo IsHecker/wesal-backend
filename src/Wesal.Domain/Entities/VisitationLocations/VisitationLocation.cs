@@ -1,6 +1,4 @@
 using Wesal.Domain.DomainEvents;
-using Wesal.Domain.Entities.Visitations;
-using Wesal.Domain.Entities.VisitationSchedules;
 
 namespace Wesal.Domain.Entities.VisitationLocations;
 
@@ -15,9 +13,6 @@ public sealed class VisitationLocation : Entity
 
     public string? Notes { get; private set; }
     public string? ContactNumber { get; private set; }
-
-    public ICollection<VisitationSchedule> VisitationSchedules { get; private set; } = [];
-    public ICollection<Visitation> Visitations { get; private set; } = [];
 
     private VisitationLocation() { }
 

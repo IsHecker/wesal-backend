@@ -20,9 +20,14 @@ using Wesal.Infrastructure.Database;
 using Wesal.Infrastructure.Families;
 using Wesal.Infrastructure.Notifications;
 using Wesal.Infrastructure.ObligationAlerts;
+using Wesal.Infrastructure.ObligationAlerts.MissedVisitationsDetection;
+using Wesal.Infrastructure.ObligationAlerts.OverdueAlimonyPaymentsDetection;
 using Wesal.Infrastructure.Parents;
+using Wesal.Infrastructure.PaymentDues;
+using Wesal.Infrastructure.PaymentDues.PaymentDuesGeneration;
 using Wesal.Infrastructure.PaymentGateway;
 using Wesal.Infrastructure.Payments;
+using Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
 using Wesal.Presentation.Endpoints;
 
 namespace Wesal.Infrastructure;
@@ -62,6 +67,7 @@ public static class DependencyInjection
 
         services.AddRepositories();
         services.AddServices();
+        services.AddBackgroundJobs(configuration);
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -72,6 +78,7 @@ public static class DependencyInjection
         services.AddScoped<ICourtCaseRepository, CourtCaseRepository>();
         services.AddScoped<ICustodyRepository, CustodyRepository>();
         services.AddScoped<IAlimonyRepository, AlimonyRepository>();
+        services.AddScoped<IPaymentDueRepository, PaymentDueRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<ICourtStaffRepository, CourtStaffRepository>();
         services.AddScoped<IObligationAlertRepository, ObligationAlertRepository>();
@@ -82,5 +89,31 @@ public static class DependencyInjection
     {
         services.AddScoped<IPaymentGatewayService, PaymentGatewayService>();
         services.AddScoped<INotificationService, NotificationService>();
+    }
+
+    private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<GenerateVisitationSessionsOptions>(
+            configuration.GetSection(GenerateVisitationSessionsOptions.SectionName));
+
+        services.ConfigureOptions<GenerateVisitationSessionsJobConfiguration>();
+
+
+        services.Configure<GeneratePaymentDuesOptions>(
+            configuration.GetSection(GeneratePaymentDuesOptions.SectionName));
+
+        services.ConfigureOptions<GeneratePaymentDuesJobConfiguration>();
+
+
+        services.Configure<DetectMissedVisitationsOptions>(
+            configuration.GetSection(DetectMissedVisitationsOptions.SectionName));
+
+        services.ConfigureOptions<DetectMissedVisitationsJobConfiguration>();
+
+
+        services.Configure<DetectOverdueAlimonyPaymentsOptions>(
+            configuration.GetSection(DetectOverdueAlimonyPaymentsOptions.SectionName));
+
+        services.ConfigureOptions<DetectOverdueAlimonyPaymentsJobConfiguration>();
     }
 }

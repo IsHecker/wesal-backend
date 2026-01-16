@@ -4,6 +4,7 @@ using Wesal.Application.Data;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Alimonies;
+using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
 using Wesal.Domain.Results;
 
@@ -12,6 +13,7 @@ namespace Wesal.Application.Payments.MakeAlimonyPayment;
 internal sealed class MakeAlimonyPaymentCommandHandler(
     IAlimonyRepository alimonyRepository,
     IPaymentRepository paymentRepository,
+    IPaymentDueRepository paymentDueRepository,
     IPaymentGatewayService paymentGateway,
     INotificationService notificationService) : ICommandHandler<MakeAlimonyPaymentCommand, Guid>
 {
@@ -29,12 +31,21 @@ internal sealed class MakeAlimonyPaymentCommandHandler(
         if (request.Amount != alimony.Amount)
             return PaymentErrors.InvalidAmount(request.Amount, alimony.Amount);
 
+        var paymentDue = await paymentDueRepository.GetByIdAsync(request.PaymetDueId, cancellationToken);
+        if (paymentDue is null)
+            return PaymentDueErrors.NotFound(request.PaymetDueId);
+
+        if (paymentDue.IsPaid)
+            return PaymentDueErrors.IsAlreadyPaid;
+
+        if (paymentDue.IsDueDatePassed)
+            return PaymentDueErrors.DueDatePassed;
+
         var paymentMethod = request.PaymentMethod.ToEnum<PaymentMethod>();
 
         // TODO: Process payment using by a payment gateway.
         var gatewayResult = await paymentGateway.ProcessPaymentAsync(
             request.Amount,
-            alimony.Currency,
             paymentMethod,
             cancellationToken);
 
@@ -42,6 +53,7 @@ internal sealed class MakeAlimonyPaymentCommandHandler(
         {
             var failedPayment = Payment.Create(
                 alimony.Id,
+                request.PaymetDueId,
                 request.Amount,
                 PaymentStatus.Failed,
                 paymentMethod,
@@ -55,21 +67,24 @@ internal sealed class MakeAlimonyPaymentCommandHandler(
 
         var payment = Payment.Create(
             alimony.Id,
+            request.PaymetDueId,
             request.Amount,
-            PaymentStatus.Completed,
+            PaymentStatus.Paid,
             paymentMethod,
             "ReceiptUrl",
             DateTime.UtcNow);
 
+        paymentDue.MarkAsPaid(payment.Id);
+
         await paymentRepository.AddAsync(payment, cancellationToken);
+        paymentDueRepository.Update(paymentDue);
 
         // TODO: Record payment
 
         await notificationService.SendPaymentConfirmationAsync(
             alimony.PayerId,
-            alimony.ReceiverId,
+            alimony.RecipientId,
             request.Amount,
-            alimony.Currency,
             payment.ReceiptUrl,
             cancellationToken);
 

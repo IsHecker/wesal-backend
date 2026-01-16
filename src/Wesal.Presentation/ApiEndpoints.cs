@@ -9,6 +9,7 @@ public static class ApiEndpoints
     private const string CourtCasesBase = $"{ApiBase}/court-cases";
     private const string CustodiesBase = $"{ApiBase}/custodies";
     private const string visitationsBase = $"{ApiBase}/visitations";
+    private const string PaymentsDueBase = $"{ApiBase}/payments-due";
     private const string PaymentsBase = $"{ApiBase}/payments";
     private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
     private const string NotificationsBase = $"{ApiBase}/notifications";
@@ -40,9 +41,14 @@ public static class ApiEndpoints
         public const string ListByFamily = $"{visitationsBase}/{{familyId:guid}}";
     }
 
+    public static class PaymentsDue
+    {
+        public const string ListByFamily = $"{PaymentsDueBase}/{{familyId:guid}}";
+    }
+
     public static class Payments
     {
-        public const string ListByFamily = $"{PaymentsBase}/{{familyId:guid}}";
+        public const string ListByPaymentDue = $"{PaymentsBase}/{{paymetDueId:guid}}";
         public const string MakeAlimony = PaymentsBase;
     }
 

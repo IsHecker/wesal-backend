@@ -5,5 +5,6 @@ namespace Wesal.Application.Payments.MakeAlimonyPayment;
 public record struct MakeAlimonyPaymentCommand(
     Guid PayerId,
     Guid AlimonyId,
+    Guid PaymetDueId,
     long Amount,
     string PaymentMethod) : ICommand<Guid>;

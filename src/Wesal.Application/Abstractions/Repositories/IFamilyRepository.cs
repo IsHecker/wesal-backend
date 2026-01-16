@@ -5,5 +5,5 @@ namespace Wesal.Application.Abstractions.Repositories;
 
 public interface IFamilyRepository : IRepository<Family>
 {
-    Task<Family?> GetByParentIdAsync(Guid parentId, CancellationToken cancellationToken = default);
+
 }

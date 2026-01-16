@@ -8,8 +8,8 @@ public sealed class CourtStaff : Entity
 
     public Guid CourtId { get; private set; }
 
+    public string Email { get; private set; } = null!;
     public string FullName { get; private set; } = null!;
-    public string? Email { get; private set; }
     public string? Phone { get; private set; }
 
     private CourtStaff() { }
@@ -17,8 +17,8 @@ public sealed class CourtStaff : Entity
     public static CourtStaff Create(
         Guid userId,
         Guid courtId,
+        string email,
         string fullName,
-        string? email = null,
         string? phone = null)
     {
         return new CourtStaff

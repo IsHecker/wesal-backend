@@ -15,11 +15,12 @@ internal sealed class MakeAlimonyPayment : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(ApiEndpoints.Payments.MakeAlimony, async (Request request, ISender sender, ClaimsPrincipal user) =>
+        app.MapPost(ApiEndpoints.Payments.MakeAlimony, async (Request request, ISender sender) =>
         {
             var result = await sender.Send(new MakeAlimonyPaymentCommand(
                 SharedData.UserId,
                 request.AlimonyId,
+                request.PaymentDueId,
                 request.Amount,
                 request.PaymentMethod));
 
@@ -35,6 +36,7 @@ internal sealed class MakeAlimonyPayment : IEndpoint
 
     internal readonly record struct Request(
         Guid AlimonyId,
+        Guid PaymentDueId,
         long Amount,
         string PaymentMethod);
 }

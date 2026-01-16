@@ -7,10 +7,9 @@ public sealed class Alimony : Entity
     public Guid CourtCaseId { get; private set; }
     public Guid FamilyId { get; private set; }
     public Guid PayerId { get; private set; }
-    public Guid ReceiverId { get; private set; }
+    public Guid RecipientId { get; private set; }
 
     public long Amount { get; private set; }
-    public string Currency { get; private set; } = null!;
 
     public AlimonyFrequency Frequency { get; private set; }
 
@@ -28,9 +27,8 @@ public sealed class Alimony : Entity
         Guid courtCaseId,
         Guid familyId,
         Guid payerId,
-        Guid receiverId,
+        Guid recipientId,
         long amount,
-        string currency,
         DateTime startAt,
         DateTime endAt)
     {
@@ -39,9 +37,8 @@ public sealed class Alimony : Entity
             FamilyId = familyId,
             CourtCaseId = courtCaseId,
             PayerId = payerId,
-            ReceiverId = receiverId,
+            RecipientId = recipientId,
             Amount = amount,
-            Currency = currency,
             StartAt = startAt,
             EndAt = endAt,
         };

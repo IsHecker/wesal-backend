@@ -4,9 +4,8 @@ public interface INotificationService
 {
     Task SendPaymentConfirmationAsync(
         Guid payerId,
-        Guid receiverId,
+        Guid recipientId,
         long amount,
-        string currency,
         string receiptUrl,
         CancellationToken cancellationToken = default);
 }

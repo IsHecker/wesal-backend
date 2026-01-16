@@ -1,7 +1,4 @@
 using Wesal.Domain.DomainEvents;
-using Wesal.Domain.Entities.CourtCases;
-using Wesal.Domain.Entities.FamilyCourts;
-using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
 
 namespace Wesal.Domain.Entities.ObligationAlerts;
@@ -9,11 +6,10 @@ namespace Wesal.Domain.Entities.ObligationAlerts;
 public sealed class ObligationAlert : Entity
 {
     public Guid ParentId { get; private set; }
-    public Guid CourtCaseId { get; private set; }
+    public Guid CourtId { get; private set; }
 
     // ID of the record that caused the alert (e.g., VisitId or PaymentId).
     public Guid RelatedEntityId { get; private set; }
-    public Guid CourtId { get; private set; }
 
     public AlertType Type { get; private set; }
     public string Description { get; private set; } = null!;
@@ -26,15 +22,10 @@ public sealed class ObligationAlert : Entity
 
     public string ResolutionNotes { get; private set; } = null!;
 
-    public Parent Parent { get; private set; } = null!;
-    public CourtCase CourtCase { get; private set; } = null!;
-    public FamilyCourt Court { get; private set; } = null!;
-
     private ObligationAlert() { }
 
     public static ObligationAlert Create(
         Guid parentId,
-        Guid courtCaseId,
         Guid relatedEntityId,
         Guid courtId,
         AlertType type,
@@ -47,7 +38,6 @@ public sealed class ObligationAlert : Entity
         return new ObligationAlert
         {
             ParentId = parentId,
-            CourtCaseId = courtCaseId,
             RelatedEntityId = relatedEntityId,
             CourtId = courtId,
             Type = type,

@@ -788,12 +788,12 @@ Notifications: 2 unread
 - ✅Validate and save case data
 
 ## 4. Parent Interactions - View Access
-- ✅View basic family information
+- ✅View family information
 - ✅View children information
 - ✅View custody decision
 - ✅View current court case status and details
 - ✅View visitation schedules (upcoming and past)
-- View alimony obligations/schedules
+- ✅View alimony obligations/schedules
 - ✅View payment history and receipts
 - ✅View notifications and alerts
 - ✅View receipts history for evidence
@@ -801,14 +801,13 @@ Notifications: 2 unread
 ## 5. Parent Interactions - Actions
 - ✅Make alimony payments
 - File complaints (optional)
-- Confirm attendance for upcoming visit (optional)
 
-## 6. Automatic Visitation Generation
-- Read defined Visitation Schedules
-- Calculate next month/12 months of visitation dates
-- Create individual Visitation records based on frequency
-- Save Visitation sessions to database
-- Send notification to non-custodial parent with upcoming visits
+## 6. ✅Automatic Visitation Generation
+- ✅Read defined Visitation Schedules
+- ✅Calculate next month/12 months of visitation dates
+- ✅Create individual Visitation records based on frequency
+- ✅Save Visitation sessions to database
+- ✅Send notification to non-custodial parent with upcoming visits
 
 ## 7. Visitation Attendance Recording
 - Send reminder notification 24 hours before visit
@@ -868,15 +867,7 @@ Notifications: 2 unread
 - Send notifications to users
 - Track notification status
 
-## 14. Parent Dashboard
-- Login with National ID
-- View family information
-- View court case summary
-- View upcoming and past visitations
-- View alimony obligations and payment history
-- View notifications
-
-## 15. Court Staff Dashboard
+## 14. Court Staff Dashboard
 - Login
 - View total families registered
 - View active court cases
@@ -887,17 +878,17 @@ Notifications: 2 unread
 - Navigate to view violations
 - Navigate to manage users
 
-## 16. Multi-Court & Court Isolation Support
+## 15. Multi-Court & Court Isolation Support
 - Create new court instances (Platform Admin)
 - Ensure court data isolation
 - Prevent courts from seeing each other's data
 
-## 17. Platform Admin Features
+## 16. Platform Admin Features
 - Maintain system
 - Manage courts
 - Configure system-wide settings
 
-## 18. Custody Request (Beyond MVP)
+## 17. Custody Request (Beyond MVP)
 - Non-custodial parent issues custody request
 - Specify custody period
 - Provide reason for request
@@ -905,7 +896,7 @@ Notifications: 2 unread
 - Accept/Decline request with court decision note
 - Update custody decision with effective date
 
-## 19. Document Management (Beyond MVP - Optional)
+## 18. Document Management (Beyond MVP - Optional)
 - Upload documents by any role
 - Secure file storage
 - Audit trail for document uploads
@@ -913,7 +904,7 @@ Notifications: 2 unread
 - Parents view relevant documents
 - Schools view documents for their students
 
-## 20. Complaint System (Beyond MVP - Optional)
+## 19. Complaint System (Beyond MVP - Optional)
 - File complaint against other parent
 - Select complaint type
 - Upload evidence
@@ -922,7 +913,7 @@ Notifications: 2 unread
 - Mark complaint as resolved with notes
 - Track complaint history per case
 
-## 21. Compliance Analytics (Beyond MVP - Optional)
+## 20. Compliance Analytics (Beyond MVP - Optional)
 - Calculate visitation attendance rates
 - Calculate alimony payment on-time rates
 - Track violation rate over time

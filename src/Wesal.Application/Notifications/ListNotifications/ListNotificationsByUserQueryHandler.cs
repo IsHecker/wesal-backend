@@ -14,15 +14,15 @@ internal sealed class ListNotificationsByUserQueryHandler(INotificationRepositor
         ListNotificationsByUserQuery request,
         CancellationToken cancellationToken)
     {
-        var allNotifications = await notificationRepository.GetByRecipientIdAsync(
+        var notifications = await notificationRepository.GetByRecipientIdAsync(
             request.RecipientId,
             cancellationToken);
 
         var filteredNotifications = request.UnreadOnly
-            ? allNotifications.Where(n => n.Status == NotificationStatus.Unread)
-            : allNotifications;
+            ? notifications.Where(n => n.Status == NotificationStatus.Unread)
+            : notifications;
 
-        _ = allNotifications.TryGetNonEnumeratedCount(out var totalCount);
+        _ = notifications.TryGetNonEnumeratedCount(out var totalCount);
         _ = filteredNotifications.TryGetNonEnumeratedCount(out var unreadCount);
 
         var pagedNotifications = await filteredNotifications

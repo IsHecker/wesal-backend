@@ -1,5 +1,4 @@
 using Wesal.Domain.DomainEvents;
-using Wesal.Domain.Entities.Parents;
 
 namespace Wesal.Domain.Entities.Notifications;
 
@@ -13,8 +12,6 @@ public sealed class Notification : Entity
 
     public DateTime SentAt { get; private set; }
     public DateTime? ReadAt { get; private set; }
-
-    public Parent Recipient { get; private set; } = null!;
 
     private Notification() { }
 

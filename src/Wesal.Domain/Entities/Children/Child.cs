@@ -1,8 +1,4 @@
 using Wesal.Domain.DomainEvents;
-using Wesal.Domain.Entities.ChildReports;
-using Wesal.Domain.Entities.Custodies;
-using Wesal.Domain.Entities.Families;
-using Wesal.Domain.Entities.Schools;
 
 namespace Wesal.Domain.Entities.Children;
 
@@ -15,13 +11,6 @@ public sealed class Child : Entity
     public string FullName { get; private set; } = null!;
     public DateTime BirthDate { get; private set; }
     public string Gender { get; private set; } = null!;
-
-
-    public Family Family { get; private set; } = null!;
-    public School? School { get; private set; }
-    public ICollection<ChildReport> ChildReports { get; private set; } = [];
-
-    public Custody Custody { get; private set; } = null!;
 
     private Child() { }
 

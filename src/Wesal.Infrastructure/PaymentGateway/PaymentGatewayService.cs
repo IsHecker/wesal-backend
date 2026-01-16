@@ -8,7 +8,6 @@ internal sealed class PaymentGatewayService : IPaymentGatewayService
 {
     public async Task<Result> ProcessPaymentAsync(
         long amount,
-        string currency,
         PaymentMethod paymentMethod,
         CancellationToken cancellationToken = default)
     {
