@@ -8,7 +8,7 @@ internal sealed class ListObligationAlertsQueryValidator : AbstractValidator<Lis
 {
     public ListObligationAlertsQueryValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.StaffId)
             .NotEmpty()
             .WithMessage("User ID is required");
 

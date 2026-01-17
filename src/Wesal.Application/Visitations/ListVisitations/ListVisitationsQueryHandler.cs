@@ -33,10 +33,10 @@ internal sealed class ListVisitationsQueryHandler(
             .Paginate(request.Pagination)
             .Select(visitation => new VisitationResponse(
                 visitation.Id,
-                visitation.CCFamilyId,
-                visitation.CCParentId,
-                visitation.CCLocationId,
-                visitation.CCVisitationScheduleId,
+                visitation.FamilyId,
+                visitation.ParentId,
+                visitation.LocationId,
+                visitation.VisitationScheduleId,
                 visitation.Date,
                 visitation.StartTime,
                 visitation.EndTime,
@@ -76,10 +76,10 @@ internal sealed class ListVisitationsQueryHandler(
         var query = context.Visitations.AsQueryable();
 
         if (request.FamilyId.HasValue)
-            query = query.Where(v => v.CCFamilyId == request.FamilyId.Value);
+            query = query.Where(v => v.FamilyId == request.FamilyId.Value);
 
         if (parentId.HasValue && parentId != Guid.Empty)
-            query = query.Where(v => v.CCParentId == parentId.Value);
+            query = query.Where(v => v.ParentId == parentId.Value);
 
         if (!string.IsNullOrWhiteSpace(request.Status))
         {

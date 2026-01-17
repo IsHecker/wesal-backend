@@ -5,10 +5,12 @@ public static class ApiEndpoints
     private const string ApiBase = "api";
 
     private const string ParentsBase = $"{ApiBase}/parents";
+    private const string SchoolsBase = $"{ApiBase}/schools";
     private const string FamiliesBase = $"{ApiBase}/families";
     private const string CourtCasesBase = $"{ApiBase}/court-cases";
     private const string CustodiesBase = $"{ApiBase}/custodies";
     private const string visitationsBase = $"{ApiBase}/visitations";
+    private const string visitationLocationsBase = $"{ApiBase}/visitation-locations";
     private const string PaymentsDueBase = $"{ApiBase}/payments-due";
     private const string PaymentsBase = $"{ApiBase}/payments";
     private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
@@ -17,6 +19,12 @@ public static class ApiEndpoints
     public static class Parents
     {
         public const string Profile = $"{ParentsBase}/me";
+    }
+
+    public static class Schools
+    {
+        public const string List = SchoolsBase;
+        public const string Register = SchoolsBase;
     }
 
     public static class Families
@@ -43,6 +51,13 @@ public static class ApiEndpoints
         public const string List = visitationsBase;
         public const string CheckIn = $"{GetById}/check-in";
         public const string Complete = $"{GetById}/complete";
+    }
+
+    public static class VisitationLocations
+    {
+        public const string List = visitationLocationsBase;
+        public const string Create = visitationLocationsBase;
+        public const string Update = $"{visitationLocationsBase}/{{locationId:guid}}";
     }
 
     public static class PaymentsDue

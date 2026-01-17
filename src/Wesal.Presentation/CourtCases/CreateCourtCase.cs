@@ -15,15 +15,15 @@ internal sealed class CreateCourtCase : IEndpoint
     {
         app.MapPost(ApiEndpoints.CourtCases.Create, async (Request request, ISender sender) =>
         {
-            var command = new CreateCourtCaseCommand(
+            var result = await sender.Send(new CreateCourtCaseCommand(
                 request.CourtId,
                 request.FamilyId,
                 request.CaseNumber,
                 request.FiledAt,
                 request.Status,
-                request.DecisionSummary);
+                request.DecisionSummary));
 
-            return (await sender.Send(command)).MatchResponse(Results.Ok, ApiResults.Problem);
+            return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
         .WithTags(Tags.CourtCases)
         .Produces<Guid>(StatusCodes.Status200OK)

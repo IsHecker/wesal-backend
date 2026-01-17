@@ -12,9 +12,8 @@ internal static class SwaggerExtensions
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Enforcer API",
-                Version = "v1",
-                Description = "Enforcer API built using the modular monolith architecture."
+                Title = "Wesal API",
+                Version = "v1"
             });
 
             options.CustomSchemaIds(t => t.FullName?.Replace("+", "."));

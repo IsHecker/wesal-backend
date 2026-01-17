@@ -20,12 +20,12 @@ internal sealed class ListObligationAlertsQueryHandler(
     {
         IEnumerable<ObligationAlert> alerts;
 
-        var staff = await courtStaffRepository.GetByIdAsync(request.UserId, cancellationToken);
+        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
 
         if (staff is null)
         {
             return Result.Failure<ObligationAlertsResponse>(
-                CourtStaffErrors.NotFound(request.UserId));
+                CourtStaffErrors.NotFound(request.StaffId));
         }
 
         alerts = context.ObligationAlerts

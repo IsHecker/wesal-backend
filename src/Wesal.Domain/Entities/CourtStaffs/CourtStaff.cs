@@ -1,4 +1,5 @@
 using Wesal.Domain.DomainEvents;
+using Wesal.Domain.Entities.FamilyCourts;
 
 namespace Wesal.Domain.Entities.CourtStaffs;
 
@@ -11,6 +12,8 @@ public sealed class CourtStaff : Entity
     public string Email { get; private set; } = null!;
     public string FullName { get; private set; } = null!;
     public string? Phone { get; private set; }
+
+    public FamilyCourt Court { get; private set; } = null!;
 
     private CourtStaff() { }
 

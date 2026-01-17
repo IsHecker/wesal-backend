@@ -1,10 +1,10 @@
-﻿using Enforcer.Common.Application;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Quartz;
+using Wesal.Application;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
@@ -29,6 +29,8 @@ using Wesal.Infrastructure.PaymentDues;
 using Wesal.Infrastructure.PaymentDues.PaymentDuesGeneration;
 using Wesal.Infrastructure.PaymentGateway;
 using Wesal.Infrastructure.Payments;
+using Wesal.Infrastructure.Schools;
+using Wesal.Infrastructure.VisitationLocations;
 using Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
 using Wesal.Presentation.Endpoints;
 
@@ -84,10 +86,12 @@ public static class DependencyInjection
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         services.AddScoped<IParentRepository, ParentRepository>();
+        services.AddScoped<ISchoolRepository, SchoolRepository>();
         services.AddScoped<IFamilyRepository, FamilyRepository>();
         services.AddScoped<IChildRepository, ChildRepository>();
         services.AddScoped<ICourtCaseRepository, CourtCaseRepository>();
         services.AddScoped<ICustodyRepository, CustodyRepository>();
+        services.AddScoped<IVisitationLocationRepository, VisitationLocationRepository>();
         services.AddScoped<IAlimonyRepository, AlimonyRepository>();
         services.AddScoped<IPaymentDueRepository, PaymentDueRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();

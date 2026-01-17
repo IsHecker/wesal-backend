@@ -22,7 +22,7 @@ internal sealed class ListObligationAlerts : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new ListObligationAlertsQuery(
-                SharedData.UserId,
+                SharedData.StaffId,
                 query.Status,
                 query.Type,
                 pagination));

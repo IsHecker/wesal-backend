@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Wesal.Application;
 using Wesal.Application.Behaviours;
 
-namespace Enforcer.Common.Application;
+namespace Wesal.Application;
 
 public static class ApplicationConfiguration
 {

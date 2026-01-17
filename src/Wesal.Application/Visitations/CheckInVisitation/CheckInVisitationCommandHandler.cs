@@ -22,11 +22,11 @@ internal sealed class CheckInVisitationCommandHandler(
         if (visitation is null)
             return VisitationErrors.NotFound(request.VisitationId);
 
-        var staff = await centerStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
+        var staff = await centerStaffRepository.GetByIdAsync(request.CenterStaffId, cancellationToken);
         if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
+            return CourtStaffErrors.NotFound(request.CenterStaffId);
 
-        var checkInResult = visitation.CheckIn(staff.SomeLocationId, options.Value.GracePeriodMinutes);
+        var checkInResult = visitation.CheckIn(staff.LocationId, options.Value.GracePeriodMinutes);
         if (checkInResult.IsFailure)
             return checkInResult.Error;
 

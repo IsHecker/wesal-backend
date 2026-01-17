@@ -5,24 +5,25 @@
 namespace Wesal.Infrastructure.Database.Migrations
 {
     /// <inheritdoc />
-    public partial class whatever3 : Migration
+    public partial class Edit2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "VisitedAt",
-                table: "Visitations",
-                newName: "CompletedAt");
+            migrationBuilder.AddColumn<string>(
+                name: "Username",
+                table: "Users",
+                type: "nvarchar(max)",
+                nullable: false,
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "CompletedAt",
-                table: "Visitations",
-                newName: "VisitedAt");
+            migrationBuilder.DropColumn(
+                name: "Username",
+                table: "Users");
         }
     }
 }

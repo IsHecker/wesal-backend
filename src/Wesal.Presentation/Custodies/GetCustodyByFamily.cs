@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Custodies.GetCustodyByFamily;
 using Wesal.Contracts.Custodies;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -17,7 +16,7 @@ internal sealed class GetCustodyByFamily : IEndpoint
     {
         app.MapGet(ApiEndpoints.Custodies.GetByFamily, async (Guid familyId, ISender sender) =>
         {
-            var result = await sender.Send(new GetCustodyByFamilyQuery(familyId, SharedData.UserId));
+            var result = await sender.Send(new GetCustodyByFamilyQuery(familyId));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

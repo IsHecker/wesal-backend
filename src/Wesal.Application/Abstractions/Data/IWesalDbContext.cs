@@ -16,6 +16,7 @@ using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitationSchedules;
+using Wesal.Domain.Entities.VisitCenterStaffs;
 
 namespace Wesal.Application.Abstractions.Data;
 
@@ -24,6 +25,7 @@ public interface IWesalDbContext
     DbSet<User> Users { get; init; }
     DbSet<FamilyCourt> FamilyCourts { get; init; }
     DbSet<CourtStaff> CourtStaffs { get; init; }
+    DbSet<VisitCenterStaff> VisitCenterStaffs { get; init; }
     DbSet<Parent> Parents { get; init; }
     DbSet<School> Schools { get; init; }
     DbSet<Family> Families { get; init; }

@@ -17,7 +17,7 @@ internal sealed class GetParentProfile : IEndpoint
     {
         app.MapGet(ApiEndpoints.Parents.Profile, async (ISender sender) =>
         {
-            var result = await sender.Send(new GetParentProfileQuery(SharedData.UserId));
+            var result = await sender.Send(new GetParentProfileQuery(SharedData.FatherId));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

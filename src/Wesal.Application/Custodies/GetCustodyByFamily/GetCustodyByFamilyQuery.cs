@@ -3,5 +3,5 @@ using Wesal.Contracts.Custodies;
 
 namespace Wesal.Application.Custodies.GetCustodyByFamily;
 
-public record struct GetCustodyByFamilyQuery(Guid FamilyId, Guid ParentId)
+public record struct GetCustodyByFamilyQuery(Guid FamilyId)
     : IQuery<CustodyResponse>;

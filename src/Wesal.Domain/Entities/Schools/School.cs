@@ -6,7 +6,7 @@ public sealed class School : Entity
 {
     public Guid UserId { get; private set; }
 
-    public string Email { get; private set; } = null!;
+    public string? Email { get; private set; } = null!;
     public string Name { get; private set; } = null!;
     public string Address { get; private set; } = null!;
     public string Governorate { get; private set; } = null!;

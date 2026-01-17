@@ -17,6 +17,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
@@ -46,50 +47,21 @@ namespace Wesal.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Visitations",
+                name: "VisitCenterStaffs",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCFamilyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCVisitationScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCVerifiedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    VisitedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsCheckedIn = table.Column<bool>(type: "bit", nullable: false),
-                    CheckedInAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Visitations", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "VisitationSchedules",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCCourtCaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCFamilyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CCLocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StartDayInMonth = table.Column<int>(type: "int", nullable: false),
-                    Frequency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
-                    LastGeneratedDate = table.Column<DateOnly>(type: "date", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_VisitationSchedules", x => x.Id);
+                    table.PrimaryKey("PK_VisitCenterStaffs", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -439,6 +411,97 @@ namespace Wesal.Infrastructure.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VisitationSchedules",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CourtCaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FamilyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StartDayInMonth = table.Column<int>(type: "int", nullable: false),
+                    Frequency = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    LastGeneratedDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VisitationSchedules", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VisitationSchedules_CourtCases_CourtCaseId",
+                        column: x => x.CourtCaseId,
+                        principalTable: "CourtCases",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_VisitationSchedules_Families_FamilyId",
+                        column: x => x.FamilyId,
+                        principalTable: "Families",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_VisitationSchedules_Parents_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Parents",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_VisitationSchedules_VisitationLocations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "VisitationLocations",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Visitations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FamilyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VisitationScheduleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VerifiedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    StartTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CheckedInAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Visitations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Visitations_CourtStaffs_VerifiedById",
+                        column: x => x.VerifiedById,
+                        principalTable: "CourtStaffs",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visitations_Families_FamilyId",
+                        column: x => x.FamilyId,
+                        principalTable: "Families",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visitations_Parents_ParentId",
+                        column: x => x.ParentId,
+                        principalTable: "Parents",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visitations_VisitationLocations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "VisitationLocations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Visitations_VisitationSchedules_VisitationScheduleId",
+                        column: x => x.VisitationScheduleId,
+                        principalTable: "VisitationSchedules",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Payments",
                 columns: table => new
                 {
@@ -680,6 +743,51 @@ namespace Wesal.Infrastructure.Database.Migrations
                 columns: new[] { "Name", "Governorate" },
                 unique: true);
 
+            migrationBuilder.CreateIndex(
+                name: "IX_Visitations_FamilyId",
+                table: "Visitations",
+                column: "FamilyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visitations_LocationId",
+                table: "Visitations",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visitations_ParentId",
+                table: "Visitations",
+                column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visitations_VerifiedById",
+                table: "Visitations",
+                column: "VerifiedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visitations_VisitationScheduleId",
+                table: "Visitations",
+                column: "VisitationScheduleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitationSchedules_CourtCaseId",
+                table: "VisitationSchedules",
+                column: "CourtCaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitationSchedules_FamilyId",
+                table: "VisitationSchedules",
+                column: "FamilyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitationSchedules_LocationId",
+                table: "VisitationSchedules",
+                column: "LocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitationSchedules_ParentId",
+                table: "VisitationSchedules",
+                column: "ParentId");
+
             migrationBuilder.AddForeignKey(
                 name: "FK_Payments_PaymentsDue_PaymentDueId",
                 table: "Payments",
@@ -724,9 +832,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                 table: "Payments");
 
             migrationBuilder.DropTable(
-                name: "CourtStaffs");
-
-            migrationBuilder.DropTable(
                 name: "Custodies");
 
             migrationBuilder.DropTable(
@@ -739,19 +844,25 @@ namespace Wesal.Infrastructure.Database.Migrations
                 name: "ObligationAlerts");
 
             migrationBuilder.DropTable(
-                name: "VisitationLocations");
-
-            migrationBuilder.DropTable(
                 name: "Visitations");
 
             migrationBuilder.DropTable(
-                name: "VisitationSchedules");
+                name: "VisitCenterStaffs");
 
             migrationBuilder.DropTable(
                 name: "Children");
 
             migrationBuilder.DropTable(
+                name: "CourtStaffs");
+
+            migrationBuilder.DropTable(
+                name: "VisitationSchedules");
+
+            migrationBuilder.DropTable(
                 name: "Schools");
+
+            migrationBuilder.DropTable(
+                name: "VisitationLocations");
 
             migrationBuilder.DropTable(
                 name: "CourtCases");

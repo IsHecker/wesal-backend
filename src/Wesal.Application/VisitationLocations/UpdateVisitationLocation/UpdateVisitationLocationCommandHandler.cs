@@ -1,0 +1,40 @@
+using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Messaging;
+using Wesal.Domain.Entities.CourtStaffs;
+using Wesal.Domain.Entities.VisitationLocations;
+using Wesal.Domain.Results;
+
+namespace Wesal.Application.VisitationLocations.UpdateVisitationLocation;
+
+internal sealed class UpdateVisitationLocationCommandHandler(
+    IVisitationLocationRepository visitLocationRepository,
+    ICourtStaffRepository courtStaffRepository)
+    : ICommandHandler<UpdateVisitationLocationCommand>
+{
+    public async Task<Result> Handle(
+        UpdateVisitationLocationCommand request,
+        CancellationToken cancellationToken)
+    {
+        var location = await visitLocationRepository.GetByIdAsync(request.LocationId, cancellationToken);
+        if (location is null)
+            return VisitationLocationErrors.NotFound(request.LocationId);
+
+        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
+        if (staff is null)
+            return CourtStaffErrors.NotFound(request.StaffId);
+
+        if (location.CourtId != staff.CourtId)
+            return VisitationLocationErrors.Unauthorized();
+
+        location.Update(
+            request.Name,
+            request.Address,
+            request.Governorate,
+            request.ContactNumber,
+            request.MaxConcurrentVisits,
+            request.OpeningTime,
+            request.ClosingTime);
+
+        return Result.Success;
+    }
+}

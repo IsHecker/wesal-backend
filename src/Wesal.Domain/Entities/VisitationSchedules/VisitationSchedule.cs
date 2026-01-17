@@ -4,11 +4,11 @@ namespace Wesal.Domain.Entities.VisitationSchedules;
 
 public sealed class VisitationSchedule : Entity
 {
-    public Guid CCCourtCaseId { get; private set; }
-    public Guid CCFamilyId { get; private set; }
-    public Guid CCParentId { get; private set; }
+    public Guid CourtCaseId { get; private set; }
+    public Guid FamilyId { get; private set; }
+    public Guid ParentId { get; private set; }
 
-    public Guid CCLocationId { get; private set; }
+    public Guid LocationId { get; private set; }
     public int StartDayInMonth { get; private set; }
     public VisitationFrequency Frequency { get; private set; }
 
@@ -29,8 +29,8 @@ public sealed class VisitationSchedule : Entity
     {
         return new VisitationSchedule
         {
-            CCCourtCaseId = courtCaseId,
-            CCLocationId = locationId,
+            CourtCaseId = courtCaseId,
+            LocationId = locationId,
             StartDayInMonth = startDayInMonth,
             Frequency = frequency,
             StartTime = startTime,

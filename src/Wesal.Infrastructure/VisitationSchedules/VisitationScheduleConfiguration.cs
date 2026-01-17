@@ -12,24 +12,24 @@ internal sealed class VisitationScheduleConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<VisitationSchedule> builder)
     {
-        // builder.HasOne<CourtCase>()
-        //     .WithMany()
-        //     .HasForeignKey(courtCase => courtCase.CourtCaseId)
-        //     .OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<CourtCase>()
+            .WithMany()
+            .HasForeignKey(courtCase => courtCase.CourtCaseId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        // builder.HasOne<Family>()
-        //     .WithMany()
-        //     .HasForeignKey(visit => visit.FamilyId)
-        //     .OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<Family>()
+            .WithMany()
+            .HasForeignKey(visit => visit.FamilyId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        // builder.HasOne<Parent>()
-        //     .WithMany()
-        //     .HasForeignKey(visit => visit.ParentId)
-        //     .OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<Parent>()
+            .WithMany()
+            .HasForeignKey(visit => visit.ParentId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        // builder.HasOne<VisitationLocation>()
-        //     .WithMany()
-        //     .HasForeignKey(courtCase => courtCase.LocationId)
-        //     .OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne<VisitationLocation>()
+            .WithMany()
+            .HasForeignKey(courtCase => courtCase.LocationId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -4,9 +4,9 @@ namespace Wesal.Domain.Entities.VisitCenterStaffs;
 
 public sealed class VisitCenterStaff : Entity
 {
-    public Guid BlyatUserId { get; private set; }
+    public Guid UserId { get; private set; }
 
-    public Guid SomeLocationId { get; private set; }
+    public Guid LocationId { get; private set; }
 
     public string Email { get; private set; } = null!;
     public string FullName { get; private set; } = null!;
@@ -23,8 +23,8 @@ public sealed class VisitCenterStaff : Entity
     {
         return new VisitCenterStaff
         {
-            SomeLocationId = locationId,
-            BlyatUserId = userId,
+            LocationId = locationId,
+            UserId = userId,
             FullName = fullName,
             Email = email,
             Phone = phone

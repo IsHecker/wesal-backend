@@ -7,11 +7,11 @@ namespace Wesal.Domain.Entities.Visitations;
 
 public sealed class Visitation : Entity
 {
-    public Guid CCFamilyId { get; private set; }
-    public Guid CCParentId { get; private set; }
-    public Guid CCLocationId { get; private set; }
-    public Guid CCVisitationScheduleId { get; private set; }
-    public Guid CCVerifiedById { get; private set; }
+    public Guid FamilyId { get; private set; }
+    public Guid ParentId { get; private set; }
+    public Guid LocationId { get; private set; }
+    public Guid VisitationScheduleId { get; private set; }
+    public Guid VerifiedById { get; private set; }
 
     public DateOnly Date { get; private set; }
     public TimeOnly StartTime { get; private set; }
@@ -27,10 +27,10 @@ public sealed class Visitation : Entity
     {
         return new Visitation
         {
-            CCFamilyId = schedule.CCFamilyId,
-            CCParentId = schedule.CCParentId,
-            CCLocationId = schedule.CCLocationId,
-            CCVisitationScheduleId = schedule.Id,
+            FamilyId = schedule.FamilyId,
+            ParentId = schedule.ParentId,
+            LocationId = schedule.LocationId,
+            VisitationScheduleId = schedule.Id,
             Date = visitationDate,
             StartTime = schedule.StartTime,
             EndTime = schedule.EndTime
@@ -59,7 +59,7 @@ public sealed class Visitation : Entity
     public Result Complete(VisitCenterStaff staff, int gracePeriodMinutes)
     {
         var validation = ValidateTransition(
-            staff.SomeLocationId,
+            staff.LocationId,
             VisitationStatus.CheckedIn,
             VisitationStatus.Completed);
 
@@ -74,7 +74,7 @@ public sealed class Visitation : Entity
 
         CompletedAt = DateTime.UtcNow;
         Status = VisitationStatus.Completed;
-        CCVerifiedById = staff.Id;
+        VerifiedById = staff.Id;
 
         return Result.Success;
     }
@@ -86,7 +86,7 @@ public sealed class Visitation : Entity
     {
         var now = DateTime.UtcNow;
 
-        if (CCLocationId != staffLocationId)
+        if (LocationId != staffLocationId)
             return VisitationErrors.LocationMismatch;
 
         if (Status == targetStatus)

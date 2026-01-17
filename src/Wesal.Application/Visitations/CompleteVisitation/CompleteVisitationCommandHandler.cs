@@ -21,9 +21,9 @@ internal sealed class CompleteVisitationCommandHandler(
         if (visitation is null)
             return VisitationErrors.NotFound(request.VisitationId);
 
-        var staff = await centerStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
+        var staff = await centerStaffRepository.GetByIdAsync(request.CenterStaffId, cancellationToken);
         if (staff is null)
-            return VisitCenterStaffErrors.NotFound(request.StaffId);
+            return VisitCenterStaffErrors.NotFound(request.CenterStaffId);
 
         var CompleteResult = visitation.Complete(staff, options.Value.GracePeriodMinutes);
         if (CompleteResult.IsFailure)
