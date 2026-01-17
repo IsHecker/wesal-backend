@@ -9,7 +9,6 @@ public record struct VisitationResponse(
     DateOnly Date,
     TimeOnly StartTime,
     TimeOnly EndTime,
-    DateTime? VisitedAt,
+    DateTime? CompletedAt,
     string Status,
-    bool IsCheckedIn,
     DateTime? CheckedInAt);

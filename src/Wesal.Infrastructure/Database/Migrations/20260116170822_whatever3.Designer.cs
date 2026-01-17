@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wesal.Infrastructure.Database;
 
@@ -11,9 +12,11 @@ using Wesal.Infrastructure.Database;
 namespace Wesal.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(WesalDbContext))]
-    partial class WesalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260116170822_whatever3")]
+    partial class whatever3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

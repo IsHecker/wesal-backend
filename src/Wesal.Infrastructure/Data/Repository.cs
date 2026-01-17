@@ -2,15 +2,16 @@ using System.Linq.Expressions;
 using Wesal.Application.Data;
 using Wesal.Domain.DomainEvents;
 using Microsoft.EntityFrameworkCore;
+using Wesal.Infrastructure.Database;
 
 namespace Wesal.Infrastructure.Data;
 
-public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
+internal class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
 {
-    protected readonly DbContext _context;
+    protected readonly WesalDbContext _context;
     protected readonly DbSet<TEntity> _dbSet;
 
-    public Repository(DbContext context)
+    public Repository(WesalDbContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
         _dbSet = _context.Set<TEntity>();

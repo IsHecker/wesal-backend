@@ -1,5 +1,4 @@
 using System.Reflection;
-using Wesal.Application.Messaging;
 using Wesal.Domain;
 using Wesal.Domain.Results;
 using FluentValidation;
@@ -11,7 +10,7 @@ namespace Wesal.Application.Behaviours;
 internal sealed class ValidationBehaviour<TRequest, TResponse>(
     IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IBaseCommand
+    where TRequest : IBaseRequest
     where TResponse : Result
 {
     public async Task<TResponse> Handle(

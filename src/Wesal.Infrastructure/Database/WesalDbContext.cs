@@ -18,6 +18,7 @@ using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitationSchedules;
+using Wesal.Domain.Entities.VisitCenterStaffs;
 using Wesal.Infrastructure.Extensions;
 
 namespace Wesal.Infrastructure.Database;
@@ -28,6 +29,7 @@ internal sealed class WesalDbContext(DbContextOptions<WesalDbContext> options)
    public DbSet<User> Users { get; init; }
    public DbSet<FamilyCourt> FamilyCourts { get; init; }
    public DbSet<CourtStaff> CourtStaffs { get; init; }
+   public DbSet<VisitCenterStaff> VisitCenterStaffs { get; init; }
    public DbSet<Parent> Parents { get; init; }
    public DbSet<School> Schools { get; init; }
    public DbSet<Family> Families { get; init; }

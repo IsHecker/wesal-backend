@@ -1,3 +1,3 @@
 ﻿namespace Wesal.Application.Authorization;
 
-public sealed record PermissionsResponse(Guid UserId, HashSet<string> Permissions);
+public record struct PermissionsResponse(Guid UserId, HashSet<string> Permissions);

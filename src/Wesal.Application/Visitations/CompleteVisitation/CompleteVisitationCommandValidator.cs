@@ -1,0 +1,17 @@
+using FluentValidation;
+
+namespace Wesal.Application.Visitations.CompleteVisitation;
+
+internal sealed class CompleteVisitationCommandValidator : AbstractValidator<CompleteVisitationCommand>
+{
+    public CompleteVisitationCommandValidator()
+    {
+        RuleFor(x => x.VisitationId)
+            .NotEmpty()
+            .WithMessage("Visitation ID is required");
+
+        RuleFor(x => x.StaffId)
+            .NotEmpty()
+            .WithMessage("Staff ID is required");
+    }
+}

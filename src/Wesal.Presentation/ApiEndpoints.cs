@@ -38,7 +38,11 @@ public static class ApiEndpoints
 
     public static class Visitations
     {
-        public const string ListByFamily = $"{visitationsBase}/{{familyId:guid}}";
+        public const string GetById = $"{visitationsBase}/{{visitationId:guid}}";
+
+        public const string List = visitationsBase;
+        public const string CheckIn = $"{GetById}/check-in";
+        public const string Complete = $"{GetById}/complete";
     }
 
     public static class PaymentsDue

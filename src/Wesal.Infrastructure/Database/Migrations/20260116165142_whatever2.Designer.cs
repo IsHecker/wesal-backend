@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wesal.Infrastructure.Database;
 
@@ -11,9 +12,11 @@ using Wesal.Infrastructure.Database;
 namespace Wesal.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(WesalDbContext))]
-    partial class WesalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260116165142_whatever2")]
+    partial class whatever2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -781,9 +784,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("CheckedInAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -801,6 +801,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("VisitedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");

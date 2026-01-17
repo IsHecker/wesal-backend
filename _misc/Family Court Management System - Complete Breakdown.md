@@ -289,7 +289,7 @@ Official complaints filed by a parent alleging a violation by the other parent
 
 # 🔹 3. Data & Action Flows
 
-## 3.1 Family Enrollment
+## 3.1 ✅Family Enrollment
 **Actors:** Court Staff
 **Trigger(Outside):** Court receives physical case file from legal proceedings
 
@@ -314,7 +314,7 @@ Official complaints filed by a parent alleging a violation by the other parent
 
 **No fraud:** Parents cannot self-register or create fake accounts
 
-## 3.2 Court Case Setup
+## 3.2 ✅Court Case Setup
 **Actors:** Court Staff
 
 **Trigger:** Court case file contains custody and visitation orders
@@ -331,7 +331,7 @@ Official complaints filed by a parent alleging a violation by the other parent
 6. Staff optionally defines **Alimony Obligations**
 7. System **validates** all data and saves the case
 
-## 3.3 Parent Interactions
+## 3.3 ✅Parent Interactions
 **Actors:** Parents
 
 **What Parents Can View:**
@@ -357,10 +357,6 @@ Official complaints filed by a parent alleging a violation by the other parent
     - Report harassment
     - Upload evidence (photos, screenshots)
 
-3. **Confirm Attendance (Optional Feature)**
-    - Parent can click "I will attend" for upcoming visit
-    - System logs confirmation
-    - Does NOT change visitation (just a courtesy flag)
 
 **Parents CANNOT:**
 
@@ -382,7 +378,7 @@ Alimony Due: $500 (Due: Jan 1, 2025)
 Notifications: 2 unread
 ```
 
-## 3.4 Automatic Visitation Generation
+## 3.4 ✅Automatic Visitation Generation
 **Actors:** System (background job)
 
 **Trigger:** Court case setup completes with **Visitation Schedules**
@@ -398,7 +394,7 @@ Notifications: 2 unread
     - "Your visitation schedule is now available"
     - Lists upcoming 3-4 visits
 
-## 3.5 Visitation Attendance Recording
+## 3.5 ✅Visitation Attendance Recording
 
 **Actors:** Visit Center Staff, System
 
@@ -413,7 +409,7 @@ Notifications: 2 unread
    3. Staff tries to find the scheduled session for this parent (maybe using **national ID**)
    4. Staff clicks **"Check In"**
    5. System records timestamp
-   6. Status changes from `Scheduled`  to `Checked-In`  
+   6. Status changes to `Checked-In`  
 3. **After Visit:** 
    1. Staff marks the visitation as `Completed` when parent leaves
    2. System records end time and changes status to `Completed` 
@@ -421,7 +417,6 @@ Notifications: 2 unread
 **Output:**
 
 - Attendance recorded
-- Court notified automatically
 - Data becomes **legal evidence**
 
 ## 3.6 Alimony Payment Flow
@@ -496,6 +491,14 @@ Notifications: 2 unread
 - Schools see **only children assigned to them**
 - Schools **cannot** see families, cases, or other schools
 - Court verifies schools before creation which prevents impersonation
+
+## 9. School Creation & Child-School Linking
+- Check if school exists in system
+- Register new school
+- Auto-generate school account credentials
+- Display school credentials to court staff
+- Link child to school
+- Save child-school relationship
 
 ## 3.8 School Report Upload
 
@@ -784,10 +787,10 @@ Notifications: 2 unread
 - ✅Create new court case
 - ✅Enter case metadata
 - ✅Link case to Family ID
-- Upload court order document (optional)
 - ✅Validate and save case data
+- Upload court order document (optional)
 
-## 4. Parent Interactions - View Access
+## 4. ✅Parent Interactions - View Access
 - ✅View family information
 - ✅View children information
 - ✅View custody decision
@@ -798,7 +801,7 @@ Notifications: 2 unread
 - ✅View notifications and alerts
 - ✅View receipts history for evidence
 
-## 5. Parent Interactions - Actions
+## 5. ✅Parent Interactions - Actions
 - ✅Make alimony payments
 - File complaints (optional)
 
@@ -807,15 +810,12 @@ Notifications: 2 unread
 - ✅Calculate next month/12 months of visitation dates
 - ✅Create individual Visitation records based on frequency
 - ✅Save Visitation sessions to database
-- ✅Send notification to non-custodial parent with upcoming visits
 
-## 7. Visitation Attendance Recording
-- Send reminder notification 24 hours before visit
-- View "Today's Visitations" screen (Visit Center Staff)
-- Find scheduled session by national ID
-- Check in parent (record timestamp, change status to Checked-In)
-- Mark visitation as Completed (record end time)
-- Notify court automatically
+## 7. ✅Visitation Attendance Recording
+- ✅View "Today's Visitations" screen (Visit Center Staff)
+- ✅Find scheduled session by national ID
+- ✅Check in parent (record timestamp, change status to Checked-In)
+- ✅Mark visitation as Completed (record end time)
 
 ## 8. Alimony Payment Flow
 - Calculate next payment due date

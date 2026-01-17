@@ -1,22 +1,16 @@
 using System.Transactions;
 using MediatR;
 using Wesal.Application.Data;
-using Wesal.Application.Messaging;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Behaviours;
 
-public class UnitOfWorkBehaviour<TRequest, TResponse> :
-    IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IBaseCommand
+public class UnitOfWorkBehaviour<TRequest, TResponse>(IUnitOfWork unitOfWork)
+    : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IBaseRequest
     where TResponse : Result
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public UnitOfWorkBehaviour(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<TResponse> Handle(
         TRequest request,

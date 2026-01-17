@@ -3,8 +3,8 @@ using MediatR;
 
 namespace Wesal.Application.Messaging;
 
-public interface ICommand : IRequest<Result>, IBaseCommand;
+public interface ICommand : IRequest<Result>, IBaseRequest;
 
-public interface ICommand<TResponse> : IRequest<Result<TResponse>>, IBaseCommand;
+public interface ICommand<TResponse> : IRequest<Result<TResponse>>, IBaseRequest;
 
-public interface IBaseCommand;
+public interface IBaseRequest;

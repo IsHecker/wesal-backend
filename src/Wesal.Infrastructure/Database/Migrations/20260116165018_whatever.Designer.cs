@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wesal.Infrastructure.Database;
 
@@ -11,9 +12,11 @@ using Wesal.Infrastructure.Database;
 namespace Wesal.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(WesalDbContext))]
-    partial class WesalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260116165018_whatever")]
+    partial class whatever
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -634,40 +637,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("BlyatUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SomeLocationId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("VisitCenterStaffs");
-                });
-
             modelBuilder.Entity("Wesal.Domain.Entities.VisitationLocations.VisitationLocation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -781,9 +750,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("CheckedInAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -801,6 +767,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("VisitedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");

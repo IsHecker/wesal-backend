@@ -15,6 +15,7 @@ public sealed class School : Entity
     private School() { }
 
     public static School Create(
+        Guid userId,
         string name,
         string address,
         string governorate,
@@ -22,6 +23,7 @@ public sealed class School : Entity
     {
         return new School
         {
+            UserId = userId,
             Name = name,
             Address = address,
             Governorate = governorate,

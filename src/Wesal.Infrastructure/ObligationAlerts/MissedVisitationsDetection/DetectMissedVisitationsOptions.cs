@@ -6,7 +6,6 @@ internal sealed class DetectMissedVisitationsOptions
 
     public bool Enabled { get; init; } = true;
     public float RunIntervalInMinutes { get; init; }
-    public int VisitationGracePeriodMinutes { get; init; }
 
     public TimeSpan RunInterval => TimeSpan.FromMinutes(RunIntervalInMinutes);
 }

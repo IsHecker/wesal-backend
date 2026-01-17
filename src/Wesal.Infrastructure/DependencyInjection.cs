@@ -10,12 +10,14 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Caching;
 using Wesal.Application.Data;
+using Wesal.Application.Visitations;
 using Wesal.Infrastructure.Alimonies;
 using Wesal.Infrastructure.Caching;
 using Wesal.Infrastructure.Children;
 using Wesal.Infrastructure.CourtCases;
 using Wesal.Infrastructure.CourtStaffs;
 using Wesal.Infrastructure.Custodies;
+using Wesal.Infrastructure.Data;
 using Wesal.Infrastructure.Database;
 using Wesal.Infrastructure.Families;
 using Wesal.Infrastructure.Notifications;
@@ -65,13 +67,22 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WesalDbContext>());
         services.AddScoped<IWesalDbContext>(sp => sp.GetRequiredService<WesalDbContext>());
 
+        services.AddOptions(configuration);
         services.AddRepositories();
         services.AddServices();
         services.AddBackgroundJobs(configuration);
     }
 
+    private static void AddOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<VisitationOptions>(
+            configuration.GetSection(VisitationOptions.SectionName));
+    }
+
     private static void AddRepositories(this IServiceCollection services)
     {
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
         services.AddScoped<IParentRepository, ParentRepository>();
         services.AddScoped<IFamilyRepository, FamilyRepository>();
         services.AddScoped<IChildRepository, ChildRepository>();
