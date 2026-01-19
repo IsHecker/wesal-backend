@@ -21,6 +21,7 @@ public sealed class VisitationSchedule : Entity
 
     public static VisitationSchedule Create(
         Guid courtCaseId,
+        Guid parentId,
         Guid locationId,
         int startDayInMonth,
         VisitationFrequency frequency,
@@ -30,6 +31,7 @@ public sealed class VisitationSchedule : Entity
         return new VisitationSchedule
         {
             CourtCaseId = courtCaseId,
+            ParentId = parentId,
             LocationId = locationId,
             StartDayInMonth = startDayInMonth,
             Frequency = frequency,

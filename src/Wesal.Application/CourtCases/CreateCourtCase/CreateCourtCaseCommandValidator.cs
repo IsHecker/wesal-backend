@@ -8,10 +8,6 @@ internal sealed class CreateCourtCaseCommandValidator : AbstractValidator<Create
 {
     public CreateCourtCaseCommandValidator()
     {
-        RuleFor(x => x.CourtId)
-            .NotEmpty()
-            .WithMessage("Court ID is required");
-
         RuleFor(x => x.FamilyId)
             .NotEmpty()
             .WithMessage("Family ID is required");
@@ -19,12 +15,6 @@ internal sealed class CreateCourtCaseCommandValidator : AbstractValidator<Create
         RuleFor(x => x.CaseNumber)
             .NotEmpty()
             .MaximumLength(50);
-
-        RuleFor(x => x.FiledAt)
-            .NotEmpty()
-            .WithMessage("Filed date is required")
-            .LessThanOrEqualTo(DateTime.UtcNow)
-            .WithMessage("Filed date cannot be in the future");
 
         RuleFor(x => x.Status)
             .NotEmpty()

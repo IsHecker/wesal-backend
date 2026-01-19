@@ -11,7 +11,7 @@ public sealed class Visitation : Entity
     public Guid ParentId { get; private set; }
     public Guid LocationId { get; private set; }
     public Guid VisitationScheduleId { get; private set; }
-    public Guid VerifiedById { get; private set; }
+    public Guid? VerifiedById { get; private set; } = null!;
 
     public DateOnly Date { get; private set; }
     public TimeOnly StartTime { get; private set; }
@@ -78,6 +78,16 @@ public sealed class Visitation : Entity
 
         return Result.Success;
     }
+
+    public bool IsCompleted()
+    {
+        return Status == VisitationStatus.Completed
+            && CompletedAt.HasValue
+            && CheckedInAt.HasValue
+            && VerifiedById.HasValue;
+    }
+
+    public void MarkAsMissed() => Status = VisitationStatus.Missed;
 
     private Result ValidateTransition(
         Guid staffLocationId,

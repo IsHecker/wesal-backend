@@ -18,7 +18,7 @@ internal sealed class MakeAlimonyPayment : IEndpoint
         app.MapPost(ApiEndpoints.Payments.MakeAlimony, async (Request request, ISender sender) =>
         {
             var result = await sender.Send(new MakeAlimonyPaymentCommand(
-                SharedData.FatherId,
+                SharedData.FatherUserId,
                 request.AlimonyId,
                 request.PaymentDueId,
                 request.Amount,

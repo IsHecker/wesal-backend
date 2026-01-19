@@ -4,7 +4,7 @@ namespace Wesal.Application.VisitationLocations.UpdateVisitationLocation;
 
 public record struct UpdateVisitationLocationCommand(
     Guid LocationId,
-    Guid StaffId,
+    Guid UserId,
     string Name,
     string Address,
     string Governorate,

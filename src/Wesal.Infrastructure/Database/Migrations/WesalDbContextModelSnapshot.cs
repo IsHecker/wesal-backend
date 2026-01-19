@@ -52,9 +52,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DueDay")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("EndAt")
                         .HasColumnType("datetime2");
 
@@ -65,6 +62,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateOnly?>("LastGeneratedDate")
+                        .HasColumnType("date");
+
                     b.Property<Guid>("PayerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -73,6 +73,9 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.Property<DateTime>("StartAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("StartDayInMonth")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -390,7 +393,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ResolutionNotes")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ResolvedAt")
@@ -431,6 +433,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("CourtId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -460,6 +465,9 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ViolationCount")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -491,8 +499,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("DueDate")
+                        .HasColumnType("date");
 
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("uniqueidentifier");
@@ -566,6 +574,40 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("PaymentDueId");
 
                     b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.SchoolReports.SchoolReport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReportType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SchoolId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SchoolReports");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Schools.School", b =>
@@ -820,7 +862,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("VerifiedById")
+                    b.Property<Guid?>("VerifiedById")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("VisitationScheduleId")
@@ -1113,8 +1155,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasOne("Wesal.Domain.Entities.CourtStaffs.CourtStaff", null)
                         .WithMany()
                         .HasForeignKey("VerifiedById")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Wesal.Domain.Entities.VisitationSchedules.VisitationSchedule", null)
                         .WithMany()

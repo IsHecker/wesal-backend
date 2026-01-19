@@ -1,6 +1,6 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Messaging;
-using Wesal.Domain.Entities.CourtStaffs;
+using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Results;
 
@@ -15,13 +15,17 @@ internal sealed class CreateVisitationLocationCommandHandler(
         CreateVisitationLocationCommand request,
         CancellationToken cancellationToken)
     {
-        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
+        var staff = await courtStaffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
+            return UserErrors.NotFound(request.UserId);
 
-        var validationResult = await ValidateLocation(request, cancellationToken);
-        if (validationResult.IsFailure)
-            return validationResult.Error;
+        var nameExists = await locationRepository.ExistsByNameAndGovernorateAsync(
+            request.Name,
+            request.Governorate,
+            cancellationToken);
+
+        if (nameExists)
+            return VisitationLocationErrors.AlreadyExists(request.Name, request.Governorate);
 
         var location = VisitationLocation.Create(
             staff.CourtId,
@@ -36,20 +40,5 @@ internal sealed class CreateVisitationLocationCommandHandler(
         await locationRepository.AddAsync(location, cancellationToken);
 
         return location.Id;
-    }
-
-    private async Task<Result> ValidateLocation(
-        CreateVisitationLocationCommand request,
-        CancellationToken cancellationToken)
-    {
-        var nameExists = await locationRepository.ExistsByNameAndGovernorateAsync(
-            request.Name,
-            request.Governorate,
-            cancellationToken);
-
-        if (nameExists)
-            return VisitationLocationErrors.AlreadyExists(request.Name, request.Governorate);
-
-        return Result.Success;
     }
 }

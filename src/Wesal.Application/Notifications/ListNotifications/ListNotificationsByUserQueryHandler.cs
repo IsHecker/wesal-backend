@@ -1,21 +1,29 @@
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Data;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Notifications;
 using Wesal.Domain.Entities.Notifications;
+using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Notifications.ListNotifications;
 
-internal sealed class ListNotificationsByUserQueryHandler(INotificationRepository notificationRepository)
+internal sealed class ListNotificationsByUserQueryHandler(
+    INotificationRepository notificationRepository,
+    IRepository<User> userRepository)
     : IQueryHandler<ListNotificationsByUserQuery, ListNotificationsResponse>
 {
     public async Task<Result<ListNotificationsResponse>> Handle(
         ListNotificationsByUserQuery request,
         CancellationToken cancellationToken)
     {
+        var isUserExist = await userRepository.ExistsAsync(request.UserId, cancellationToken);
+        if (!isUserExist)
+            return UserErrors.NotFound(request.UserId);
+
         var notifications = await notificationRepository.GetByRecipientIdAsync(
-            request.RecipientId,
+            request.UserId,
             cancellationToken);
 
         var filteredNotifications = request.UnreadOnly

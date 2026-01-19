@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Data;
+using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
@@ -10,16 +11,18 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Schools.ListSchools;
 
-internal sealed class ListSchoolsQueryHandler(IWesalDbContext context)
+internal sealed class ListSchoolsQueryHandler(
+    ICourtStaffRepository staffRepository,
+    IWesalDbContext context)
     : IQueryHandler<ListSchoolsQuery, PagedResponse<SchoolResponse>>
 {
     public async Task<Result<PagedResponse<SchoolResponse>>> Handle(
         ListSchoolsQuery request,
         CancellationToken cancellationToken)
     {
-        var staff = await GetStaffByIdAsync(request.StaffId, cancellationToken);
+        var staff = await staffRepository.GetByUserIdWithCourtAsync(request.UserId, cancellationToken);
         if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
+            return CourtStaffErrors.NotFound(request.UserId);
 
         var query = BuildQuery(request.Name, staff.Court.Governorate);
 
@@ -47,12 +50,5 @@ internal sealed class ListSchoolsQueryHandler(IWesalDbContext context)
             query = query.Where(s => s.Name.Contains(name));
 
         return query.OrderBy(s => s.Name);
-    }
-
-    private Task<CourtStaff?> GetStaffByIdAsync(Guid staffId, CancellationToken cancellationToken)
-    {
-        return context.CourtStaffs
-            .Include(staff => staff.Court)
-            .FirstOrDefaultAsync(staff => staff.Id == staffId, cancellationToken);
     }
 }

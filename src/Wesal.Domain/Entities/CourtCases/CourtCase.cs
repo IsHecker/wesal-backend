@@ -18,7 +18,6 @@ public sealed class CourtCase : Entity
         Guid courtId,
         Guid familyId,
         string caseNumber,
-        DateTime filedAt,
         CourtCaseStatus status,
         string decisionSummary)
     {
@@ -27,9 +26,9 @@ public sealed class CourtCase : Entity
             CourtId = courtId,
             FamilyId = familyId,
             CaseNumber = caseNumber,
-            FiledAt = filedAt,
             Status = status,
             DecisionSummary = decisionSummary,
+            FiledAt = DateTime.UtcNow,
         };
     }
 }

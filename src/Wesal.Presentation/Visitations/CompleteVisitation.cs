@@ -18,7 +18,7 @@ internal sealed class CompleteVisitation : IEndpoint
             Guid visitationId,
             ISender sender) =>
         {
-            var result = await sender.Send(new CompleteVisitationCommand(visitationId, SharedData.StaffId));
+            var result = await sender.Send(new CompleteVisitationCommand(visitationId, SharedData.StaffUserId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })

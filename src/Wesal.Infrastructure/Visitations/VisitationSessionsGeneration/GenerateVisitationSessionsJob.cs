@@ -1,20 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
-using Wesal.Application.Abstractions.Data;
-using Wesal.Application.Data;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitationSchedules;
+using Wesal.Infrastructure.Database;
 
 namespace Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
 
 [DisallowConcurrentExecution]
 internal sealed class GenerateVisitationSessionsJob(
     IOptions<GenerateVisitationSessionsOptions> options,
-    IWesalDbContext context,
-    IUnitOfWork unitOfWork) : IJob
+    WesalDbContext dbContext) : IJob
 {
-    private readonly GenerateVisitationSessionsOptions _options = options.Value;
+    private readonly GenerateVisitationSessionsOptions options = options.Value;
 
     public async Task Execute(IJobExecutionContext context)
     {
@@ -22,50 +20,49 @@ internal sealed class GenerateVisitationSessionsJob(
         var currentMonth = new DateOnly(now.Year, now.Month, 1);
 
         // Reads all active VisitationSchedule records
-        var schedules = await GetSchedulesAsync(currentMonth, _options.BatchSize);
+        var schedules = await GetSchedulesAsync(currentMonth, options.BatchSize);
 
         // System calculates next month's visits based on frequency
         // Creates Visitation records if they don't exist
         // System saves all **Visitation** sessions to database
         foreach (var schedule in schedules)
         {
-            await GenerateUpcomingVisitations(schedule);
+            await GenerateUpcomingVisitationsAsync(schedule);
         }
 
-        await unitOfWork.SaveChangesAsync(context.CancellationToken);
+        await dbContext.SaveChangesAsync(context.CancellationToken);
     }
 
     private async Task<List<VisitationSchedule>> GetSchedulesAsync(DateOnly currentMonth, int batchSize)
     {
-        return await context.VisitationSchedules
+        return await dbContext.VisitationSchedules
             .Where(schedule => !schedule.LastGeneratedDate.HasValue
                 || schedule.LastGeneratedDate.Value < currentMonth)
             .Take(batchSize)
             .ToListAsync();
     }
 
-    private async Task GenerateUpcomingVisitations(VisitationSchedule schedule)
+    private async Task GenerateUpcomingVisitationsAsync(VisitationSchedule schedule)
     {
         foreach (var visitationDate in GetNextVisitationDates(schedule))
         {
             var visitation = Visitation.Create(schedule, visitationDate);
-            await context.Visitations.AddAsync(visitation);
+            await dbContext.Visitations.AddAsync(visitation);
 
             schedule.UpdateLastGeneratedDate(visitationDate);
         }
 
-        context.VisitationSchedules.Update(schedule);
+        dbContext.VisitationSchedules.Update(schedule);
     }
 
     private static IEnumerable<DateOnly> GetNextVisitationDates(VisitationSchedule schedule)
     {
-        var startDay = schedule.StartDayInMonth;
-        var lastDay = DateTime.DaysInMonth(DateTime.UtcNow.Year, DateTime.UtcNow.Month);
+        var lastDayInMonth = DateTime.DaysInMonth(DateTime.UtcNow.Year, DateTime.UtcNow.Month);
 
         var frequencyDays = schedule.GetFrequencyInDays();
         var now = DateTime.UtcNow;
 
-        for (int day = startDay; day <= lastDay; day += frequencyDays)
+        for (int day = schedule.StartDayInMonth; day <= lastDayInMonth; day += frequencyDays)
         {
             yield return new DateOnly(now.Year, now.Month, day);
         }

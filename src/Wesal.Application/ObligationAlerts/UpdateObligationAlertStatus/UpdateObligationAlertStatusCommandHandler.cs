@@ -1,8 +1,8 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
-using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.ObligationAlerts;
+using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.ObligationAlerts.UpdateObligationAlertStatus;
@@ -20,10 +20,9 @@ internal sealed class UpdateObligationAlertStatusCommandHandler(
         if (alert is null)
             return ObligationAlertErrors.NotFound(request.AlertId);
 
-        var staff = await staffRepository.GetByIdAsync(request.StaffId, cancellationToken);
-
+        var staff = await staffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
+            return UserErrors.NotFound(request.UserId);
 
         if (alert.CourtId != staff.CourtId)
             return ObligationAlertErrors.Unauthorized();

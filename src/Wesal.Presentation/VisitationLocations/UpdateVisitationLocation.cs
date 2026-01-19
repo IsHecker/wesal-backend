@@ -21,7 +21,7 @@ internal sealed class UpdateVisitationLocation : IEndpoint
         {
             var result = await sender.Send(new UpdateVisitationLocationCommand(
                 locationId,
-                SharedData.StaffId,
+                SharedData.StaffUserId,
                 request.Name,
                 request.Address,
                 request.Governorate,

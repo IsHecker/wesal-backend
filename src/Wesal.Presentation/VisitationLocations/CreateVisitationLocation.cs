@@ -19,7 +19,7 @@ internal sealed class CreateVisitationLocation : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new CreateVisitationLocationCommand(
-                SharedData.StaffId,
+                SharedData.StaffUserId,
                 request.Name,
                 request.Address,
                 request.Governorate,

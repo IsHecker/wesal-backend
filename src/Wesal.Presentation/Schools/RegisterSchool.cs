@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Schools.RegisterSchool;
 using Wesal.Contracts.Schools;
+using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -19,9 +20,9 @@ internal sealed class RegisterSchool : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new RegisterSchoolCommand(
+                SharedData.StaffUserId,
                 request.Name,
                 request.Address,
-                request.Governorate,
                 request.ContactNumber));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);

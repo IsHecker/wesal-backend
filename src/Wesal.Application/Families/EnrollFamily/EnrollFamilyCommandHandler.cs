@@ -3,13 +3,16 @@ using Wesal.Application.Data;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
 using Wesal.Domain.Entities.Children;
+using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Parents;
+using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Families.EnrollFamily;
 
 internal sealed class EnrollFamilyCommandHandler(
+    ICourtStaffRepository staffRepository,
     IParentRepository parentRepository,
     IFamilyRepository familyRepository,
     IChildRepository childRepository) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
@@ -18,6 +21,10 @@ internal sealed class EnrollFamilyCommandHandler(
         EnrollFamilyCommand request,
         CancellationToken cancellationToken)
     {
+        var staff = await staffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        if (staff is null)
+            return UserErrors.NotFound(request.UserId);
+
         // TODO: Father can be in many families.
         if (await parentRepository.ExistsByNationalIdAsync(request.Father.NationalId, cancellationToken))
             return FamilyErrors.ParentAlreadyExists(request.Father.NationalId);
@@ -26,6 +33,7 @@ internal sealed class EnrollFamilyCommandHandler(
             return FamilyErrors.ParentAlreadyExists(request.Mother.NationalId);
 
         var father = Parent.Create(
+            staff.CourtId,
             request.Father.NationalId,
             request.Father.FullName,
             request.Father.BirthDate,
@@ -36,6 +44,7 @@ internal sealed class EnrollFamilyCommandHandler(
             request.Father.Email);
 
         var mother = Parent.Create(
+            staff.CourtId,
             request.Mother.NationalId,
             request.Mother.FullName,
             request.Mother.BirthDate,

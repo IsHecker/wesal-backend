@@ -11,6 +11,7 @@ using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
+using Wesal.Domain.Entities.SchoolReports;
 using Wesal.Domain.Entities.Schools;
 using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
@@ -28,6 +29,7 @@ public interface IWesalDbContext
     DbSet<VisitCenterStaff> VisitCenterStaffs { get; init; }
     DbSet<Parent> Parents { get; init; }
     DbSet<School> Schools { get; init; }
+    DbSet<SchoolReport> SchoolReports { get; init; }
     DbSet<Family> Families { get; init; }
     DbSet<Child> Children { get; init; }
     DbSet<CourtCase> CourtCases { get; init; }

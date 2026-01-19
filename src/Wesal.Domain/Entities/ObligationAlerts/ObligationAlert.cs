@@ -20,7 +20,7 @@ public sealed class ObligationAlert : Entity
 
     public DateTime? ResolvedAt { get; private set; }
 
-    public string ResolutionNotes { get; private set; } = null!;
+    public string? ResolutionNotes { get; private set; }
 
     private ObligationAlert() { }
 
@@ -29,11 +29,7 @@ public sealed class ObligationAlert : Entity
         Guid relatedEntityId,
         Guid courtId,
         AlertType type,
-        string description,
-        DateTime triggeredAt,
-        AlertStatus status,
-        string resolutionNotes,
-        DateTime? resolvedAt = null)
+        string description)
     {
         return new ObligationAlert
         {
@@ -42,10 +38,10 @@ public sealed class ObligationAlert : Entity
             CourtId = courtId,
             Type = type,
             Description = description,
-            TriggeredAt = triggeredAt,
-            Status = status,
-            ResolvedAt = resolvedAt,
-            ResolutionNotes = resolutionNotes,
+            Status = AlertStatus.Pending,
+            TriggeredAt = DateTime.UtcNow,
+            ResolvedAt = null,
+            ResolutionNotes = null,
         };
     }
 

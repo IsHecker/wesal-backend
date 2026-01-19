@@ -6,13 +6,16 @@ public static class ApiEndpoints
 
     private const string ParentsBase = $"{ApiBase}/parents";
     private const string SchoolsBase = $"{ApiBase}/schools";
+    private const string SchoolReportsBase = $"{ApiBase}/school-reports";
     private const string FamiliesBase = $"{ApiBase}/families";
     private const string CourtCasesBase = $"{ApiBase}/court-cases";
     private const string CustodiesBase = $"{ApiBase}/custodies";
+    private const string VisitationSchedulesBase = $"{ApiBase}/visitation-schedules";
     private const string visitationsBase = $"{ApiBase}/visitations";
     private const string visitationLocationsBase = $"{ApiBase}/visitation-locations";
     private const string PaymentsDueBase = $"{ApiBase}/payments-due";
     private const string PaymentsBase = $"{ApiBase}/payments";
+    private const string AlimoniesBase = $"{ApiBase}/alimonies";
     private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
     private const string NotificationsBase = $"{ApiBase}/notifications";
 
@@ -27,10 +30,16 @@ public static class ApiEndpoints
         public const string Register = SchoolsBase;
     }
 
+    public static class SchoolReports
+    {
+        public const string ListByChild = $"{SchoolReportsBase}/{{childId:guid}}";
+        public const string Upload = SchoolReportsBase;
+    }
+
     public static class Families
     {
         public const string Enroll = FamiliesBase;
-        public const string GetByParent = $"{FamiliesBase}/{{parentId:guid}}";
+        public const string GetByParent = FamiliesBase;
     }
 
     public static class CourtCases
@@ -42,6 +51,11 @@ public static class ApiEndpoints
     public static class Custodies
     {
         public const string GetByFamily = $"{CustodiesBase}/{{familyId:guid}}";
+    }
+
+    public static class VisitationSchedules
+    {
+        public const string Create = VisitationSchedulesBase;
     }
 
     public static class Visitations
@@ -74,6 +88,11 @@ public static class ApiEndpoints
     public static class Notifications
     {
         public const string ListByUser = $"{NotificationsBase}/me";
+    }
+
+    public static class Alimonies
+    {
+        public const string Create = AlimoniesBase;
     }
 
     public static class ObligationAlerts

@@ -13,4 +13,10 @@ internal sealed class ParentRepository(WesalDbContext context)
     {
         return context.Parents.AnyAsync(parent => parent.NationalId == nationalId, cancellationToken);
     }
+
+    public Task<Parent?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return context.Parents
+            .FirstOrDefaultAsync(school => school.UserId == userId, cancellationToken);
+    }
 }

@@ -10,6 +10,7 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Schools.RegisterSchool;
 
 internal sealed class RegisterSchoolCommandHandler(
+    ICourtStaffRepository staffRepository,
     IRepository<User> userRepository,
     ISchoolRepository schoolRepository)
     : ICommandHandler<RegisterSchoolCommand, RegisterSchoolResponse>
@@ -18,11 +19,15 @@ internal sealed class RegisterSchoolCommandHandler(
         RegisterSchoolCommand request,
         CancellationToken cancellationToken)
     {
-        var validationResult = await ValidateSchool(request, cancellationToken);
+        var staff = await staffRepository.GetByUserIdWithCourtAsync(request.UserId, cancellationToken);
+        if (staff is null)
+            return UserErrors.NotFound(request.UserId);
+
+        var validationResult = await ValidateSchool(request, staff.Court.Governorate, cancellationToken);
         if (validationResult.IsFailure)
             return validationResult.Error;
 
-        var credentials = GenerateCredentials(request.Governorate);
+        var credentials = GenerateCredentials(staff.Court.Governorate);
 
         var user = User.Create(
             UserRole.School,
@@ -33,7 +38,7 @@ internal sealed class RegisterSchoolCommandHandler(
             user.Id,
             request.Name,
             request.Address,
-            request.Governorate,
+            staff.Court.Governorate,
             request.ContactNumber);
 
         await userRepository.AddAsync(user, cancellationToken);
@@ -45,15 +50,18 @@ internal sealed class RegisterSchoolCommandHandler(
             credentials.Password);
     }
 
-    private async Task<Result> ValidateSchool(RegisterSchoolCommand request, CancellationToken cancellationToken)
+    private async Task<Result> ValidateSchool(
+        RegisterSchoolCommand request,
+        string governorate,
+        CancellationToken cancellationToken)
     {
         var nameExists = await schoolRepository.ExistsByNameAndGovernorateAsync(
             request.Name,
-            request.Governorate,
+            governorate,
             cancellationToken);
 
         if (nameExists)
-            return SchoolErrors.SchoolAlreadyExists(request.Name, request.Governorate);
+            return SchoolErrors.SchoolAlreadyExists(request.Name, governorate);
 
         return Result.Success;
     }

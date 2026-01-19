@@ -6,7 +6,7 @@ public sealed class CreateVisitationLocationCommandValidator : AbstractValidator
 {
     public CreateVisitationLocationCommandValidator()
     {
-        RuleFor(x => x.StaffId)
+        RuleFor(x => x.UserId)
             .NotEmpty()
             .WithMessage("Staff ID is required");
 

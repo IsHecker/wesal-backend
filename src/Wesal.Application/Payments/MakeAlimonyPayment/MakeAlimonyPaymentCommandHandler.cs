@@ -25,7 +25,7 @@ internal sealed class MakeAlimonyPaymentCommandHandler(
         if (alimony is null)
             return AlimonyErrors.NotFound(request.AlimonyId);
 
-        if (alimony.PayerId != request.PayerId)
+        if (alimony.PayerId != request.UserId)
             return PaymentErrors.Unauthorized("You are not authorized to make this payment");
 
         if (request.Amount != alimony.Amount)

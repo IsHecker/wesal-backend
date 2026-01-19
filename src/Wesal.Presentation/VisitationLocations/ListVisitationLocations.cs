@@ -23,7 +23,7 @@ internal sealed class ListVisitationLocations : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new ListVisitationLocationsQuery(
-                SharedData.StaffId,
+                SharedData.StaffUserId,
                 query.Name,
                 pagination));
 

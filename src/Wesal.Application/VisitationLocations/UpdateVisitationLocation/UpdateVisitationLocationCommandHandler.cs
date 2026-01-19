@@ -1,6 +1,6 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Messaging;
-using Wesal.Domain.Entities.CourtStaffs;
+using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Results;
 
@@ -19,9 +19,9 @@ internal sealed class UpdateVisitationLocationCommandHandler(
         if (location is null)
             return VisitationLocationErrors.NotFound(request.LocationId);
 
-        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
+        var staff = await courtStaffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
+            return UserErrors.NotFound(request.UserId);
 
         if (location.CourtId != staff.CourtId)
             return VisitationLocationErrors.Unauthorized();

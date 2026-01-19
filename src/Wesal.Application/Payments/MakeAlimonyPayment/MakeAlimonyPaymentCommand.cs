@@ -3,7 +3,7 @@ using Wesal.Application.Messaging;
 namespace Wesal.Application.Payments.MakeAlimonyPayment;
 
 public record struct MakeAlimonyPaymentCommand(
-    Guid PayerId,
+    Guid UserId,
     Guid AlimonyId,
     Guid PaymetDueId,
     long Amount,

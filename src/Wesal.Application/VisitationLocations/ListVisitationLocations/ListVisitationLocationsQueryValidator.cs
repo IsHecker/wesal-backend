@@ -6,7 +6,7 @@ public sealed class ListVisitationLocationsQueryValidator : AbstractValidator<Li
 {
     public ListVisitationLocationsQueryValidator()
     {
-        RuleFor(x => x.StaffId)
+        RuleFor(x => x.UserId)
             .NotEmpty()
             .WithMessage("Staff ID is required");
 

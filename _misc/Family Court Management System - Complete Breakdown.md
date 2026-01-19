@@ -492,7 +492,7 @@ Notifications: 2 unread
 - Schools **cannot** see families, cases, or other schools
 - Court verifies schools before creation which prevents impersonation
 
-## 3.8 School Report Upload
+## 3.8 ✅School Report Upload
 
 **Actors:** School, System, Court Staff
 
@@ -519,7 +519,7 @@ Notifications: 2 unread
    - View other schools' data
    - Create children or families
 
-## 3.9 Violation Detection & Alert Notification
+## 3.9 ✅Violation Detection & Alert Notification
 
 **Actors:** System, Court Staff
 
@@ -536,13 +536,12 @@ Notifications: 2 unread
 
 
 2. **Unpaid Alimony**
-
     - A Job checks all alimony obligations with passed due dates
     - Detection: Due date passes and alimony isn't paid yet
     - Action: 
       - System marks the alimony record as `NotPaid`
       - Generates a **Violation alert**
-
+    
 3. **Custody Breach (Optional)**
     - Detection: Custodial parent denies access
     - Action: Non-custodial parent files complaint for the court to review it
@@ -642,7 +641,7 @@ Notifications: 2 unread
 
 ### 4. ✅Automatic Visitation Generation
 
-### 5. Automatic Violations Detection
+### 5. ✅Automatic Violations Detection
 
 ### 6. ✅Visitation Attendance Recording
 
@@ -767,47 +766,6 @@ Notifications: 2 unread
 - Force password change on first login (School accounts)
 - Role-based access control enforcement
 
-## 2. ✅Family Enrollment
-- ✅Create new family
-- ✅Create Parent A user account with temporary password
-- ✅Create Parent B user account with temporary password
-- ✅Create Child Profile(s)
-- ✅Link family to Court Case ID
-
-## 3. ✅Court Case Setup
-- ✅Create new court case
-- ✅Enter case metadata
-- ✅Link case to Family ID
-- ✅Validate and save case data
-- Upload court order document (optional)
-
-## 4. ✅Parent Interactions - View Access
-- ✅View family information
-- ✅View children information
-- ✅View custody decision
-- ✅View current court case status and details
-- ✅View visitation schedules (upcoming and past)
-- ✅View alimony obligations/schedules
-- ✅View payment history and receipts
-- ✅View notifications and alerts
-- ✅View receipts history for evidence
-
-## 5. ✅Parent Interactions - Actions
-- ✅Make alimony payments
-- File complaints (optional)
-
-## 6. ✅Automatic Visitation Generation
-- ✅Read defined Visitation Schedules
-- ✅Calculate next month/12 months of visitation dates
-- ✅Create individual Visitation records based on frequency
-- ✅Save Visitation sessions to database
-
-## 7. ✅Visitation Attendance Recording
-- ✅View "Today's Visitations" screen (Visit Center Staff)
-- ✅Find scheduled session by national ID
-- ✅Check in parent (record timestamp, change status to Checked-In)
-- ✅Mark visitation as Completed (record end time)
-
 ## 8. Alimony Payment Flow
 - Calculate next payment due date
 - Send reminder notification 7 days before due date
@@ -818,37 +776,6 @@ Notifications: 2 unread
 - Mark alimony as Paid
 - Send confirmation email with receipt
 - Send failure notification
-
-## 9. ✅School Creation & Child-School Linking
-- ✅Register new school
-- ✅Auto-generate school account credentials
-- ✅Display school credentials to court staff
-
-## 10. School Report Upload
-- School login with credentials
-- View only assigned students
-- Upload report (attendance, grades, behavior)
-- Enter report notes/description
-- Upload report file
-- Store report
-- Notify court staff and parents
-
-## 11. Violation Detection & Alert Notification
-- Detect missed visitation (30-minute grace period)
-- Mark parent as Absent
-- Generate violation alert for missed visitation
-- Check unpaid alimony past due date
-- Mark alimony as NotPaid
-- Generate violation alert for unpaid alimony
-- Send notification to court staff and payer parent
-- Review alert (mark as Under Review)
-- Add resolution notes
-- Mark alert as Resolved
-- Detect custody breach (optional)
-
-## 12. ✅Visit Locations Management
-- ✅Create visit location
-- ✅Define court-approved places for visitations
 
 ## 13. Notifications
 - Generate system notifications for events

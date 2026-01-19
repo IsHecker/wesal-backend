@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Families.GetFamilyByParent;
 using Wesal.Contracts.Families;
+using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -14,9 +15,9 @@ internal sealed class GetFamilyByParent : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.Families.GetByParent, async (Guid parentId, ISender sender) =>
+        app.MapGet(ApiEndpoints.Families.GetByParent, async (ISender sender) =>
         {
-            var result = await sender.Send(new GetFamilyByParentQuery(parentId));
+            var result = await sender.Send(new GetFamilyByParentQuery(SharedData.FatherUserId));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

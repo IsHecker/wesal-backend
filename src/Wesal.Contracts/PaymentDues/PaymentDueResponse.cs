@@ -4,7 +4,7 @@ public record struct PaymentDueResponse(
     Guid Id,
     Guid AlimonyId,
     long Amount,
-    DateTime DueDate,
+    DateOnly DueDate,
     string Status,
     Guid? PaymentId = null,
     DateTime? PaidAt = null);

@@ -6,6 +6,6 @@ using Wesal.Contracts.VisitationLocations;
 namespace Wesal.Application.VisitationLocations.ListVisitationLocations;
 
 public record struct ListVisitationLocationsQuery(
-    Guid StaffId,
+    Guid UserId,
     string? Name,
     Pagination Pagination) : IQuery<PagedResponse<VisitationLocationResponse>>;

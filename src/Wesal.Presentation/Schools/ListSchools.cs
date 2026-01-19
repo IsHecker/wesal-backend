@@ -22,7 +22,7 @@ internal sealed class ListSchools : IEndpoint
             [AsParameters] Pagination pagination,
             ISender sender) =>
         {
-            var result = await sender.Send(new ListSchoolsQuery(SharedData.StaffId, query.Name, pagination));
+            var result = await sender.Send(new ListSchoolsQuery(SharedData.StaffUserId, query.Name, pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

@@ -4,10 +4,10 @@ namespace Wesal.Domain.Entities.VisitationLocations;
 
 public static class VisitationLocationErrors
 {
-    public static Error NotFound(Guid locationId) =>
+    public static Error NotFound(Guid id) =>
         Error.NotFound(
             "VisitLocation.NotFound",
-            $"Visit location with ID '{locationId}' was not found");
+            $"Visit location with ID '{id}' was not found");
 
     public static Error AlreadyExists(string name, string governorate) =>
         Error.Conflict(

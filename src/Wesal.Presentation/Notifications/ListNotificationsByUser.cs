@@ -22,7 +22,7 @@ internal sealed class ListNotificationsByUser : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new ListNotificationsByUserQuery(
-                SharedData.FatherId,
+                SharedData.FatherUserId,
                 query.UnreadOnly,
                 pagination));
 

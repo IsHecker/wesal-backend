@@ -17,4 +17,10 @@ internal sealed class SchoolRepository(WesalDbContext context)
         return await context.Schools
             .AnyAsync(school => school.Name == name && school.Governorate == governorate, cancellationToken);
     }
+
+    public Task<School?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return context.Schools
+            .FirstOrDefaultAsync(school => school.UserId == userId, cancellationToken);
+    }
 }

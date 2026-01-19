@@ -5,7 +5,7 @@ using Wesal.Contracts.ObligationAlerts;
 namespace Wesal.Application.ObligationAlerts.ListObligationAlerts;
 
 public record struct ListObligationAlertsQuery(
-    Guid StaffId,
+    Guid UserId,
     string? Status,
     string? Type,
     Pagination Pagination) : IQuery<ObligationAlertsResponse>;

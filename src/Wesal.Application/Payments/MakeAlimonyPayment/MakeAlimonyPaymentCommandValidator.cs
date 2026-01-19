@@ -8,7 +8,7 @@ internal sealed class MakeAlimonyPaymentCommandValidator : AbstractValidator<Mak
 {
     public MakeAlimonyPaymentCommandValidator()
     {
-        RuleFor(x => x.PayerId)
+        RuleFor(x => x.UserId)
             .NotEmpty()
             .WithMessage("Payer ID is required");
 

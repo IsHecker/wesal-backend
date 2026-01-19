@@ -14,12 +14,14 @@ public sealed class Alimony : Entity
     public AlimonyFrequency Frequency { get; private set; }
 
     // Which day payment is due (1-31 for Monthly, 1-7 for Weekly, etc.)
-    public int DueDay { get; private set; }
+    public int StartDayInMonth { get; private set; }
 
     public DateTime StartAt { get; private set; }
 
     // When this obligation ends (could be years later)
     public DateTime EndAt { get; private set; }
+
+    public DateOnly? LastGeneratedDate { get; private set; } = null;
 
     private Alimony() { }
 
@@ -29,6 +31,8 @@ public sealed class Alimony : Entity
         Guid payerId,
         Guid recipientId,
         long amount,
+        AlimonyFrequency frequency,
+        int startDayInMonth,
         DateTime startAt,
         DateTime endAt)
     {
@@ -39,8 +43,32 @@ public sealed class Alimony : Entity
             PayerId = payerId,
             RecipientId = recipientId,
             Amount = amount,
+            Frequency = frequency,
+            StartDayInMonth = startDayInMonth,
             StartAt = startAt,
             EndAt = endAt,
+        };
+    }
+
+    public void UpdateLastGeneratedDate(DateOnly visitationDate)
+    {
+        if (LastGeneratedDate.HasValue && visitationDate < LastGeneratedDate.Value)
+            throw new InvalidOperationException();
+
+        LastGeneratedDate = visitationDate;
+    }
+
+    public int GetFrequencyInDays()
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        return Frequency switch
+        {
+            AlimonyFrequency.Daily => 1,
+            AlimonyFrequency.Weekly => 7,
+            AlimonyFrequency.Monthly => DateTime.DaysInMonth(today.Year, today.Month),
+            AlimonyFrequency.Yearly => today.AddYears(1).DayNumber - today.DayNumber,
+            _ => throw new NotImplementedException()
         };
     }
 }

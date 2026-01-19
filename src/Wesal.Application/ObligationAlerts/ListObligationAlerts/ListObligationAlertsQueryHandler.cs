@@ -3,14 +3,14 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.ObligationAlerts;
-using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.ObligationAlerts;
+using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.ObligationAlerts.ListObligationAlerts;
 
 internal sealed class ListObligationAlertsQueryHandler(
-    ICourtStaffRepository courtStaffRepository,
+    ICourtStaffRepository staffRepository,
     IWesalDbContext context)
     : IQueryHandler<ListObligationAlertsQuery, ObligationAlertsResponse>
 {
@@ -20,13 +20,9 @@ internal sealed class ListObligationAlertsQueryHandler(
     {
         IEnumerable<ObligationAlert> alerts;
 
-        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
-
+        var staff = await staffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         if (staff is null)
-        {
-            return Result.Failure<ObligationAlertsResponse>(
-                CourtStaffErrors.NotFound(request.StaffId));
-        }
+            return UserErrors.NotFound(request.UserId);
 
         alerts = context.ObligationAlerts
             .Where(alert => alert.CourtId == staff.CourtId);

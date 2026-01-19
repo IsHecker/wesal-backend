@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.CourtCases.CreateCourtCase;
+using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -16,10 +17,9 @@ internal sealed class CreateCourtCase : IEndpoint
         app.MapPost(ApiEndpoints.CourtCases.Create, async (Request request, ISender sender) =>
         {
             var result = await sender.Send(new CreateCourtCaseCommand(
-                request.CourtId,
+                SharedData.StaffUserId,
                 request.FamilyId,
                 request.CaseNumber,
-                request.FiledAt,
                 request.Status,
                 request.DecisionSummary));
 
@@ -33,10 +33,8 @@ internal sealed class CreateCourtCase : IEndpoint
     }
 
     internal readonly record struct Request(
-        Guid CourtId,
         Guid FamilyId,
         string CaseNumber,
-        DateTime FiledAt,
         string Status,
         string DecisionSummary);
 }

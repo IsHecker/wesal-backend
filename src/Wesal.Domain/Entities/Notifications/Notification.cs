@@ -18,19 +18,16 @@ public sealed class Notification : Entity
     public static Notification Create(
         Guid recipientId,
         string content,
-        NotificationType type,
-        NotificationStatus status,
-        DateTime sentAt,
-        DateTime? readAt = null)
+        NotificationType type)
     {
         return new Notification
         {
             RecipientId = recipientId,
             Content = content,
             Type = type,
-            Status = status,
-            SentAt = sentAt,
-            ReadAt = readAt,
+            Status = NotificationStatus.Sent,
+            SentAt = DateTime.UtcNow,
+            ReadAt = null,
         };
     }
 }

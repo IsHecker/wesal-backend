@@ -10,7 +10,7 @@ internal sealed class CheckInVisitationCommandValidator : AbstractValidator<Chec
             .NotEmpty()
             .WithMessage("Visitation ID is required");
 
-        RuleFor(x => x.CenterStaffId)
+        RuleFor(x => x.UserId)
             .NotEmpty()
             .WithMessage("Staff ID is required");
     }

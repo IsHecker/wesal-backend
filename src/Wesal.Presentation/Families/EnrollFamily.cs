@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Families.EnrollFamily;
 using Wesal.Application.Families.EnrollFamily.Dtos;
 using Wesal.Contracts.Families;
+using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -18,6 +19,7 @@ internal sealed class EnrollFamily : IEndpoint
         app.MapPost(ApiEndpoints.Families.Enroll, async (Request request, ISender sender) =>
         {
             var result = await sender.Send(new EnrollFamilyCommand(
+                SharedData.StaffUserId,
                 request.Father.ToDto(),
                 request.Mother.ToDto(),
                 request.Children.Select(c => c.ToDto())));
