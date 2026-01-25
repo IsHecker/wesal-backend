@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.VisitationSchedules;
 using Wesal.Domain.Entities.VisitCenterStaffs;
@@ -16,6 +17,7 @@ public sealed class Visitation : Entity
     public DateOnly Date { get; private set; }
     public TimeOnly StartTime { get; private set; }
     public TimeOnly EndTime { get; private set; }
+    public DateTime EndAt { get; private set; }
 
     public VisitationStatus Status { get; private set; }
     public DateTime? CompletedAt { get; private set; } = null!;
@@ -79,14 +81,6 @@ public sealed class Visitation : Entity
         return Result.Success;
     }
 
-    public bool IsCompleted()
-    {
-        return Status == VisitationStatus.Completed
-            && CompletedAt.HasValue
-            && CheckedInAt.HasValue
-            && VerifiedById.HasValue;
-    }
-
     public void MarkAsMissed() => Status = VisitationStatus.Missed;
 
     private Result ValidateTransition(
@@ -96,14 +90,13 @@ public sealed class Visitation : Entity
     {
         var now = DateTime.UtcNow;
 
+        var transitionResult = StatusTransition
+            .Validate(Status, requiredStatus, targetStatus);
+        if (transitionResult.IsFailure)
+            return transitionResult.Error;
+
         if (LocationId != staffLocationId)
             return VisitationErrors.LocationMismatch;
-
-        if (Status == targetStatus)
-            return VisitationErrors.IsAlready(Status);
-
-        if (Status != requiredStatus)
-            return VisitationErrors.CannotTransition(Status, targetStatus);
 
         var today = DateOnly.FromDateTime(now);
         if (today != Date)

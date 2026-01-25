@@ -25,7 +25,7 @@ internal sealed class UpdateObligationAlertStatusCommandHandler(
             return UserErrors.NotFound(request.UserId);
 
         if (alert.CourtId != staff.CourtId)
-            return ObligationAlertErrors.Unauthorized();
+            return ObligationAlertErrors.Unauthorized;
 
         alertRepository.Update(alert);
 

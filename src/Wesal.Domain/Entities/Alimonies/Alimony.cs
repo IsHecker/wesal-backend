@@ -13,15 +13,16 @@ public sealed class Alimony : Entity
 
     public AlimonyFrequency Frequency { get; private set; }
 
-    // Which day payment is due (1-31 for Monthly, 1-7 for Weekly, etc.)
-    public int StartDayInMonth { get; private set; }
-
-    public DateTime StartAt { get; private set; }
+    public DateOnly StartDate { get; private set; }
 
     // When this obligation ends (could be years later)
-    public DateTime EndAt { get; private set; }
+    public DateOnly EndDate { get; private set; }
 
     public DateOnly? LastGeneratedDate { get; private set; } = null;
+
+
+    // Which day payment is due (1-31 for Monthly, 1-7 for Weekly, etc.)
+    public int StartDayInMonth => StartDate.Day;
 
     private Alimony() { }
 
@@ -32,9 +33,8 @@ public sealed class Alimony : Entity
         Guid recipientId,
         long amount,
         AlimonyFrequency frequency,
-        int startDayInMonth,
-        DateTime startAt,
-        DateTime endAt)
+        DateOnly startDate,
+        DateOnly endDate)
     {
         return new Alimony
         {
@@ -44,9 +44,8 @@ public sealed class Alimony : Entity
             RecipientId = recipientId,
             Amount = amount,
             Frequency = frequency,
-            StartDayInMonth = startDayInMonth,
-            StartAt = startAt,
-            EndAt = endAt,
+            StartDate = startDate,
+            EndDate = endDate,
         };
     }
 
@@ -58,16 +57,14 @@ public sealed class Alimony : Entity
         LastGeneratedDate = visitationDate;
     }
 
-    public int GetFrequencyInDays()
+    public int GetFrequencyInDays(DateOnly targetDate)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
         return Frequency switch
         {
             AlimonyFrequency.Daily => 1,
             AlimonyFrequency.Weekly => 7,
-            AlimonyFrequency.Monthly => DateTime.DaysInMonth(today.Year, today.Month),
-            AlimonyFrequency.Yearly => today.AddYears(1).DayNumber - today.DayNumber,
+            AlimonyFrequency.Monthly => DateTime.DaysInMonth(targetDate.Year, targetDate.Month),
+            AlimonyFrequency.Yearly => targetDate.AddYears(1).DayNumber - targetDate.DayNumber,
             _ => throw new NotImplementedException()
         };
     }

@@ -41,7 +41,7 @@ internal sealed class EnrollFamily : IEndpoint
     internal readonly record struct CreateParentRequest(
         string NationalId,
         string FullName,
-        DateTime BirthDate,
+        DateOnly BirthDate,
         string Gender,
         string? Job,
         string? Address,
@@ -62,7 +62,7 @@ internal sealed class EnrollFamily : IEndpoint
 
     internal readonly record struct CreateChildRequest(
         string FullName,
-        DateTime BirthDate,
+        DateOnly BirthDate,
         string Gender,
         Guid? SchoolId)
     {

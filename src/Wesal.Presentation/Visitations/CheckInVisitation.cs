@@ -18,7 +18,7 @@ internal sealed class CheckInVisitation : IEndpoint
             Guid visitationId,
             ISender sender) =>
         {
-            var result = await sender.Send(new CheckInVisitationCommand(visitationId, SharedData.StaffUserId));
+            var result = await sender.Send(new CheckInVisitationCommand(visitationId, SharedData.CenterStaffUserId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })

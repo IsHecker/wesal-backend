@@ -42,9 +42,8 @@ internal sealed class CreateAlimonyCommandHandler(
             request.RecipientId,
             request.Amount,
             request.Frequency.ToEnum<AlimonyFrequency>(),
-            request.StartDayInMonth,
-            request.StartAt,
-            request.EndAt);
+            request.StartDate,
+            request.EndDate);
 
         await alimonyRepository.AddAsync(alimony, cancellationToken);
 

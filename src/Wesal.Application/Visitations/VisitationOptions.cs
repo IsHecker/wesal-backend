@@ -4,5 +4,6 @@ public sealed class VisitationOptions
 {
     public const string SectionName = "Visitations";
 
-    public int GracePeriodMinutes { get; init; }
+    public int CheckInGracePeriodMinutes { get; init; }
+    public int CheckOutGracePeriodMinutes { get; init; }
 }

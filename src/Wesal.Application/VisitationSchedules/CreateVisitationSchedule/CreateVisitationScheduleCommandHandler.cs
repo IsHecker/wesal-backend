@@ -28,7 +28,11 @@ internal sealed class CreateVisitationScheduleCommandHandler(
         if (!isUserExist)
             return CourtStaffErrors.NotFound(request.UserId);
 
-        var validationResult = await ValidateSchedule(request, cancellationToken);
+        var courtCase = await courtCaseRepository.GetByIdAsync(request.CourtCaseId, cancellationToken);
+        if (courtCase is null)
+            return CourtCaseErrors.NotFound(request.CourtCaseId);
+
+        var validationResult = await ValidateSchedule(request,courtCase.FamilyId, cancellationToken);
         if (validationResult.IsFailure)
             return validationResult.Error;
 
@@ -37,6 +41,7 @@ internal sealed class CreateVisitationScheduleCommandHandler(
 
         var schedule = VisitationSchedule.Create(
             request.CourtCaseId,
+            courtCase.FamilyId,
             request.ParentId,
             request.LocationId,
             request.StartDayInMonth,
@@ -51,13 +56,10 @@ internal sealed class CreateVisitationScheduleCommandHandler(
 
     private async Task<Result> ValidateSchedule(
         CreateVisitationScheduleCommand request,
+        Guid familyId,
         CancellationToken cancellationToken)
     {
-        var courtCase = await courtCaseRepository.GetByIdAsync(request.CourtCaseId, cancellationToken);
-        if (courtCase is null)
-            return CourtCaseErrors.NotFound(request.CourtCaseId);
-
-        var family = await familyRepository.GetByIdAsync(courtCase.FamilyId, cancellationToken)
+        var family = await familyRepository.GetByIdAsync(familyId, cancellationToken)
             ?? throw new InvalidOperationException();
 
         var isParentExist = await parentRepository.ExistsAsync(request.ParentId, cancellationToken);

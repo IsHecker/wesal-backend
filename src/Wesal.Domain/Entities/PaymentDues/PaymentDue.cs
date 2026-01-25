@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.Payments;
@@ -18,13 +19,14 @@ public sealed class PaymentDue : Entity
     public DateTime? PaidAt { get; private set; }
 
     public bool IsPaid => PaidAt != null && PaymentId != null && Status == PaymentStatus.Paid;
-    public bool IsDueDatePassed => DueDate >= DateOnly.FromDateTime(DateTime.UtcNow);
+    public bool IsDueDatePassed => DueDate <= DateOnly.FromDateTime(DateTime.UtcNow);
 
     public static PaymentDue Create(Alimony alimony, DateOnly dueDate)
     {
         return new PaymentDue()
         {
             AlimonyId = alimony.Id,
+            FamilyId = alimony.FamilyId,
             DueDate = dueDate,
             Amount = alimony.Amount,
             Status = PaymentStatus.Pending
@@ -33,7 +35,9 @@ public sealed class PaymentDue : Entity
 
     public Result MarkAsPaid(Guid paymentId)
     {
-        var result = ValidateTransition(PaymentStatus.Pending, PaymentStatus.Paid);
+        var result = StatusTransition
+            .Validate(Status, PaymentStatus.Pending, PaymentStatus.Paid);
+
         if (result.IsFailure)
             return result.Error;
 
@@ -44,19 +48,13 @@ public sealed class PaymentDue : Entity
 
     public Result MarkAsOverdue()
     {
-        return ValidateTransition(PaymentStatus.Pending, PaymentStatus.Overdue);
-    }
+        var result = StatusTransition
+            .Validate(Status, PaymentStatus.Pending, PaymentStatus.Overdue);
 
-    private Result ValidateTransition(
-        PaymentStatus requiredStatus,
-        PaymentStatus targetStatus)
-    {
-        if (Status == targetStatus)
-            return PaymentDueErrors.IsAlready(Status);
+        if (result.IsFailure)
+            return result.Error;
 
-        if (Status != requiredStatus)
-            return PaymentDueErrors.CannotTransition(Status, targetStatus);
-
+        Status = PaymentStatus.Overdue;
         return Result.Success;
     }
 }

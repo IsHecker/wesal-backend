@@ -18,7 +18,6 @@ public sealed class CourtCase : Entity
         Guid courtId,
         Guid familyId,
         string caseNumber,
-        CourtCaseStatus status,
         string decisionSummary)
     {
         return new CourtCase
@@ -26,7 +25,7 @@ public sealed class CourtCase : Entity
             CourtId = courtId,
             FamilyId = familyId,
             CaseNumber = caseNumber,
-            Status = status,
+            Status = CourtCaseStatus.Active,
             DecisionSummary = decisionSummary,
             FiledAt = DateTime.UtcNow,
         };

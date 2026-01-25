@@ -20,7 +20,6 @@ internal sealed class CreateCourtCase : IEndpoint
                 SharedData.StaffUserId,
                 request.FamilyId,
                 request.CaseNumber,
-                request.Status,
                 request.DecisionSummary));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -35,6 +34,5 @@ internal sealed class CreateCourtCase : IEndpoint
     internal readonly record struct Request(
         Guid FamilyId,
         string CaseNumber,
-        string Status,
         string DecisionSummary);
 }

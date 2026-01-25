@@ -53,14 +53,17 @@ internal sealed class GeneratePaymentDuesJob(
 
     private static IEnumerable<DateOnly> GetNextVisitationDates(Alimony alimony)
     {
-        var lastDayInMonth = DateTime.DaysInMonth(DateTime.UtcNow.Year, DateTime.UtcNow.Month);
+        var targetDate = alimony.LastGeneratedDate.HasValue
+            ? DateOnly.FromDateTime(DateTime.UtcNow)
+            : alimony.StartDate;
 
-        var frequencyDays = alimony.GetFrequencyInDays();
-        var now = DateTime.UtcNow;
+        var lastDayInMonth = DateTime.DaysInMonth(targetDate.Year, targetDate.Month);
+
+        var frequencyDays = alimony.GetFrequencyInDays(targetDate);
 
         for (int day = alimony.StartDayInMonth; day <= lastDayInMonth; day += frequencyDays)
         {
-            yield return new DateOnly(now.Year, now.Month, day);
+            yield return new DateOnly(targetDate.Year, targetDate.Month, day);
         }
     }
 }

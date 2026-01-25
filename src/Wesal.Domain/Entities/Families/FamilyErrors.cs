@@ -8,7 +8,7 @@ public static class FamilyErrors
         Error.NotFound("Family.NotFound", $"Family with ID '{id}' was not found");
 
     public static Error NotFoundByParent(Guid parentId) =>
-        Error.NotFound("Family.NotFound", $"Family with ID '{parentId}' was not found");
+        Error.NotFound("Family.NotFound", $"Family with Parent ID '{parentId}' was not found");
 
     public static Error ParentAlreadyExists(string nationalId) =>
         Error.Conflict(

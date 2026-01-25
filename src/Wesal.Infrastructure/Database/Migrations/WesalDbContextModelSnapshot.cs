@@ -52,8 +52,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("uniqueidentifier");
@@ -71,11 +71,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<Guid>("RecipientId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("StartDayInMonth")
-                        .HasColumnType("int");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -100,8 +97,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -430,8 +427,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
 
                     b.Property<Guid>("CourtId")
                         .HasColumnType("uniqueidentifier");
@@ -607,6 +604,12 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ChildId")
+                        .IsUnique();
+
+                    b.HasIndex("SchoolId")
+                        .IsUnique();
+
                     b.ToTable("SchoolReports");
                 });
 
@@ -694,7 +697,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -713,6 +716,15 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("LocationId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("VisitCenterStaffs");
                 });
@@ -840,6 +852,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
+                    b.Property<DateTime>("EndAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
@@ -912,13 +927,13 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Wesal.Domain.Entities.Users.User", null)
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
                         .HasForeignKey("PayerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Wesal.Domain.Entities.Users.User", null)
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
                         .HasForeignKey("RecipientId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1021,7 +1036,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Wesal.Domain.Entities.Notifications.Notification", b =>
                 {
-                    b.HasOne("Wesal.Domain.Entities.Users.User", null)
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
                         .HasForeignKey("RecipientId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1087,12 +1102,42 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Wesal.Domain.Entities.SchoolReports.SchoolReport", b =>
+                {
+                    b.HasOne("Wesal.Domain.Entities.Children.Child", null)
+                        .WithOne()
+                        .HasForeignKey("Wesal.Domain.Entities.SchoolReports.SchoolReport", "ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wesal.Domain.Entities.Schools.School", null)
+                        .WithOne()
+                        .HasForeignKey("Wesal.Domain.Entities.SchoolReports.SchoolReport", "SchoolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Wesal.Domain.Entities.Schools.School", b =>
                 {
                     b.HasOne("Wesal.Domain.Entities.Users.User", null)
                         .WithOne()
                         .HasForeignKey("Wesal.Domain.Entities.Schools.School", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", b =>
+                {
+                    b.HasOne("Wesal.Domain.Entities.VisitationLocations.VisitationLocation", null)
+                        .WithOne()
+                        .HasForeignKey("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", "LocationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Wesal.Domain.Entities.Users.User", null)
+                        .WithOne()
+                        .HasForeignKey("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", "UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

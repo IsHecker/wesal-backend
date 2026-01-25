@@ -428,7 +428,6 @@ Notifications: 2 unread
 **Flow:**
 1. Can pay Alimony at any time before due date
 2. **Before Due Date:**
-
     - System calculates next payment due date
     - System sends a **reminder notification** (7 days) before: 
       - Notification **(all type of ways)**: "Your alimony payment of $500 is due on Jan 1, 2025"
@@ -438,8 +437,7 @@ Notifications: 2 unread
     - Navigates to **"Alimony"**
     - Clicks **"Pay Now"**
 4. **Payment Processing:**
-
-    - Gateway processes transaction and sends a **Webhook** to the system
+- Gateway processes transaction and sends a **Webhook** to the system
 5. **System Records Payment:**
     - If **successful**, System:
       - logs the **Payment**
@@ -449,13 +447,11 @@ Notifications: 2 unread
       - logs failure reason
       - sends a **notification** to the parent to try again later
 
-6. **Court reviews violation and takes an action**
 
 **Output:**
 
 - Both parents see payment history
 - Transactions logged for legal proof
-- Violations tracked automatically
 
 ## 3.7 ✅School Creation & Child-School Linking
 
@@ -527,7 +523,7 @@ Notifications: 2 unread
 
 **Types of Violations:**
 
-1. **Missed Visitation**
+1. ✅**Missed Visitation**
     - System gives the parent a grace period of 30 minutes past scheduled time
     - Detection: Parent still doesn't show up
     - Action:
@@ -535,7 +531,7 @@ Notifications: 2 unread
       - Generates violation alert immediately
 
 
-2. **Unpaid Alimony**
+2. ✅**Unpaid Alimony**
     - A Job checks all alimony obligations with passed due dates
     - Detection: Due date passes and alimony isn't paid yet
     - Action: 
@@ -674,7 +670,7 @@ Notifications: 2 unread
      - View Violations
      - Manage Users
 
-### 9. Multi-Court & Court Isolation Support
+### 9. ✅Multi-Court & Court Isolation Support
 
    - Each court operates independently
    - Courts cannot see each other's data
@@ -766,17 +762,6 @@ Notifications: 2 unread
 - Force password change on first login (School accounts)
 - Role-based access control enforcement
 
-## 8. Alimony Payment Flow
-- Calculate next payment due date
-- Send reminder notification 7 days before due date
-- View alimony obligations
-- Process payment through gateway
-- Receive webhook from payment gateway
-- Log payment (success or failure)
-- Mark alimony as Paid
-- Send confirmation email with receipt
-- Send failure notification
-
 ## 13. Notifications
 - Generate system notifications for events
 - Send notifications to users
@@ -792,11 +777,6 @@ Notifications: 2 unread
 - Navigate to create case
 - Navigate to view violations
 - Navigate to manage users
-
-## 15. Multi-Court & Court Isolation Support
-- Create new court instances (Platform Admin)
-- Ensure court data isolation
-- Prevent courts from seeing each other's data
 
 ## 16. Platform Admin Features
 - Maintain system
@@ -833,3 +813,20 @@ Notifications: 2 unread
 - Calculate alimony payment on-time rates
 - Track violation rate over time
 - Export analytics reports as PDF
+
+
+
+# Confusion Points
+
+- Should Court case-related entities(custody, visitations, and alimonies) be created only once for a family and updated when needed, or it can be created multiple times per family.
+- Should there be a full management(CRUD) for the following entities: 
+  - Alimonies
+  - CourtCases
+  - Custodies
+  - Families
+  - SchoolReports
+  - Schools
+  - VisitationLocations
+  - VisitationSchedules
+- Should visitations and alimonies be generated in advance or just one at a time.
+- Should Notifications be only for parents, or courts and court staff can also get notifications.

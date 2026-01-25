@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -15,13 +14,11 @@ internal sealed class MakeAlimonyPayment : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(ApiEndpoints.Payments.MakeAlimony, async (Request request, ISender sender) =>
+        app.MapPost(ApiEndpoints.Payments.MakeAlimony, async (Guid paymentDueId, Request request, ISender sender) =>
         {
             var result = await sender.Send(new MakeAlimonyPaymentCommand(
                 SharedData.FatherUserId,
-                request.AlimonyId,
-                request.PaymentDueId,
-                request.Amount,
+                paymentDueId,
                 request.PaymentMethod));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -34,9 +31,5 @@ internal sealed class MakeAlimonyPayment : IEndpoint
         .WithOpenApiName(nameof(MakeAlimonyPayment));
     }
 
-    internal readonly record struct Request(
-        Guid AlimonyId,
-        Guid PaymentDueId,
-        long Amount,
-        string PaymentMethod);
+    internal readonly record struct Request(string PaymentMethod);
 }

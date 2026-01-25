@@ -35,7 +35,6 @@ internal sealed class CreateCourtCaseHandler(
             staff.CourtId,
             request.FamilyId,
             request.CaseNumber,
-            request.Status.ToEnum<CourtCaseStatus>(),
             request.DecisionSummary);
 
         await courtCaseRepository.AddAsync(courtCase, cancellationToken);

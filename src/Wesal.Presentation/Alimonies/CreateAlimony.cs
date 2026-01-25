@@ -25,10 +25,8 @@ internal sealed class CreateAlimony : IEndpoint
                 request.RecipientId,
                 request.Amount,
                 request.Frequency,
-                request.StartDayInMonth,
-                request.DueDay,
-                request.StartAt,
-                request.EndAt);
+                request.StartDate,
+                request.EndDate);
 
             var result = await sender.Send(command);
 
@@ -43,13 +41,10 @@ internal sealed class CreateAlimony : IEndpoint
 
     internal record struct Request(
         Guid CourtCaseId,
-        Guid FamilyId,
         Guid PayerId,
         Guid RecipientId,
         long Amount,
         string Frequency,
-        int StartDayInMonth,
-        int DueDay,
-        DateTime StartAt,
-        DateTime EndAt);
+        DateOnly StartDate,
+        DateOnly EndDate);
 }

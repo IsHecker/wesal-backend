@@ -31,7 +31,8 @@ internal sealed class UploadSchoolReport : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(UploadSchoolReport));
+        .WithOpenApiName(nameof(UploadSchoolReport))
+        .DisableAntiforgery();
     }
 
     internal record struct Request(Guid ChildId, string ReportType);

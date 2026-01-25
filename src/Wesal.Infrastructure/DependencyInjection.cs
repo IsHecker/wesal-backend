@@ -7,7 +7,6 @@ using Quartz;
 using Wesal.Application;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Caching;
 using Wesal.Application.Data;
 using Wesal.Application.ObligationAlerts;
@@ -28,7 +27,6 @@ using Wesal.Infrastructure.ObligationAlerts.OverdueAlimonyPaymentsDetection;
 using Wesal.Infrastructure.Parents;
 using Wesal.Infrastructure.PaymentDues;
 using Wesal.Infrastructure.PaymentDues.PaymentDuesGeneration;
-using Wesal.Infrastructure.PaymentGateway;
 using Wesal.Infrastructure.Payments;
 using Wesal.Infrastructure.Schools;
 using Wesal.Infrastructure.VisitationLocations;
@@ -108,8 +106,7 @@ public static class DependencyInjection
 
     private static void AddServices(this IServiceCollection services)
     {
-        services.AddScoped<IPaymentGatewayService, PaymentGatewayService>();
-        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<ObligationAlertService>();
     }
 
     private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)

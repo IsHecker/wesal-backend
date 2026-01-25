@@ -15,6 +15,6 @@ public static class FluentValidationExtensions
 
     private static string AllowedValuesMessage<TEnum>() where TEnum : struct, Enum
     {
-        return $"'{nameof(TEnum)}' must be one of: {string.Join(", ", Enum.GetNames(typeof(TEnum)))}";
+        return $"'{typeof(TEnum).Name}' must be one of: {string.Join(", ", Enum.GetNames(typeof(TEnum)))}";
     }
 }

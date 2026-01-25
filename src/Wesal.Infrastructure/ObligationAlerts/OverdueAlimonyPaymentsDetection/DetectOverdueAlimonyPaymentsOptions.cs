@@ -4,7 +4,7 @@ internal sealed class DetectOverdueAlimonyPaymentsOptions
 {
     public const string SectionName = "BackgroundJobs:DetectOverdueAlimonyPayments";
 
-    public bool Enabled { get; init; } = true;
+    public bool Enabled { get; init; }
     public int BatchSize { get; init; }
     public float RunIntervalInMinutes { get; init; }
 

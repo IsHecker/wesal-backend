@@ -28,8 +28,8 @@ internal sealed class UploadSchoolReportCommandHandler(
             return validationResult.Error;
 
         var report = SchoolReport.Create(
-            school.Id,
             request.ChildId,
+            school.Id,
             request.ReportType.ToEnum<SchoolReportType>());
 
         await schoolReportRepository.AddAsync(report, cancellationToken);

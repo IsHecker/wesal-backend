@@ -9,7 +9,7 @@ public sealed class Child : Entity
     public Guid? SchoolId { get; private set; }
 
     public string FullName { get; private set; } = null!;
-    public DateTime BirthDate { get; private set; }
+    public DateOnly BirthDate { get; private set; }
     public string Gender { get; private set; } = null!;
 
     private Child() { }
@@ -17,7 +17,7 @@ public sealed class Child : Entity
     public static Child Create(
         Guid familyId,
         string fullName,
-        DateTime birthDate,
+        DateOnly birthDate,
         string gender,
         Guid? schoolId = null)
     {

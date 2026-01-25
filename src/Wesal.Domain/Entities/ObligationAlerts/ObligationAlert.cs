@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Results;
 
@@ -25,10 +26,11 @@ public sealed class ObligationAlert : Entity
     private ObligationAlert() { }
 
     public static ObligationAlert Create(
+        Guid courtId,
         Guid parentId,
         Guid relatedEntityId,
-        Guid courtId,
         AlertType type,
+        AlertStatus status,
         string description)
     {
         return new ObligationAlert
@@ -38,11 +40,16 @@ public sealed class ObligationAlert : Entity
             CourtId = courtId,
             Type = type,
             Description = description,
-            Status = AlertStatus.Pending,
+            Status = status,
             TriggeredAt = DateTime.UtcNow,
             ResolvedAt = null,
             ResolutionNotes = null,
         };
+    }
+
+    public void Activate()
+    {
+        Status = AlertStatus.Pending;
     }
 
     public Result UpdateStatus(AlertStatus status, string? resolutionNotes)
@@ -51,17 +58,17 @@ public sealed class ObligationAlert : Entity
         {
             AlertStatus.UnderReview => MarkAsUnderReview(),
             AlertStatus.Resolved => Resolve(resolutionNotes!, DateTime.UtcNow),
-            _ => Result.Success
+            _ => ObligationAlertErrors.CannotUpdateStatus(status)
         };
     }
 
     private Result MarkAsUnderReview()
     {
-        if (Status == AlertStatus.Resolved)
-            return ObligationAlertErrors.CannotModifyResolved();
+        var result = StatusTransition
+            .Validate(Status, AlertStatus.Resolved, AlertStatus.UnderReview);
 
-        if (Status == AlertStatus.UnderReview)
-            return ObligationAlertErrors.AlreadyUnderReview();
+        if (result.IsFailure)
+            return result.Error;
 
         Status = AlertStatus.UnderReview;
         return Result.Success;
@@ -70,7 +77,7 @@ public sealed class ObligationAlert : Entity
     private Result Resolve(string resolutionNotes, DateTime resolvedAt)
     {
         if (Status == AlertStatus.Resolved)
-            return ObligationAlertErrors.AlreadyResolved();
+            return ObligationAlertErrors.AlreadyResolved;
 
         Status = AlertStatus.Resolved;
         ResolutionNotes = resolutionNotes;

@@ -11,7 +11,7 @@ public sealed class Parent : Entity
 
     public string NationalId { get; private set; } = null!;
     public string FullName { get; private set; } = null!;
-    public DateTime BirthDate { get; private set; }
+    public DateOnly BirthDate { get; private set; }
     public string Gender { get; private set; } = null!;
     public string? Job { get; private set; }
     public string? Address { get; private set; }
@@ -22,10 +22,11 @@ public sealed class Parent : Entity
     private Parent() { }
 
     public static Parent Create(
+        Guid userId,
         Guid courtId,
         string nationalId,
         string fullName,
-        DateTime birthDate,
+        DateOnly birthDate,
         string gender,
         string? job = null,
         string? address = null,
@@ -34,6 +35,7 @@ public sealed class Parent : Entity
     {
         return new Parent
         {
+            UserId = userId,
             CourtId = courtId,
             NationalId = nationalId,
             FullName = fullName,

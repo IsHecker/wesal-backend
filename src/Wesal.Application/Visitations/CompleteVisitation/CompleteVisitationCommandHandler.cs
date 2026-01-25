@@ -26,7 +26,7 @@ internal sealed class CompleteVisitationCommandHandler(
         if (staff is null)
             return UserErrors.NotFound(request.UserId);
 
-        var CompleteResult = visitation.Complete(staff, options.Value.GracePeriodMinutes);
+        var CompleteResult = visitation.Complete(staff, options.Value.CheckInGracePeriodMinutes);
         if (CompleteResult.IsFailure)
             return CompleteResult.Error;
 

@@ -9,7 +9,5 @@ public record struct CreateAlimonyCommand(
     Guid RecipientId,
     long Amount,
     string Frequency,
-    int StartDayInMonth,
-    int DueDay,
-    DateTime StartAt,
-    DateTime EndAt) : ICommand<Guid>;
+    DateOnly StartDate,
+    DateOnly EndDate) : ICommand<Guid>;

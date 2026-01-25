@@ -5,5 +5,5 @@ public record struct ChildResponse(
     string FullName,
     Guid? SchoolId,
     string Gender,
-    DateTime BirthDate,
+    DateOnly BirthDate,
     int Age);

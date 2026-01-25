@@ -38,6 +38,8 @@ public static class ApiEndpoints
 
     public static class Families
     {
+        public const string GetById = $"{FamiliesBase}/{{familyId:guid}}";
+
         public const string Enroll = FamiliesBase;
         public const string GetByParent = FamiliesBase;
     }
@@ -76,13 +78,14 @@ public static class ApiEndpoints
 
     public static class PaymentsDue
     {
-        public const string ListByFamily = $"{PaymentsDueBase}/{{familyId:guid}}";
+        public const string GetById = $"{PaymentsDueBase}/{{paymetDueId:guid}}";
+        public const string ListByFamily = $"{Families.GetById}/payments-due";
     }
 
     public static class Payments
     {
-        public const string ListByPaymentDue = $"{PaymentsBase}/{{paymetDueId:guid}}";
-        public const string MakeAlimony = PaymentsBase;
+        public const string ListByPaymentDue = $"{PaymentsDue.GetById}/payments";
+        public const string MakeAlimony = $"{PaymentsDue.GetById}/payments";
     }
 
     public static class Notifications

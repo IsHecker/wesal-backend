@@ -3,7 +3,6 @@ using Wesal.Application.Data;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
 using Wesal.Domain.Entities.Children;
-using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.Users;
@@ -12,6 +11,7 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Families.EnrollFamily;
 
 internal sealed class EnrollFamilyCommandHandler(
+    IRepository<User> userRepository,
     ICourtStaffRepository staffRepository,
     IParentRepository parentRepository,
     IFamilyRepository familyRepository,
@@ -32,7 +32,11 @@ internal sealed class EnrollFamilyCommandHandler(
         if (await parentRepository.ExistsByNationalIdAsync(request.Mother.NationalId, cancellationToken))
             return FamilyErrors.ParentAlreadyExists(request.Mother.NationalId);
 
+        var fatherUser = User.Create(UserRole.Parent, request.Father.NationalId, "");
+        var motherUser = User.Create(UserRole.Parent, request.Father.NationalId, "");
+
         var father = Parent.Create(
+            fatherUser.Id,
             staff.CourtId,
             request.Father.NationalId,
             request.Father.FullName,
@@ -44,6 +48,7 @@ internal sealed class EnrollFamilyCommandHandler(
             request.Father.Email);
 
         var mother = Parent.Create(
+            motherUser.Id,
             staff.CourtId,
             request.Mother.NationalId,
             request.Mother.FullName,
@@ -56,8 +61,9 @@ internal sealed class EnrollFamilyCommandHandler(
 
         // TODO: Create User accounts with for both parents temporary passwords
 
-        await parentRepository.AddAsync(father, cancellationToken);
-        await parentRepository.AddAsync(mother, cancellationToken);
+        await parentRepository.AddRangeAsync([father, mother], cancellationToken);
+
+        await userRepository.AddRangeAsync([fatherUser, motherUser], cancellationToken);
 
         var family = Family.Create(father.Id, mother.Id);
 

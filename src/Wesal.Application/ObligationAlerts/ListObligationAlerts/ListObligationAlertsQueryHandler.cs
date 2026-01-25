@@ -18,14 +18,14 @@ internal sealed class ListObligationAlertsQueryHandler(
         ListObligationAlertsQuery request,
         CancellationToken cancellationToken)
     {
-        IEnumerable<ObligationAlert> alerts;
+        IQueryable<ObligationAlert> alerts;
 
         var staff = await staffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         if (staff is null)
             return UserErrors.NotFound(request.UserId);
 
         alerts = context.ObligationAlerts
-            .Where(alert => alert.CourtId == staff.CourtId);
+            .Where(alert => alert.CourtId == staff.CourtId && alert.Status != AlertStatus.Drafted);
 
         if (!string.IsNullOrWhiteSpace(request.Status))
             alerts = alerts.Where(a => a.Status == request.Status.ToEnum<AlertStatus>());
@@ -33,13 +33,14 @@ internal sealed class ListObligationAlertsQueryHandler(
         if (!string.IsNullOrWhiteSpace(request.Type))
             alerts = alerts.Where(a => a.Type == request.Type.ToEnum<AlertType>());
 
-        _ = alerts.TryGetNonEnumeratedCount(out var totalCount);
+        var totalCount = alerts.Count();
         var pendingCount = alerts.Count(a => a.Status == AlertStatus.Pending);
         var underReviewCount = alerts.Count(a => a.Status == AlertStatus.UnderReview);
         var resolvedCount = alerts.Count(a => a.Status == AlertStatus.Resolved);
 
         var pagedAlerts = await alerts
             .OrderByDescending(a => a.TriggeredAt)
+            .Paginate(request.Pagination)
             .Select(alert => new ObligationAlertResponse(
                 alert.Id,
                 alert.CourtId,
@@ -51,7 +52,6 @@ internal sealed class ListObligationAlertsQueryHandler(
                 alert.Status.ToString(),
                 alert.ResolvedAt,
                 alert.ResolutionNotes))
-            .Paginate(request.Pagination)
             .ToPagedResponseAsync(request.Pagination, totalCount);
 
         return new ObligationAlertsResponse(

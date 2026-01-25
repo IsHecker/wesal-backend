@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wesal.Domain.Entities.Notifications;
-using Wesal.Domain.Entities.Users;
+using Wesal.Domain.Entities.Parents;
 
 namespace Wesal.Infrastructure.Notifications;
 
@@ -9,7 +9,7 @@ internal sealed class NotificationConfiguration : IEntityTypeConfiguration<Notif
 {
     public void Configure(EntityTypeBuilder<Notification> builder)
     {
-        builder.HasOne<User>()
+        builder.HasOne<Parent>()
             .WithMany()
             .HasForeignKey(notif => notif.RecipientId);
     }

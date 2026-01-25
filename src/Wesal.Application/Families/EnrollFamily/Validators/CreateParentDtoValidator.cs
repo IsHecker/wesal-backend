@@ -27,7 +27,7 @@ internal sealed class CreateParentDtoValidator : AbstractValidator<CreateParentD
         RuleFor(x => x.BirthDate)
             .NotEmpty()
             .WithMessage($"birth date is required")
-            .LessThan(DateTime.UtcNow)
+            .LessThan(DateOnly.FromDateTime(DateTime.UtcNow))
             .WithMessage($"birth date must be in the past")
             .Must(BeAtLeast18YearsOld)
             .WithMessage($"must be at least 18 years old");
@@ -64,7 +64,7 @@ internal sealed class CreateParentDtoValidator : AbstractValidator<CreateParentD
             .WithMessage($"job cannot exceed 100 characters");
     }
 
-    private static bool BeAtLeast18YearsOld(DateTime birthDate)
+    private static bool BeAtLeast18YearsOld(DateOnly birthDate)
     {
         var age = AgeCalculator.CalculateAge(birthDate);
 

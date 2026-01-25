@@ -18,7 +18,7 @@ internal sealed class CreateChildDtoValidator : AbstractValidator<CreateChildDto
         RuleFor(x => x.BirthDate)
             .NotEmpty()
             .WithMessage("Child birth date is required")
-            .LessThan(DateTime.UtcNow)
+            .LessThan(DateOnly.FromDateTime(DateTime.UtcNow))
             .WithMessage("Child birth date must be in the past");
 
         RuleFor(x => x.Gender)

@@ -45,6 +45,7 @@ internal class Program
 
         app.UseSerilogRequestLogging();
         app.UseExceptionHandler();
+        // app.UseAntiforgery();
         app.MapEndpoints();
 
         app.Run();

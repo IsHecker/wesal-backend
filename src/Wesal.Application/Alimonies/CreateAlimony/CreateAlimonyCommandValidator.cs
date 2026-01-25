@@ -12,8 +12,8 @@ public sealed class CreateAlimonyCommandValidator : AbstractValidator<CreateAlim
         RuleFor(x => x.CourtCaseId).NotEmpty();
         RuleFor(x => x.PayerId).NotEmpty();
         RuleFor(x => x.RecipientId).NotEmpty();
-        RuleFor(x => x.StartAt).NotEmpty();
-        RuleFor(x => x.EndAt).NotEmpty();
+        RuleFor(x => x.StartDate).NotEmpty();
+        RuleFor(x => x.EndDate).NotEmpty();
 
         RuleFor(x => x.Amount)
             .GreaterThan(0)
@@ -22,11 +22,6 @@ public sealed class CreateAlimonyCommandValidator : AbstractValidator<CreateAlim
         RuleFor(x => x.Frequency)
             .NotEmpty()
             .MustBeEnumValue<CreateAlimonyCommand, AlimonyFrequency>();
-
-        RuleFor(x => x.DueDay)
-            .GreaterThanOrEqualTo(1)
-            .LessThanOrEqualTo(31)
-            .WithMessage("Due day must be between 1 and 31");
 
         RuleFor(x => x)
             .Must(HaveValidDateRange)
@@ -38,7 +33,7 @@ public sealed class CreateAlimonyCommandValidator : AbstractValidator<CreateAlim
     }
 
     private bool HaveValidDateRange(CreateAlimonyCommand command) =>
-        command.StartAt < command.EndAt;
+        command.StartDate < command.EndDate;
 
     private bool HaveDifferentPayerAndRecipient(CreateAlimonyCommand command) =>
         command.PayerId != command.RecipientId;

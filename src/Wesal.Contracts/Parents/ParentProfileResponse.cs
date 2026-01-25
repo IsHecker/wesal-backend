@@ -4,7 +4,7 @@ public record struct ParentProfileResponse(
     Guid Id,
     string FullName,
     string NationalId,
-    DateTime BirthDate,
+    DateOnly BirthDate,
     string Gender,
     string? Job,
     string? Address,

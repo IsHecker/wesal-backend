@@ -16,11 +16,6 @@ internal sealed class CreateCourtCaseCommandValidator : AbstractValidator<Create
             .NotEmpty()
             .MaximumLength(50);
 
-        RuleFor(x => x.Status)
-            .NotEmpty()
-            .WithMessage("Case status is required")
-            .MustBeEnumValue<CreateCourtCaseCommand, CourtCaseStatus>();
-
         RuleFor(x => x.DecisionSummary)
             .NotEmpty()
             .WithMessage("Decision summary is required")

@@ -6,5 +6,4 @@ public record struct CreateCourtCaseCommand(
     Guid UserId,
     Guid FamilyId,
     string CaseNumber,
-    string Status,
     string DecisionSummary) : ICommand<Guid>;

@@ -7,16 +7,6 @@ public static class VisitationErrors
     public static Error NotFound(Guid visitationId) =>
         Error.NotFound("Visitation.NotFound", $"Visitation with ID '{visitationId}' not found");
 
-    public static Error IsAlready(VisitationStatus status) =>
-        Error.Validation(
-            $"Visitation.IsAlready{status}",
-            $"This visitation is already '{status}'");
-
-    public static Error CannotTransition(VisitationStatus currentStatus, VisitationStatus targetStatus) =>
-        Error.Validation(
-            "Visitation.InvalidStatusTransition",
-            $"Cannot change visitation status from '{currentStatus}' to '{targetStatus}'.");
-
     public static Error CannotCompleteBeforeEndTime(TimeOnly endTime) =>
         Error.Validation(
             "Visitation.CannotCompleteBeforeEndTime",
