@@ -1,10 +1,10 @@
+using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.CourtCases;
-using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Results;
 
@@ -27,7 +27,7 @@ internal sealed class ListCourtCasesByFamilyQueryHandler(
         var courtCases = context.CourtCases
             .Where(courtCase => courtCase.FamilyId == request.FamilyId);
 
-        _ = courtCases.TryGetNonEnumeratedCount(out var totalCount);
+        var totalCount = await courtCases.CountAsync(cancellationToken);
 
         return await courtCases
             .Paginate(request.Pagination)

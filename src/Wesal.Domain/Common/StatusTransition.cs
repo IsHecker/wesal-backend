@@ -11,12 +11,12 @@ internal sealed class StatusTransition
         where TEnum : struct, Enum
     {
         if (EqualityComparer<TEnum>.Default.Equals(current, targetStatus))
-            Error.Validation(
+            return Error.Validation(
                 $"General.IsAlready{current}",
                 $"This Entity is already '{current}'");
 
         if (!EqualityComparer<TEnum>.Default.Equals(current, requiredStatus))
-            Error.Validation(
+            return Error.Validation(
                 "General.InvalidStatusTransition",
                 $"Cannot change status from '{current}' to '{targetStatus}'.");
 

@@ -4,5 +4,5 @@ public enum ComplaintType
 {
     Denied,
     Visitation,
-    harassment
+    Harassment
 }

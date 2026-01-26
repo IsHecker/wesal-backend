@@ -129,6 +129,52 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.ToTable("Children");
                 });
 
+            modelBuilder.Entity("Wesal.Domain.Entities.Complaints.Complaint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourtId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FiledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ReporterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ResolutionNotes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReporterId");
+
+                    b.ToTable("Complaints");
+                });
+
             modelBuilder.Entity("Wesal.Domain.Entities.CourtCases.CourtCase", b =>
                 {
                     b.Property<Guid>("Id")
@@ -253,10 +299,62 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.ToTable("Custodies");
                 });
 
+            modelBuilder.Entity("Wesal.Domain.Entities.CustodyRequests.CustodyRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourtCaseId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("CustodyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DecisionNote")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustodyRequests");
+                });
+
             modelBuilder.Entity("Wesal.Domain.Entities.Families.Family", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourtId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -953,6 +1051,15 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasForeignKey("SchoolId");
                 });
 
+            modelBuilder.Entity("Wesal.Domain.Entities.Complaints.Complaint", b =>
+                {
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
+                        .WithMany()
+                        .HasForeignKey("ReporterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Wesal.Domain.Entities.CourtCases.CourtCase", b =>
                 {
                     b.HasOne("Wesal.Domain.Entities.FamilyCourts.FamilyCourt", null)
@@ -993,7 +1100,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Wesal.Domain.Entities.Users.User", null)
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
                         .HasForeignKey("CustodianId")
                         .OnDelete(DeleteBehavior.NoAction)

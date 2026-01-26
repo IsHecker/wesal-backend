@@ -9,6 +9,12 @@ namespace Wesal.Infrastructure.Custodies;
 internal sealed class CustodyRepository(WesalDbContext context)
     : Repository<Custody>(context), ICustodyRepository
 {
+    public Task<bool> ExistsByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default)
+    {
+        return context.Custodies
+            .AnyAsync(custody => custody.CourtCaseId == courtCaseId, cancellationToken);
+    }
+
     public Task<Custody?> GetByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken = default)
     {
         return context.Custodies

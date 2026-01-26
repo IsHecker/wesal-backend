@@ -57,7 +57,7 @@ public sealed class ObligationAlert : Entity
         return status switch
         {
             AlertStatus.UnderReview => MarkAsUnderReview(),
-            AlertStatus.Resolved => Resolve(resolutionNotes!, DateTime.UtcNow),
+            AlertStatus.Resolved => MarkAsResolved(resolutionNotes!, DateTime.UtcNow),
             _ => ObligationAlertErrors.CannotUpdateStatus(status)
         };
     }
@@ -65,7 +65,7 @@ public sealed class ObligationAlert : Entity
     private Result MarkAsUnderReview()
     {
         var result = StatusTransition
-            .Validate(Status, AlertStatus.Resolved, AlertStatus.UnderReview);
+            .Validate(Status, AlertStatus.Pending, AlertStatus.UnderReview);
 
         if (result.IsFailure)
             return result.Error;
@@ -74,7 +74,7 @@ public sealed class ObligationAlert : Entity
         return Result.Success;
     }
 
-    private Result Resolve(string resolutionNotes, DateTime resolvedAt)
+    private Result MarkAsResolved(string resolutionNotes, DateTime resolvedAt)
     {
         if (Status == AlertStatus.Resolved)
             return ObligationAlertErrors.AlreadyResolved;

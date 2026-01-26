@@ -7,8 +7,8 @@ public static class ObligationAlertErrors
     public static Error NotFound(Guid id) =>
         Error.NotFound("ObligationAlert.NotFound", $"Obligation alert with ID '{id}' was not found");
 
-    public static Error Unauthorized =>
-        Error.Unauthorized("ObligationAlert.Unauthorized", "You are not authorized to resolve this alert");
+    public static Error AlertMismatch =>
+        Error.Unauthorized("ObligationAlert.AlertMismatch", "You are not authorized to resolve this alert");
 
     public static Error AlreadyResolved =>
         Error.Conflict("ObligationAlert.AlreadyResolved", "This alert has already been resolved");

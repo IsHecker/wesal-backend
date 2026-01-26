@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.Custodies;
 using Wesal.Domain.Entities.Families;
-using Wesal.Domain.Entities.Users;
+using Wesal.Domain.Entities.Parents;
 
 namespace Wesal.Infrastructure.Custodies;
 
@@ -21,7 +21,7 @@ internal sealed class CustodyConfiguration : IEntityTypeConfiguration<Custody>
             .HasForeignKey(custody => custody.FamilyId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne<User>()
+        builder.HasOne<Parent>()
             .WithMany()
             .HasForeignKey(custody => custody.CustodianId)
             .OnDelete(DeleteBehavior.NoAction);

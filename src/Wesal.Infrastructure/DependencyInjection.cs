@@ -8,12 +8,14 @@ using Wesal.Application;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Caching;
+using Wesal.Application.Complaints;
 using Wesal.Application.Data;
 using Wesal.Application.ObligationAlerts;
 using Wesal.Application.Visitations;
 using Wesal.Infrastructure.Alimonies;
 using Wesal.Infrastructure.Caching;
 using Wesal.Infrastructure.Children;
+using Wesal.Infrastructure.Complaints;
 using Wesal.Infrastructure.CourtCases;
 using Wesal.Infrastructure.CourtStaffs;
 using Wesal.Infrastructure.Custodies;
@@ -82,6 +84,9 @@ public static class DependencyInjection
 
         services.Configure<ObligationAlertOptions>(
             configuration.GetSection(ObligationAlertOptions.SectionName));
+
+        services.Configure<ComplaintOptions>(
+            configuration.GetSection(ComplaintOptions.SectionName));
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -102,6 +107,7 @@ public static class DependencyInjection
         services.AddScoped<IObligationAlertRepository, ObligationAlertRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IVisitCenterStaffRepository, VisitCenterStaffRepository>();
+        services.AddScoped<IComplaintRepository, ComplaintRepository>();
     }
 
     private static void AddServices(this IServiceCollection services)

@@ -688,7 +688,18 @@ Notifications: 2 unread
 
 # 🔹 6. Beyond MVP
 
-### **1. Alimony Enforcement**
+### 4. Document Management (Optional Feature)
+
+- Document Uploaded by any role
+- **Document Storage:**
+  - Secure file storage
+  - Audit trail (who uploaded, when)
+- **Document Viewing:**
+  - Court staff view all documents per case
+  - Parents view documents relevant to them
+  - Schools view documents for their students
+
+### **1. ✅Alimony Enforcement**
 
 - **Obligation Management:**
   - Court staff define alimony terms
@@ -706,7 +717,7 @@ Notifications: 2 unread
 - ✅School Account Management
 - ✅Child-School Linking
 
-### 3. Custody Request
+### 3. ✅Custody Request
 
 - **The Non-Custodial parent issues a request for custody:**
   - Specify the period of time for this custody
@@ -716,18 +727,7 @@ Notifications: 2 unread
   - Can Accept/Decline the request with the court decision note
   - Update custody decision with effective date
 
-### 4. Document Management (Optional Feature)
-
-- Document Uploaded by any role
-- **Document Storage:**
-  - Secure file storage
-  - Audit trail (who uploaded, when)
-- **Document Viewing:**
-  - Court staff view all documents per case
-  - Parents view documents relevant to them
-  - Schools view documents for their students
-
-### 5. Complaint System (Optional Feature)
+### 5. ✅Complaint System (Optional Feature)
 
 - **Parent Complaints:**
   - Parents file complaints against other parent
@@ -741,7 +741,7 @@ Notifications: 2 unread
   - Track all complaints per case
   - Use in custody modification hearings
 
-### 6. Compliance Analytics (Optional Feature)
+### 6. ✅Compliance Analytics (Optional Feature)
 
 - Visitation attendance rates
 
@@ -766,22 +766,6 @@ Notifications: 2 unread
 - Generate system notifications for events
 - Send notifications to users
 - Track notification status
-
-## 14. Court Staff Dashboard
-- Login
-- View total families registered
-- View active court cases
-- View pending violation alerts
-- View today's scheduled visitations
-- Navigate to create family
-- Navigate to create case
-- Navigate to view violations
-- Navigate to manage users
-
-## 16. Platform Admin Features
-- Maintain system
-- Manage courts
-- Configure system-wide settings
 
 ## 17. Custody Request (Beyond MVP)
 - Non-custodial parent issues custody request
@@ -830,3 +814,4 @@ Notifications: 2 unread
   - VisitationSchedules
 - Should visitations and alimonies be generated in advance or just one at a time.
 - Should Notifications be only for parents, or courts and court staff can also get notifications.
+- Should there be multiple school accounts under the main school account just like court admin account that can create court staff accounts.

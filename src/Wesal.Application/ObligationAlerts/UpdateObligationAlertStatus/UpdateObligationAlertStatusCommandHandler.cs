@@ -9,23 +9,23 @@ namespace Wesal.Application.ObligationAlerts.UpdateObligationAlertStatus;
 
 internal sealed class UpdateObligationAlertStatusCommandHandler(
     IObligationAlertRepository alertRepository,
-    ICourtStaffRepository staffRepository) : ICommandHandler<UpdateObligationAlertStatusCommand>
+    ICourtStaffRepository staffRepository)
+    : ICommandHandler<UpdateObligationAlertStatusCommand>
 {
     public async Task<Result> Handle(
         UpdateObligationAlertStatusCommand request,
         CancellationToken cancellationToken)
     {
-        var alert = await alertRepository.GetByIdAsync(request.AlertId, cancellationToken);
-
-        if (alert is null)
-            return ObligationAlertErrors.NotFound(request.AlertId);
-
         var staff = await staffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
         if (staff is null)
             return UserErrors.NotFound(request.UserId);
 
+        var alert = await alertRepository.GetByIdAsync(request.AlertId, cancellationToken);
+        if (alert is null)
+            return ObligationAlertErrors.NotFound(request.AlertId);
+
         if (alert.CourtId != staff.CourtId)
-            return ObligationAlertErrors.Unauthorized;
+            return ObligationAlertErrors.AlertMismatch;
 
         alertRepository.Update(alert);
 

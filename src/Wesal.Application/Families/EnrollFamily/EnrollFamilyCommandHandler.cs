@@ -65,7 +65,7 @@ internal sealed class EnrollFamilyCommandHandler(
 
         await userRepository.AddRangeAsync([fatherUser, motherUser], cancellationToken);
 
-        var family = Family.Create(father.Id, mother.Id);
+        var family = Family.Create(staff.CourtId, father.Id, mother.Id);
 
         await familyRepository.AddAsync(family, cancellationToken);
 

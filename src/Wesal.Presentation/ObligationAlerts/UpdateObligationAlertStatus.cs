@@ -20,8 +20,8 @@ internal sealed class UpdateObligationAlertStatus : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new UpdateObligationAlertStatusCommand(
-                alertId,
                 SharedData.StaffUserId,
+                alertId,
                 request.Status,
                 request.ResolutionNotes));
 

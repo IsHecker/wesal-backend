@@ -6,6 +6,7 @@ namespace Wesal.Domain.Entities.Families;
 
 public sealed class Family : Entity
 {
+    public Guid CourtId { get; private set; }
     public Guid FatherId { get; private set; }
     public Guid MotherId { get; private set; }
 
@@ -15,10 +16,11 @@ public sealed class Family : Entity
 
     private Family() { }
 
-    public static Family Create(Guid fatherId, Guid motherId)
+    public static Family Create(Guid courtId, Guid fatherId, Guid motherId)
     {
         return new Family
         {
+            CourtId = courtId,
             FatherId = fatherId,
             MotherId = motherId,
         };

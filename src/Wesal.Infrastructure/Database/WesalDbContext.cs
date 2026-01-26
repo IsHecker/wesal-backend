@@ -3,9 +3,11 @@ using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Data;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.Children;
+using Wesal.Domain.Entities.Complaints;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Custodies;
+using Wesal.Domain.Entities.CustodyRequests;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Notifications;
@@ -38,12 +40,14 @@ internal sealed class WesalDbContext(DbContextOptions<WesalDbContext> options)
    public DbSet<Child> Children { get; init; }
    public DbSet<CourtCase> CourtCases { get; init; }
    public DbSet<Custody> Custodies { get; init; }
+   public DbSet<CustodyRequest> CustodyRequests { get; init; }
    public DbSet<Visitation> Visitations { get; init; }
    public DbSet<VisitationSchedule> VisitationSchedules { get; init; }
    public DbSet<VisitationLocation> VisitationLocations { get; init; }
    public DbSet<Alimony> Alimonies { get; init; }
    public DbSet<PaymentDue> PaymentsDue { get; init; }
    public DbSet<Payment> Payments { get; init; }
+   public DbSet<Complaint> Complaints { get; init; }
    public DbSet<ObligationAlert> ObligationAlerts { get; init; }
    public DbSet<Notification> Notifications { get; init; }
 
