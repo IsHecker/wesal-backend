@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.Families;
+using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Entities.VisitationSchedules;
@@ -12,6 +13,11 @@ internal sealed class VisitationScheduleConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<VisitationSchedule> builder)
     {
+        builder.HasOne<FamilyCourt>()
+            .WithMany()
+            .HasForeignKey(courtCase => courtCase.CourtId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         builder.HasOne<CourtCase>()
             .WithMany()
             .HasForeignKey(courtCase => courtCase.CourtCaseId)

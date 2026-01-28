@@ -1,6 +1,6 @@
 namespace Wesal.Domain.Entities.ObligationAlerts;
 
-public enum AlertType
+public enum ViolationType
 {
     MissedVisit,
     UnpaidAlimony,

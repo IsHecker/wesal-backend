@@ -1,6 +1,7 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
+using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
 using Wesal.Domain.Results;
@@ -10,7 +11,8 @@ namespace Wesal.Application.Payments.MakeAlimonyPayment;
 internal sealed class MakeAlimonyPaymentCommandHandler(
     IAlimonyRepository alimonyRepository,
     IPaymentRepository paymentRepository,
-    IPaymentDueRepository paymentDueRepository)
+    IPaymentDueRepository paymentDueRepository,
+    IComplianceMetricsRepository metricsRepository)
     : ICommandHandler<MakeAlimonyPaymentCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(
@@ -51,8 +53,20 @@ internal sealed class MakeAlimonyPaymentCommandHandler(
         await paymentRepository.AddAsync(payment, cancellationToken);
         paymentDueRepository.Update(paymentDue);
 
-        // TODO: Record payment
+        await RecordAlimonyPaidOnTimeAsync(alimony, cancellationToken);
 
         return payment.Id;
+    }
+
+    private async Task RecordAlimonyPaidOnTimeAsync(Alimony alimony, CancellationToken cancellationToken)
+    {
+        var metrics = await metricsRepository.GetAsync(
+            alimony.FamilyId,
+            alimony.PayerId,
+            DateTime.UtcNow.ToDateOnly(),
+            cancellationToken) ?? throw new InvalidOperationException();
+
+        metrics.RecordAlimonyPaidOnTime();
+        metricsRepository.Update(metrics);
     }
 }

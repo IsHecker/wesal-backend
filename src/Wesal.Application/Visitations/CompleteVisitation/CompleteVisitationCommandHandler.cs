@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Data;
+using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.Visitations;
@@ -11,6 +12,7 @@ namespace Wesal.Application.Visitations.CompleteVisitation;
 internal sealed class CompleteVisitationCommandHandler(
     IRepository<Visitation> visitationRepository,
     IVisitCenterStaffRepository centerStaffRepository,
+    IComplianceMetricsRepository metricsRepository,
     IOptions<VisitationOptions> options)
     : ICommandHandler<CompleteVisitationCommand>
 {
@@ -31,7 +33,20 @@ internal sealed class CompleteVisitationCommandHandler(
             return CompleteResult.Error;
 
         visitationRepository.Update(visitation);
+        await RecordVisitationCompletedAsync(visitation, cancellationToken);
 
         return Result.Success;
+    }
+
+    private async Task RecordVisitationCompletedAsync(Visitation visitation, CancellationToken cancellationToken)
+    {
+        var metrics = await metricsRepository.GetAsync(
+            visitation.FamilyId,
+            visitation.ParentId,
+            DateTime.UtcNow.ToDateOnly(),
+            cancellationToken) ?? throw new InvalidOperationException();
+
+        metrics.RecordVisitationCompleted();
+        metricsRepository.Update(metrics);
     }
 }

@@ -18,7 +18,7 @@ internal sealed class ListVisitationsQueryValidator : AbstractValidator<ListVisi
             .When(x => !string.IsNullOrWhiteSpace(x.Status));
 
         RuleFor(x => x.Date)
-            .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.UtcNow).AddYears(1))
+            .LessThanOrEqualTo(DateTime.UtcNow.ToDateOnly().AddYears(1))
             .When(x => x.Date.HasValue)
             .WithMessage("Date cannot be more than 1 years in the future");
     }

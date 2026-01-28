@@ -7,6 +7,7 @@ using Quartz;
 using Wesal.Application;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Caching;
 using Wesal.Application.Complaints;
 using Wesal.Application.Data;
@@ -15,7 +16,9 @@ using Wesal.Application.Visitations;
 using Wesal.Infrastructure.Alimonies;
 using Wesal.Infrastructure.Caching;
 using Wesal.Infrastructure.Children;
+using Wesal.Infrastructure.CloudinaryStorage;
 using Wesal.Infrastructure.Complaints;
+using Wesal.Infrastructure.ComplianceMetrics;
 using Wesal.Infrastructure.CourtCases;
 using Wesal.Infrastructure.CourtStaffs;
 using Wesal.Infrastructure.Custodies;
@@ -45,9 +48,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddEndpoints(Presentation.AssemblyReference.Assembly);
-
         services.AddApplication();
-
         services.AddInfrastructure(configuration);
 
         return services;
@@ -55,13 +56,17 @@ public static class DependencyInjection
 
     private static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDistributedMemoryCache();
-        services.TryAddSingleton<ICacheService, CacheService>();
+        services.AddOptions(configuration);
+        services.AddCache();
+        services.AddDbContext(configuration);
+        services.AddDocumentServices();
+        services.AddRepositories();
+        services.AddServices();
+        services.AddBackgroundJobs(configuration);
+    }
 
-        services.AddQuartz();
-        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
-
-
+    public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
         services.AddDbContext<WesalDbContext>((sp, opts) =>
             opts.UseSqlServer(configuration.GetConnectionString("Database"))
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
@@ -70,11 +75,12 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<WesalDbContext>());
         services.AddScoped<IWesalDbContext>(sp => sp.GetRequiredService<WesalDbContext>());
+    }
 
-        services.AddOptions(configuration);
-        services.AddRepositories();
-        services.AddServices();
-        services.AddBackgroundJobs(configuration);
+    private static void AddCache(this IServiceCollection services)
+    {
+        services.AddDistributedMemoryCache();
+        services.TryAddSingleton<ICacheService, CacheService>();
     }
 
     private static void AddOptions(this IServiceCollection services, IConfiguration configuration)
@@ -87,6 +93,9 @@ public static class DependencyInjection
 
         services.Configure<ComplaintOptions>(
             configuration.GetSection(ComplaintOptions.SectionName));
+
+        services.Configure<CloudinaryOptions>(
+            configuration.GetSection(CloudinaryOptions.SectionName));
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -108,6 +117,7 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IVisitCenterStaffRepository, VisitCenterStaffRepository>();
         services.AddScoped<IComplaintRepository, ComplaintRepository>();
+        services.AddScoped<IComplianceMetricsRepository, ComplianceMetricsRepository>();
     }
 
     private static void AddServices(this IServiceCollection services)
@@ -117,6 +127,9 @@ public static class DependencyInjection
 
     private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddQuartz();
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+
         services.Configure<GenerateVisitationSessionsOptions>(
             configuration.GetSection(GenerateVisitationSessionsOptions.SectionName));
 
@@ -139,5 +152,10 @@ public static class DependencyInjection
             configuration.GetSection(DetectOverdueAlimonyPaymentsOptions.SectionName));
 
         services.ConfigureOptions<DetectOverdueAlimonyPaymentsJobConfiguration>();
+    }
+
+    private static void AddDocumentServices(this IServiceCollection services)
+    {
+        services.AddScoped<ICloudinaryService, CloudinaryService>();
     }
 }

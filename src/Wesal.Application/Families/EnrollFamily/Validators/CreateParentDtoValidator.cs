@@ -1,4 +1,5 @@
 using FluentValidation;
+using Wesal.Application.Extensions;
 using Wesal.Application.Families.EnrollFamily.Dtos;
 using Wesal.Domain.Common;
 
@@ -27,7 +28,7 @@ internal sealed class CreateParentDtoValidator : AbstractValidator<CreateParentD
         RuleFor(x => x.BirthDate)
             .NotEmpty()
             .WithMessage($"birth date is required")
-            .LessThan(DateOnly.FromDateTime(DateTime.UtcNow))
+            .LessThan(DateTime.UtcNow.ToDateOnly())
             .WithMessage($"birth date must be in the past")
             .Must(BeAtLeast18YearsOld)
             .WithMessage($"must be at least 18 years old");

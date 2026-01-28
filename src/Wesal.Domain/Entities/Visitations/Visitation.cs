@@ -14,9 +14,7 @@ public sealed class Visitation : Entity
     public Guid VisitationScheduleId { get; private set; }
     public Guid? VerifiedById { get; private set; } = null!;
 
-    public DateOnly Date { get; private set; }
-    public TimeOnly StartTime { get; private set; }
-    public TimeOnly EndTime { get; private set; }
+    public DateTime StartAt { get; private set; }
     public DateTime EndAt { get; private set; }
 
     public VisitationStatus Status { get; private set; }
@@ -25,7 +23,7 @@ public sealed class Visitation : Entity
 
     private Visitation() { }
 
-    public static Visitation Create(VisitationSchedule schedule, DateOnly visitationDate)
+    public static Visitation Create(VisitationSchedule schedule, DateTime visitationAt)
     {
         return new Visitation
         {
@@ -33,9 +31,8 @@ public sealed class Visitation : Entity
             ParentId = schedule.ParentId,
             LocationId = schedule.LocationId,
             VisitationScheduleId = schedule.Id,
-            Date = visitationDate,
-            StartTime = schedule.StartTime,
-            EndTime = schedule.EndTime
+            StartAt = visitationAt,
+            EndAt = visitationAt.Date + schedule.EndTime.ToTimeSpan()
         };
     }
 
@@ -49,8 +46,8 @@ public sealed class Visitation : Entity
         if (validation.IsFailure)
             return validation;
 
-        if (!IsWithinTimeWindow(StartTime, gracePeriodMinutes))
-            return VisitationErrors.CheckInTooLate(StartTime, gracePeriodMinutes);
+        if (!IsWithinTimeWindow(StartAt, gracePeriodMinutes))
+            return VisitationErrors.CheckInTooLate(StartAt, gracePeriodMinutes);
 
         CheckedInAt = DateTime.UtcNow;
         Status = VisitationStatus.CheckedIn;
@@ -68,11 +65,11 @@ public sealed class Visitation : Entity
         if (validation.IsFailure)
             return validation;
 
-        if (TimeOnly.FromDateTime(DateTime.UtcNow) <= EndTime)
-            return VisitationErrors.CannotCompleteBeforeEndTime(EndTime);
+        if (DateTime.UtcNow.TimeOfDay <= EndAt.TimeOfDay)
+            return VisitationErrors.CannotCompleteBeforeEndTime(EndAt);
 
-        if (!IsWithinTimeWindow(EndTime, gracePeriodMinutes))
-            return VisitationErrors.CompletionWindowExpired(EndTime, gracePeriodMinutes);
+        if (!IsWithinTimeWindow(EndAt, gracePeriodMinutes))
+            return VisitationErrors.CompletionWindowExpired(EndAt, gracePeriodMinutes);
 
         CompletedAt = DateTime.UtcNow;
         Status = VisitationStatus.Completed;
@@ -88,8 +85,6 @@ public sealed class Visitation : Entity
         VisitationStatus requiredStatus,
         VisitationStatus targetStatus)
     {
-        var now = DateTime.UtcNow;
-
         var transitionResult = StatusTransition
             .Validate(Status, requiredStatus, targetStatus);
         if (transitionResult.IsFailure)
@@ -98,16 +93,15 @@ public sealed class Visitation : Entity
         if (LocationId != staffLocationId)
             return VisitationErrors.LocationMismatch;
 
-        var today = DateOnly.FromDateTime(now);
-        if (today != Date)
+        if (DateTime.UtcNow.Date != StartAt.Date)
             return VisitationErrors.NotScheduledForToday;
 
         return Result.Success;
     }
 
-    private static bool IsWithinTimeWindow(TimeOnly time, int gracePeriodMinutes)
+    private static bool IsWithinTimeWindow(DateTime dateTime, int gracePeriodMinutes)
     {
-        var timeNow = TimeOnly.FromDateTime(DateTime.UtcNow);
-        return timeNow >= time && timeNow <= time.AddMinutes(gracePeriodMinutes);
+        var timeNow = DateTime.UtcNow.TimeOfDay;
+        return timeNow >= dateTime.TimeOfDay && timeNow <= dateTime.AddMinutes(gracePeriodMinutes).TimeOfDay;
     }
 }

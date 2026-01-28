@@ -18,7 +18,7 @@ internal sealed class ObligationAlertService(
 
     public async Task RecordViolationAsync(
         Guid parentId,
-        AlertType alertType,
+        ViolationType violationType,
         Guid relatedEntityId,
         string violationDescription,
         CancellationToken cancellationToken = default)
@@ -34,7 +34,7 @@ internal sealed class ObligationAlertService(
             parent.CourtId,
             parent.Id,
             relatedEntityId,
-            alertType,
+            violationType,
             hasReachedMaxViolations ? AlertStatus.Pending : AlertStatus.Drafted,
             $"Parent '{parent.FullName}' has {violationDescription}");
 

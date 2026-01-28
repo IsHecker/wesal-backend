@@ -12,7 +12,6 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.VisitationSchedules.CreateVisitationSchedule;
 
 internal sealed class CreateVisitationScheduleCommandHandler(
-    IRepository<User> userRepository,
     ICourtCaseRepository courtCaseRepository,
     IFamilyRepository familyRepository,
     IParentRepository parentRepository,
@@ -24,15 +23,11 @@ internal sealed class CreateVisitationScheduleCommandHandler(
         CreateVisitationScheduleCommand request,
         CancellationToken cancellationToken)
     {
-        var isUserExist = await userRepository.ExistsAsync(request.UserId, cancellationToken);
-        if (!isUserExist)
-            return CourtStaffErrors.NotFound(request.UserId);
-
         var courtCase = await courtCaseRepository.GetByIdAsync(request.CourtCaseId, cancellationToken);
         if (courtCase is null)
             return CourtCaseErrors.NotFound(request.CourtCaseId);
 
-        var validationResult = await ValidateSchedule(request,courtCase.FamilyId, cancellationToken);
+        var validationResult = await ValidateSchedule(request, courtCase.FamilyId, cancellationToken);
         if (validationResult.IsFailure)
             return validationResult.Error;
 
@@ -40,12 +35,14 @@ internal sealed class CreateVisitationScheduleCommandHandler(
             return VisitationScheduleErrors.InvalidFrequency(request.Frequency);
 
         var schedule = VisitationSchedule.Create(
+            courtCase.CourtId,
             request.CourtCaseId,
             courtCase.FamilyId,
             request.ParentId,
             request.LocationId,
-            request.StartDayInMonth,
             frequency,
+            request.StartDate,
+            request.EndDate,
             request.StartTime,
             request.EndTime);
 

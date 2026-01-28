@@ -30,8 +30,8 @@ internal sealed class ListObligationAlertsQueryHandler(
         if (!string.IsNullOrWhiteSpace(request.Status))
             alerts = alerts.Where(a => a.Status == request.Status.ToEnum<AlertStatus>());
 
-        if (!string.IsNullOrWhiteSpace(request.Type))
-            alerts = alerts.Where(a => a.Type == request.Type.ToEnum<AlertType>());
+        if (!string.IsNullOrWhiteSpace(request.ViolationType))
+            alerts = alerts.Where(a => a.ViolationType == request.ViolationType.ToEnum<ViolationType>());
 
         var totalCount = alerts.Count();
         var pendingCount = alerts.Count(a => a.Status == AlertStatus.Pending);
@@ -46,7 +46,7 @@ internal sealed class ListObligationAlertsQueryHandler(
                 alert.CourtId,
                 alert.ParentId,
                 alert.RelatedEntityId,
-                alert.Type.ToString(),
+                alert.ViolationType.ToString(),
                 alert.Description,
                 alert.TriggeredAt,
                 alert.Status.ToString(),

@@ -1,6 +1,6 @@
 namespace Wesal.Presentation;
 
-public static class ApiEndpoints
+internal static class ApiEndpoints
 {
     private const string ApiBase = "api";
 
@@ -21,18 +21,19 @@ public static class ApiEndpoints
     private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
     private const string NotificationsBase = $"{ApiBase}/notifications";
     private const string ComplaintsBase = $"{ApiBase}/complaints";
+    private const string DocumentsBase = $"{ApiBase}/documents";
 
-    public static class Courts
+    internal static class Courts
     {
         public const string Me = $"{CourtsBase}/me";
     }
 
-    public static class Parents
+    internal static class Parents
     {
         public const string Profile = $"{ParentsBase}/me";
     }
 
-    public static class Families
+    internal static class Families
     {
         public const string GetById = $"{FamiliesBase}/{{familyId:guid}}";
         public const string ListByCourt = $"{Courts.Me}/families";
@@ -41,50 +42,50 @@ public static class ApiEndpoints
         public const string GetByParent = FamiliesBase;
     }
 
-    public static class Children
+    internal static class Children
     {
         public const string ListBySchool = $"{SchoolsBase}/me/children";
     }
 
-    public static class Schools
+    internal static class Schools
     {
         public const string GetById = $"{SchoolsBase}/{{schoolId:guid}}";
         public const string List = SchoolsBase;
         public const string Register = SchoolsBase;
     }
 
-    public static class SchoolReports
+    internal static class SchoolReports
     {
         public const string ListByChild = $"{SchoolReportsBase}/{{childId:guid}}";
         public const string Upload = SchoolReportsBase;
     }
 
-    public static class CourtCases
+    internal static class CourtCases
     {
         public const string Create = CourtCasesBase;
         public const string ListByFamily = $"{CourtCasesBase}/{{familyId:guid}}";
     }
 
-    public static class Custodies
+    internal static class Custodies
     {
         public const string GetByFamily = $"{CustodiesBase}/{{familyId:guid}}";
         public const string Create = CustodiesBase;
     }
 
-    public static class CustodyRequests
+    internal static class CustodyRequests
     {
         public const string ListByCourt = CustodyRequestsBase;
         public const string Process = $"{CustodyRequestsBase}/{{requestId:guid}}/process";
         public const string Create = CustodyRequestsBase;
     }
 
-    public static class VisitationSchedules
+    internal static class VisitationSchedules
     {
         public const string ListByFamily = $"{Families.GetById}/visitation-schedules";
         public const string Create = VisitationSchedulesBase;
     }
 
-    public static class Visitations
+    internal static class Visitations
     {
         public const string GetById = $"{visitationsBase}/{{visitationId:guid}}";
 
@@ -93,45 +94,52 @@ public static class ApiEndpoints
         public const string Complete = $"{GetById}/complete";
     }
 
-    public static class VisitationLocations
+    internal static class VisitationLocations
     {
         public const string List = visitationLocationsBase;
         public const string Create = visitationLocationsBase;
         public const string Update = $"{visitationLocationsBase}/{{locationId:guid}}";
     }
 
-    public static class PaymentsDue
+    internal static class PaymentsDue
     {
         public const string GetById = $"{PaymentsDueBase}/{{paymetDueId:guid}}";
         public const string ListByFamily = $"{Families.GetById}/payments-due";
     }
 
-    public static class Payments
+    internal static class Payments
     {
         public const string ListByPaymentDue = $"{PaymentsDue.GetById}/payments";
         public const string MakeAlimony = $"{PaymentsDue.GetById}/payments";
     }
 
-    public static class Notifications
+    internal static class Notifications
     {
         public const string ListByUser = $"{NotificationsBase}/me";
     }
 
-    public static class Alimonies
+    internal static class Alimonies
     {
         public const string Create = AlimoniesBase;
     }
 
-    public static class Complaints
+    internal static class Complaints
     {
         public const string ListByCourt = $"{Courts.Me}/complaints";
         public const string UpdateStatus = $"{ComplaintsBase}/{{complaintId:guid}}/status";
         public const string Create = ComplaintsBase;
     }
 
-    public static class ObligationAlerts
+    internal static class ObligationAlerts
     {
         public const string List = ObligationAlertsBase;
         public const string UpdateStatus = $"{ObligationAlertsBase}/{{alertId:guid}}/status";
+    }
+
+    internal static class Documents
+    {
+        public const string Upload = DocumentsBase;
+        public const string GetById = $"{DocumentsBase}/{{documentId:guid}}";
+        public const string Delete = GetById;
     }
 }

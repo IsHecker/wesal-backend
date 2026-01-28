@@ -36,8 +36,7 @@ internal sealed class CreateAlimonyCommandHandler(
             return validationResult.Error;
 
         var alimony = Alimony.Create(
-            request.CourtCaseId,
-            courtCase.FamilyId,
+            courtCase,
             request.PayerId,
             request.RecipientId,
             request.Amount,

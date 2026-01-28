@@ -7,5 +7,5 @@ namespace Wesal.Application.ObligationAlerts.ListObligationAlerts;
 public record struct ListObligationAlertsQuery(
     Guid UserId,
     string? Status,
-    string? Type,
+    string? ViolationType,
     Pagination Pagination) : IQuery<ObligationAlertsResponse>;

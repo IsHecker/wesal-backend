@@ -33,6 +33,8 @@ internal class Program
                 .AllowAnyMethod()
                 .AllowAnyOrigin()));
 
+        builder.Services.AddAntiforgery();
+
         WebApplication app = builder.Build();
 
         if (app.Environment.IsDevelopment())
@@ -45,7 +47,6 @@ internal class Program
 
         app.UseSerilogRequestLogging();
         app.UseExceptionHandler();
-        // app.UseAntiforgery();
         app.MapEndpoints();
 
         app.Run();

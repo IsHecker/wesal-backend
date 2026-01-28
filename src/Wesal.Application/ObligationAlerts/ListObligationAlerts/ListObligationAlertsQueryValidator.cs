@@ -16,8 +16,8 @@ internal sealed class ListObligationAlertsQueryValidator : AbstractValidator<Lis
             .MustBeEnumValue<ListObligationAlertsQuery, AlertStatus>()
             .When(x => !string.IsNullOrWhiteSpace(x.Status));
 
-        RuleFor(x => x.Type!)
-            .MustBeEnumValue<ListObligationAlertsQuery, AlertType>()
+        RuleFor(x => x.ViolationType!)
+            .MustBeEnumValue<ListObligationAlertsQuery, ViolationType>()
             .When(x => !string.IsNullOrWhiteSpace(x.Status));
     }
 }

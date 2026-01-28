@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Extensions;
+using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
@@ -14,6 +16,7 @@ namespace Wesal.Infrastructure.ObligationAlerts.OverdueAlimonyPaymentsDetection;
 internal sealed class DetectOverdueAlimonyPaymentsJob(
     IOptions<DetectOverdueAlimonyPaymentsOptions> options,
     IAlimonyRepository alimonyRepository,
+    IComplianceMetricsRepository metricsRepository,
     ObligationAlertService alertService,
     WesalDbContext dbContext) : IJob
 {
@@ -21,26 +24,26 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var paymentDues = await GetMissedPaymentDuesAsync(options.BatchSize);
+        var paymentDues = await GetMissedPaymentDuesAsync(options.BatchSize, context.CancellationToken);
 
         foreach (var paymentDue in paymentDues)
         {
-            await ProcessPaymentDueAsync(paymentDue);
+            await ProcessPaymentDueAsync(paymentDue, context.CancellationToken);
             await dbContext.SaveChangesAsync(context.CancellationToken);
         }
     }
 
-    private Task<List<PaymentDue>> GetMissedPaymentDuesAsync(int batchSize)
+    private Task<List<PaymentDue>> GetMissedPaymentDuesAsync(int batchSize, CancellationToken cancellationToken)
     {
         return dbContext.PaymentsDue
             .Where(IsDueDatePassed)
             .Where(IsNotPaid)
             .Where(due => due.Status != PaymentStatus.Overdue)
             .Take(batchSize)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    private async Task ProcessPaymentDueAsync(PaymentDue paymentDue)
+    private async Task ProcessPaymentDueAsync(PaymentDue paymentDue, CancellationToken cancellationToken)
     {
         var result = paymentDue.MarkAsOverdue();
         if (result.IsFailure)
@@ -48,15 +51,29 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
 
         dbContext.PaymentsDue.Update(paymentDue);
 
-        var alimony = await alimonyRepository.GetByIdAsync(paymentDue.AlimonyId)
+        var alimony = await alimonyRepository.GetByIdAsync(paymentDue.AlimonyId, cancellationToken)
             ?? throw new InvalidOperationException();
 
         await alertService.RecordViolationAsync(
             alimony.PayerId,
-            AlertType.UnpaidAlimony,
+            ViolationType.UnpaidAlimony,
             paymentDue.Id,
             $@"failed to pay the alimony amount due on 
-            {paymentDue.DueDate}. The payment is now marked as overdue.");
+            {paymentDue.DueDate}. The payment is now marked as overdue.",
+            cancellationToken);
+
+        await RecordAlimonyOverdueAsync(alimony, cancellationToken);
+    }
+
+    private async Task RecordAlimonyOverdueAsync(Alimony alimony, CancellationToken cancellationToken)
+    {
+        var metrics = await metricsRepository.GetAsync(
+            alimony.FamilyId,
+            alimony.PayerId,
+            DateTime.UtcNow.ToDateOnly(),
+            cancellationToken) ?? throw new InvalidOperationException();
+
+        metrics.RecordAlimonyOverdue();
     }
 
     private static readonly Expression<Func<PaymentDue, bool>> IsNotPaid =

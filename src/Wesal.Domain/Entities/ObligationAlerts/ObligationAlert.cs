@@ -12,7 +12,7 @@ public sealed class ObligationAlert : Entity
     // ID of the record that caused the alert (e.g., VisitId or PaymentId).
     public Guid RelatedEntityId { get; private set; }
 
-    public AlertType Type { get; private set; }
+    public ViolationType ViolationType { get; private set; }
     public string Description { get; private set; } = null!;
 
     public DateTime TriggeredAt { get; private set; }
@@ -29,7 +29,7 @@ public sealed class ObligationAlert : Entity
         Guid courtId,
         Guid parentId,
         Guid relatedEntityId,
-        AlertType type,
+        ViolationType violationType,
         AlertStatus status,
         string description)
     {
@@ -38,7 +38,7 @@ public sealed class ObligationAlert : Entity
             ParentId = parentId,
             RelatedEntityId = relatedEntityId,
             CourtId = courtId,
-            Type = type,
+            ViolationType = violationType,
             Description = description,
             Status = status,
             TriggeredAt = DateTime.UtcNow,

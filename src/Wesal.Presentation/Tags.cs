@@ -2,21 +2,22 @@
 
 public static class Tags
 {
-    public const string Parents = "Parents";
-    public const string Children = "Children";
-    public const string Schools = "Schools";
-    public const string SchoolReports = "SchoolReports";
-    public const string Families = "Families";
-    public const string CourtCases = "CourtCases";
-    public const string Complaints = "Complaints";
-    public const string Custodies = "Custodies";
-    public const string CustodyRequests = "CustodyRequests";
-    public const string VisitationSchedules = "VisitationSchedules";
-    public const string Visitations = "Visitations";
-    public const string VisitationLocations = "VisitationLocations";
-    public const string PaymentsDue = "PaymentsDue";
-    public const string Payments = "Payments";
-    public const string Alimonies = "Alimonies";
-    public const string ObligationAlerts = "ObligationAlerts";
-    public const string Notifications = "Notifications";
+    public const string Parents = nameof(Parents);
+    public const string Children = nameof(Children);
+    public const string Schools = nameof(Schools);
+    public const string SchoolReports = nameof(SchoolReports);
+    public const string Families = nameof(Families);
+    public const string CourtCases = nameof(CourtCases);
+    public const string Complaints = nameof(Complaints);
+    public const string Custodies = nameof(Custodies);
+    public const string CustodyRequests = nameof(CustodyRequests);
+    public const string VisitationSchedules = nameof(VisitationSchedules);
+    public const string Visitations = nameof(Visitations);
+    public const string VisitationLocations = nameof(VisitationLocations);
+    public const string PaymentsDue = nameof(PaymentsDue);
+    public const string Payments = nameof(Payments);
+    public const string Alimonies = nameof(Alimonies);
+    public const string ObligationAlerts = nameof(ObligationAlerts);
+    public const string Notifications = nameof(Notifications);
+    public const string Documents = nameof(Documents);
 }

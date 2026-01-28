@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.Children;
 using Wesal.Domain.Entities.Complaints;
+using Wesal.Domain.Entities.Compliances;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Custodies;
 using Wesal.Domain.Entities.CustodyRequests;
+using Wesal.Domain.Entities.Documents;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Notifications;
@@ -45,5 +47,7 @@ public interface IWesalDbContext
     DbSet<Payment> Payments { get; init; }
     DbSet<Complaint> Complaints { get; init; }
     DbSet<ObligationAlert> ObligationAlerts { get; init; }
+    DbSet<ComplianceMetric> ComplianceMetrics { get; init; }
     DbSet<Notification> Notifications { get; init; }
+    DbSet<Document> Documents { get; init; }
 }

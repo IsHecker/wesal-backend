@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.VisitationSchedules.CreateVisitationSchedule;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -19,12 +18,12 @@ internal sealed class CreateVisitationSchedule : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new CreateVisitationScheduleCommand(
-                SharedData.StaffUserId,
                 request.CourtCaseId,
                 request.ParentId,
                 request.LocationId,
-                request.StartDayInMonth,
                 request.Frequency,
+                request.StartDate,
+                request.EndDate,
                 request.StartTime,
                 request.EndTime));
 
@@ -41,8 +40,9 @@ internal sealed class CreateVisitationSchedule : IEndpoint
         Guid CourtCaseId,
         Guid ParentId,
         Guid LocationId,
-        int StartDayInMonth,
         string Frequency,
+        DateOnly StartDate,
+        DateOnly EndDate,
         TimeOnly StartTime,
         TimeOnly EndTime);
 }

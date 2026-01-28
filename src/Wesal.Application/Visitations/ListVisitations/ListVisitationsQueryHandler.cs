@@ -37,9 +37,8 @@ internal sealed class ListVisitationsQueryHandler(
                 visitation.ParentId,
                 visitation.LocationId,
                 visitation.VisitationScheduleId,
-                visitation.Date,
-                visitation.StartTime,
-                visitation.EndTime,
+                visitation.StartAt,
+                visitation.EndAt,
                 visitation.CompletedAt,
                 visitation.Status.ToString(),
                 visitation.CheckedInAt))
@@ -88,8 +87,8 @@ internal sealed class ListVisitationsQueryHandler(
         }
 
         if (request.Date.HasValue)
-            query = query.Where(v => v.Date == request.Date.Value);
+            query = query.Where(v => v.StartAt.ToDateOnly() == request.Date.Value);
 
-        return query.OrderByDescending(v => v.Date);
+        return query.OrderByDescending(v => v.StartAt.ToDateOnly());
     }
 }

@@ -19,7 +19,6 @@ public sealed class CustodyRequest : Entity
     public string? DecisionNote { get; private set; }
     public DateTime? ProcessedAt { get; private set; }
 
-    public Parent Parent { get; private set; } = null!;
     public Family Family { get; private set; } = null!;
 
     private CustodyRequest() { }

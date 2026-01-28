@@ -6,9 +6,8 @@ public record struct VisitationResponse(
     Guid ParentId,
     Guid LocationId,
     Guid VisitationScheduleId,
-    DateOnly Date,
-    TimeOnly StartTime,
-    TimeOnly EndTime,
+    DateTime StartAt,
+    DateTime EndAt,
     DateTime? CompletedAt,
     string Status,
     DateTime? CheckedInAt);

@@ -37,8 +37,9 @@ internal sealed class ListVisitationSchedulesByFamilyQueryHandler(
                 schedule.FamilyId,
                 schedule.ParentId,
                 schedule.LocationId,
-                schedule.StartDayInMonth,
                 schedule.Frequency.ToString(),
+                schedule.StartDate,
+                schedule.EndDate,
                 schedule.StartTime,
                 schedule.EndTime))
             .ToPagedResponseAsync(request.Pagination, totalCount);

@@ -653,24 +653,7 @@ Notifications: 2 unread
 
    - Parents can view notifications
 
-
-### 8. Court Staff Dashboard
-
-   - Court staff can log in
-
-   - Dashboard shows: 
-     - Total families registered
-     - Active court cases
-     - Pending violation alerts
-     - Today's scheduled visitations (view-only)
-
-   - Navigation to all core features: 
-     - Create Family
-     - Create Case
-     - View Violations
-     - Manage Users
-
-### 9. ✅Multi-Court & Court Isolation Support
+### 8. ✅Multi-Court & Court Isolation Support
 
    - Each court operates independently
    - Courts cannot see each other's data
@@ -688,7 +671,7 @@ Notifications: 2 unread
 
 # 🔹 6. Beyond MVP
 
-### 4. Document Management (Optional Feature)
+### 4. ✅Document Management (Optional Feature)
 
 - Document Uploaded by any role
 - **Document Storage:**
@@ -767,37 +750,6 @@ Notifications: 2 unread
 - Send notifications to users
 - Track notification status
 
-## 17. Custody Request (Beyond MVP)
-- Non-custodial parent issues custody request
-- Specify custody period
-- Provide reason for request
-- Court reviews custody request
-- Accept/Decline request with court decision note
-- Update custody decision with effective date
-
-## 18. Document Management (Beyond MVP - Optional)
-- Upload documents by any role
-- Secure file storage
-- Audit trail for document uploads
-- Court staff view all documents per case
-- Parents view relevant documents
-- Schools view documents for their students
-
-## 19. Complaint System (Beyond MVP - Optional)
-- File complaint against other parent
-- Select complaint type
-- Upload evidence
-- Court staff review complaints
-- Investigate and gather information
-- Mark complaint as resolved with notes
-- Track complaint history per case
-
-## 20. Compliance Analytics (Beyond MVP - Optional)
-- Calculate visitation attendance rates
-- Calculate alimony payment on-time rates
-- Track violation rate over time
-- Export analytics reports as PDF
-
 
 
 # Confusion Points
@@ -815,3 +767,5 @@ Notifications: 2 unread
 - Should visitations and alimonies be generated in advance or just one at a time.
 - Should Notifications be only for parents, or courts and court staff can also get notifications.
 - Should there be multiple school accounts under the main school account just like court admin account that can create court staff accounts.
+- Ensure the system and background jobs stops processing old and closed cases, and their associated entities.
+

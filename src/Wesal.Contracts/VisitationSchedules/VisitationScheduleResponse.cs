@@ -6,7 +6,8 @@ public record struct VisitationScheduleResponse(
     Guid FamilyId,
     Guid ParentId,
     Guid LocationId,
-    int StartDayInMonth,
     string Frequency,
+    DateOnly StartDate,
+    DateOnly EndDate,
     TimeOnly StartTime,
     TimeOnly EndTime);

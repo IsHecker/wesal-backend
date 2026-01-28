@@ -1,9 +1,11 @@
 using Wesal.Domain.DomainEvents;
+using Wesal.Domain.Entities.CourtCases;
 
 namespace Wesal.Domain.Entities.Alimonies;
 
 public sealed class Alimony : Entity
 {
+    public Guid CourtId { get; private set; }
     public Guid CourtCaseId { get; private set; }
     public Guid FamilyId { get; private set; }
     public Guid PayerId { get; private set; }
@@ -20,15 +22,10 @@ public sealed class Alimony : Entity
 
     public DateOnly? LastGeneratedDate { get; private set; } = null;
 
-
-    // Which day payment is due (1-31 for Monthly, 1-7 for Weekly, etc.)
-    public int StartDayInMonth => StartDate.Day;
-
     private Alimony() { }
 
     public static Alimony Create(
-        Guid courtCaseId,
-        Guid familyId,
+        CourtCase courtCase,
         Guid payerId,
         Guid recipientId,
         long amount,
@@ -38,8 +35,9 @@ public sealed class Alimony : Entity
     {
         return new Alimony
         {
-            FamilyId = familyId,
-            CourtCaseId = courtCaseId,
+            CourtId = courtCase.CourtId,
+            FamilyId = courtCase.FamilyId,
+            CourtCaseId = courtCase.Id,
             PayerId = payerId,
             RecipientId = recipientId,
             Amount = amount,
