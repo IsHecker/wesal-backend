@@ -4,7 +4,7 @@ using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.Payments;
-using Wesal.Domain.Entities.PaymentDues;
+using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Payments.ListPaymentsByPaymentDue;

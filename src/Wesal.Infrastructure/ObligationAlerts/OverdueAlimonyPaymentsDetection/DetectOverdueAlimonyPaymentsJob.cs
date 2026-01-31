@@ -6,8 +6,8 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.ObligationAlerts;
-using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
+using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Infrastructure.Database;
 
 namespace Wesal.Infrastructure.ObligationAlerts.OverdueAlimonyPaymentsDetection;
@@ -24,16 +24,16 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var paymentDues = await GetMissedPaymentDuesAsync(options.BatchSize, context.CancellationToken);
+        var paymentsDue = await GetMissedPaymentsDueAsync(options.BatchSize, context.CancellationToken);
 
-        foreach (var paymentDue in paymentDues)
+        foreach (var paymentDue in paymentsDue)
         {
             await ProcessPaymentDueAsync(paymentDue, context.CancellationToken);
             await dbContext.SaveChangesAsync(context.CancellationToken);
         }
     }
 
-    private Task<List<PaymentDue>> GetMissedPaymentDuesAsync(int batchSize, CancellationToken cancellationToken)
+    private Task<List<PaymentDue>> GetMissedPaymentsDueAsync(int batchSize, CancellationToken cancellationToken)
     {
         return dbContext.PaymentsDue
             .Where(IsDueDatePassed)
@@ -58,7 +58,7 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
             alimony.PayerId,
             ViolationType.UnpaidAlimony,
             paymentDue.Id,
-            $@"failed to pay the alimony amount due on 
+            $@"Failed to pay the alimony amount due on 
             {paymentDue.DueDate}. The payment is now marked as overdue.",
             cancellationToken);
 

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Data;
-using Wesal.Application.Notifications.ListNotifications;
+using Wesal.Application.Notifications.ListNotificationsByUserQuery;
 using Wesal.Contracts.Notifications;
 using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;

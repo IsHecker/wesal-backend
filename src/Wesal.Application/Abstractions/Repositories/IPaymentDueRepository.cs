@@ -1,5 +1,5 @@
 using Wesal.Application.Data;
-using Wesal.Domain.Entities.PaymentDues;
+using Wesal.Domain.Entities.PaymentsDue;
 
 namespace Wesal.Application.Abstractions.Repositories;
 

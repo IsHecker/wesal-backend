@@ -15,10 +15,11 @@ using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Parents;
-using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
+using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Domain.Entities.SchoolReports;
 using Wesal.Domain.Entities.Schools;
+using Wesal.Domain.Entities.UserDevices;
 using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Entities.Visitations;
@@ -54,6 +55,7 @@ internal sealed class WesalDbContext(DbContextOptions<WesalDbContext> options)
    public DbSet<ComplianceMetric> ComplianceMetrics { get; init; }
    public DbSet<Notification> Notifications { get; init; }
    public DbSet<Document> Documents { get; init; }
+   public DbSet<UserDevice> UserDevices { get; init; }
 
    protected override void OnModelCreating(ModelBuilder modelBuilder)
    {

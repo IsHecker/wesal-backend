@@ -1,6 +1,6 @@
 ﻿namespace Wesal.Domain.DomainEvents;
 
-public abstract class DomainEvent : IDomainEvent
+public abstract record DomainEvent : IDomainEvent
 {
     protected DomainEvent()
     {

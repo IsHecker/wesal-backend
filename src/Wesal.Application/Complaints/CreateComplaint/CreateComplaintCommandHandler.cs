@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Options;
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Data;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Complaints;
+using Wesal.Domain.Entities.Documents;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
 
@@ -11,6 +13,7 @@ namespace Wesal.Application.Complaints.CreateComplaint;
 internal sealed class CreateComplaintCommandHandler(
     IParentRepository parentRepository,
     IComplaintRepository complaintRepository,
+    IRepository<Document> documentRepository,
     IOptions<ComplaintOptions> complaintOptions)
     : ICommandHandler<CreateComplaintCommand, Guid>
 {
@@ -29,11 +32,19 @@ internal sealed class CreateComplaintCommandHandler(
         if (count >= complaintOptions.MaxComplaintsInMonth)
             return ComplaintErrors.MaxCountExceeded(complaintOptions.MaxComplaintsInMonth);
 
+        if (request.DocumentId is not null)
+        {
+            var isExist = await documentRepository.ExistsAsync(request.DocumentId.Value, cancellationToken);
+            if (!isExist)
+                return DocumentErrors.NotFound(request.DocumentId.Value);
+        }
+
         var complaint = Complaint.Create(
             parent.CourtId,
             request.ParentId,
             request.Type.ToEnum<ComplaintType>(),
-            request.Description);
+            request.Description,
+            request.DocumentId);
 
         await complaintRepository.AddAsync(complaint, cancellationToken);
 

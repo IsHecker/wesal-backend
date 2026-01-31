@@ -20,8 +20,9 @@ internal sealed class UploadSchoolReport : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new UploadSchoolReportCommand(
-                SharedData.SchoolUserId,
+                SharedData.SchoolId,
                 request.ChildId,
+                request.DocumentId,
                 request.ReportType));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -35,5 +36,5 @@ internal sealed class UploadSchoolReport : IEndpoint
         .DisableAntiforgery();
     }
 
-    internal record struct Request(Guid ChildId, string ReportType);
+    internal record struct Request(Guid ChildId, Guid DocumentId, string ReportType);
 }

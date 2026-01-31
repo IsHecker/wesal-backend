@@ -19,5 +19,6 @@ public static class Tags
     public const string Alimonies = nameof(Alimonies);
     public const string ObligationAlerts = nameof(ObligationAlerts);
     public const string Notifications = nameof(Notifications);
+    public const string UserDevices = nameof(UserDevices);
     public const string Documents = nameof(Documents);
 }

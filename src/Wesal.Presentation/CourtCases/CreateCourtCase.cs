@@ -17,8 +17,9 @@ internal sealed class CreateCourtCase : IEndpoint
         app.MapPost(ApiEndpoints.CourtCases.Create, async (Request request, ISender sender) =>
         {
             var result = await sender.Send(new CreateCourtCaseCommand(
-                SharedData.StaffUserId,
+                SharedData.StaffId,
                 request.FamilyId,
+                request.DocumentId,
                 request.CaseNumber,
                 request.DecisionSummary));
 
@@ -33,6 +34,7 @@ internal sealed class CreateCourtCase : IEndpoint
 
     internal readonly record struct Request(
         Guid FamilyId,
+        Guid? DocumentId,
         string CaseNumber,
         string DecisionSummary);
 }

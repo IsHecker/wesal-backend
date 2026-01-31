@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Abstractions.Services;
 using Wesal.Application.ObligationAlerts;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.ObligationAlerts;
@@ -11,7 +11,7 @@ namespace Wesal.Infrastructure.ObligationAlerts;
 
 internal sealed class ObligationAlertService(
     IOptions<ObligationAlertOptions> alertOptions,
-    INotificationRepository notificationRepository,
+    INotificationService notificationService,
     WesalDbContext dbContext)
 {
     private readonly ObligationAlertOptions alertOptions = alertOptions.Value;
@@ -30,18 +30,18 @@ internal sealed class ObligationAlertService(
 
         var hasReachedMaxViolations = parent.ViolationCount >= alertOptions.MaxViolationsCount;
 
-        var alert = ObligationAlert.Create(
+        var obligationAlert = ObligationAlert.Create(
             parent.CourtId,
             parent.Id,
             relatedEntityId,
             violationType,
             hasReachedMaxViolations ? AlertStatus.Pending : AlertStatus.Drafted,
-            $"Parent '{parent.FullName}' has {violationDescription}");
+            $"Parent '{parent.FullName}' has: {violationDescription}");
 
-        await dbContext.ObligationAlerts.AddAsync(alert, cancellationToken);
+        await dbContext.ObligationAlerts.AddAsync(obligationAlert, cancellationToken);
 
         await SendViolationNotificationAsync(
-            parent,
+            obligationAlert,
             violationDescription,
             hasReachedMaxViolations,
             cancellationToken);
@@ -81,19 +81,16 @@ internal sealed class ObligationAlertService(
     }
 
     private async Task SendViolationNotificationAsync(
-        Parent parent,
+        ObligationAlert obligationAlert,
         string violationDescription,
         bool hasReachedMaxViolations,
         CancellationToken cancellationToken)
     {
         var notificationContent = BuildNotificationContent(violationDescription, hasReachedMaxViolations);
 
-        var notification = Notification.Create(
-            parent.Id,
-            notificationContent,
-            NotificationType.Alert);
-
-        await notificationRepository.AddAsync(notification, cancellationToken);
+        await notificationService.SendNotificationAsync(
+            NotificationTemplate.ObligationAlert(obligationAlert, notificationContent),
+            cancellationToken: cancellationToken);
     }
 
     private string BuildNotificationContent(string violationDescription, bool hasReachedMaxViolations)
@@ -101,7 +98,7 @@ internal sealed class ObligationAlertService(
         if (!hasReachedMaxViolations)
             return violationDescription;
 
-        return $@"{violationDescription}. You have reached the maximum number of violations ({alertOptions.MaxViolationsCount}). 
+        return $@"{violationDescription} You have reached the maximum number of violations ({alertOptions.MaxViolationsCount}). 
         The court has been notified and may take legal action.";
     }
 }

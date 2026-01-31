@@ -2,8 +2,8 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Alimonies;
-using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
+using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Payments.MakeAlimonyPayment;

@@ -52,7 +52,7 @@ internal sealed class DetectMissedVisitationsJob(
             visitation.ParentId,
             ViolationType.MissedVisit,
             visitation.Id,
-            $@"missed the scheduled visitation 
+            $@"Missed the scheduled visitation 
             on {visitation.StartAt} at {visitation.StartAt.TimeOfDay}.",
             cancellationToken);
 

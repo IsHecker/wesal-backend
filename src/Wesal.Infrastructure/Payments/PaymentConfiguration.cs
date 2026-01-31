@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wesal.Domain.Entities.Alimonies;
-using Wesal.Domain.Entities.PaymentDues;
 using Wesal.Domain.Entities.Payments;
+using Wesal.Domain.Entities.PaymentsDue;
 
 namespace Wesal.Infrastructure.Payments;
 

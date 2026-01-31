@@ -20,6 +20,7 @@ internal static class ApiEndpoints
     private const string AlimoniesBase = $"{ApiBase}/alimonies";
     private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
     private const string NotificationsBase = $"{ApiBase}/notifications";
+    private const string UserDevicesBase = $"{ApiBase}/user-devices";
     private const string ComplaintsBase = $"{ApiBase}/complaints";
     private const string DocumentsBase = $"{ApiBase}/documents";
 
@@ -116,6 +117,15 @@ internal static class ApiEndpoints
     internal static class Notifications
     {
         public const string ListByUser = $"{NotificationsBase}/me";
+
+        public const string MarkAsRead = $"{NotificationsBase}/{{notificationId:guid}}/read";
+        public const string UnreadCount = $"{NotificationsBase}/unread-count";
+    }
+
+    internal static class UserDevices
+    {
+        public const string RegisterDevice = $"{NotificationsBase}/devices";
+        public const string UnregisterDevice = $"{UserDevicesBase}/{{deviceToken}}";
     }
 
     internal static class Alimonies

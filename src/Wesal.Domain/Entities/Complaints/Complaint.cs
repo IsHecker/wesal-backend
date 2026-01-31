@@ -8,12 +8,13 @@ public sealed class Complaint : Entity
 {
     public Guid CourtId { get; private set; }
     public Guid ReporterId { get; private set; }
+    public Guid? DocumentId { get; private set; }
 
     public ComplaintType Type { get; private set; }
     public string Description { get; private set; } = null!;
 
-    public DateTime FiledAt { get; private set; }
     public ComplaintStatus Status { get; private set; }
+    public DateTime FiledAt { get; private set; }
 
     public DateTime? ResolvedAt { get; private set; }
 
@@ -25,12 +26,14 @@ public sealed class Complaint : Entity
         Guid courtId,
         Guid reporterId,
         ComplaintType type,
-        string description)
+        string description,
+        Guid? documentId = null)
     {
         return new Complaint
         {
             CourtId = courtId,
             ReporterId = reporterId,
+            DocumentId = documentId,
             Type = type,
             Description = description,
             FiledAt = DateTime.UtcNow,

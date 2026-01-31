@@ -2,11 +2,12 @@
 using Microsoft.Extensions.Options;
 using Quartz;
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Extensions;
 using Wesal.Domain.Entities.Compliances;
+using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitationSchedules;
-using Wesal.Infrastructure.ComplianceMetrics;
 using Wesal.Infrastructure.Database;
 
 namespace Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
@@ -15,6 +16,7 @@ namespace Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
 internal sealed class GenerateVisitationSessionsJob(
     IOptions<GenerateVisitationSessionsOptions> options,
     IComplianceMetricsRepository metricsRepository,
+    INotificationService notificationService,
     WesalDbContext dbContext) : IJob
 {
     private readonly GenerateVisitationSessionsOptions options = options.Value;
@@ -33,6 +35,10 @@ internal sealed class GenerateVisitationSessionsJob(
         foreach (var schedule in schedules)
         {
             await GenerateUpcomingVisitationsAsync(schedule, context.CancellationToken);
+
+            await notificationService.SendNotificationAsync(
+                NotificationTemplate.VisitationScheduled(schedule),
+                cancellationToken: context.CancellationToken);
         }
 
         await dbContext.SaveChangesAsync(context.CancellationToken);

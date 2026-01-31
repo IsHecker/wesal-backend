@@ -151,6 +151,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("FiledAt")
                         .HasColumnType("datetime2");
 
@@ -175,6 +178,10 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DocumentId")
+                        .IsUnique()
+                        .HasFilter("[DocumentId] IS NOT NULL");
 
                     b.HasIndex("ReporterId");
 
@@ -260,6 +267,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("uniqueidentifier");
 
@@ -276,6 +286,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CourtId");
+
+                    b.HasIndex("DocumentId");
 
                     b.HasIndex("FamilyId");
 
@@ -563,16 +575,27 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime?>("ReadAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("RecipientId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("RelatedEntityId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -585,7 +608,8 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecipientId");
+                    b.HasIndex("RecipientId", "RelatedEntityId", "EntityType")
+                        .IsUnique();
 
                     b.ToTable("Notifications");
                 });
@@ -704,7 +728,52 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.ToTable("Parents");
                 });
 
-            modelBuilder.Entity("Wesal.Domain.Entities.PaymentDues.PaymentDue", b =>
+            modelBuilder.Entity("Wesal.Domain.Entities.Payments.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AlimonyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PaidAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PaymentDueId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReceiptUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlimonyId");
+
+                    b.HasIndex("PaymentDueId");
+
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.PaymentsDue.PaymentDue", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -751,51 +820,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.ToTable("PaymentsDue");
                 });
 
-            modelBuilder.Entity("Wesal.Domain.Entities.Payments.Payment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AlimonyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("Amount")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Method")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PaidAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("PaymentDueId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ReceiptUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlimonyId");
-
-                    b.HasIndex("PaymentDueId");
-
-                    b.ToTable("Payments");
-                });
-
             modelBuilder.Entity("Wesal.Domain.Entities.SchoolReports.SchoolReport", b =>
                 {
                     b.Property<Guid>("Id")
@@ -808,11 +832,10 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ReportType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ReportUrl")
+                    b.Property<string>("ReportType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -828,6 +851,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ChildId")
+                        .IsUnique();
+
+                    b.HasIndex("DocumentId")
                         .IsUnique();
 
                     b.HasIndex("SchoolId")
@@ -879,6 +905,47 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Schools");
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.UserDevices.UserDevice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastUsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegisteredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceToken");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserDevices");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Users.User", b =>
@@ -1186,6 +1253,10 @@ namespace Wesal.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Wesal.Domain.Entities.Complaints.Complaint", b =>
                 {
+                    b.HasOne("Wesal.Domain.Entities.Documents.Document", null)
+                        .WithOne()
+                        .HasForeignKey("Wesal.Domain.Entities.Complaints.Complaint", "DocumentId");
+
                     b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
                         .HasForeignKey("ReporterId")
@@ -1221,6 +1292,10 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasForeignKey("CourtId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Wesal.Domain.Entities.Documents.Document", null)
+                        .WithMany()
+                        .HasForeignKey("DocumentId");
 
                     b.HasOne("Wesal.Domain.Entities.Families.Family", null)
                         .WithMany()
@@ -1357,9 +1432,24 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Wesal.Domain.Entities.PaymentDues.PaymentDue", b =>
+            modelBuilder.Entity("Wesal.Domain.Entities.Payments.Payment", b =>
                 {
                     b.HasOne("Wesal.Domain.Entities.Alimonies.Alimony", null)
+                        .WithMany()
+                        .HasForeignKey("AlimonyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Wesal.Domain.Entities.PaymentsDue.PaymentDue", null)
+                        .WithMany()
+                        .HasForeignKey("PaymentDueId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.PaymentsDue.PaymentDue", b =>
+                {
+                    b.HasOne("Wesal.Domain.Entities.Alimonies.Alimony", "Alimony")
                         .WithMany()
                         .HasForeignKey("AlimonyId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1373,23 +1463,10 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasOne("Wesal.Domain.Entities.Payments.Payment", null)
                         .WithOne()
-                        .HasForeignKey("Wesal.Domain.Entities.PaymentDues.PaymentDue", "PaymentId")
+                        .HasForeignKey("Wesal.Domain.Entities.PaymentsDue.PaymentDue", "PaymentId")
                         .OnDelete(DeleteBehavior.NoAction);
-                });
 
-            modelBuilder.Entity("Wesal.Domain.Entities.Payments.Payment", b =>
-                {
-                    b.HasOne("Wesal.Domain.Entities.Alimonies.Alimony", null)
-                        .WithMany()
-                        .HasForeignKey("AlimonyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Wesal.Domain.Entities.PaymentDues.PaymentDue", null)
-                        .WithMany()
-                        .HasForeignKey("PaymentDueId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.Navigation("Alimony");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.SchoolReports.SchoolReport", b =>
@@ -1397,6 +1474,12 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasOne("Wesal.Domain.Entities.Children.Child", null)
                         .WithOne()
                         .HasForeignKey("Wesal.Domain.Entities.SchoolReports.SchoolReport", "ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wesal.Domain.Entities.Documents.Document", null)
+                        .WithOne()
+                        .HasForeignKey("Wesal.Domain.Entities.SchoolReports.SchoolReport", "DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1413,6 +1496,15 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .WithOne()
                         .HasForeignKey("Wesal.Domain.Entities.Schools.School", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.UserDevices.UserDevice", b =>
+                {
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

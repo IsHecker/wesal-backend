@@ -6,9 +6,9 @@ public sealed class SchoolReport : Entity
 {
     public Guid ChildId { get; private set; }
     public Guid SchoolId { get; private set; }
+    public Guid DocumentId { get; private set; }
 
     public SchoolReportType ReportType { get; private set; }
-    public string ReportUrl { get; private set; } = null!;
     public DateTime UploadedAt { get; private set; }
 
     private SchoolReport() { }
@@ -16,6 +16,7 @@ public sealed class SchoolReport : Entity
     public static SchoolReport Create(
         Guid childId,
         Guid schoolId,
+        Guid documentId,
         SchoolReportType reportType)
     {
         return new SchoolReport
@@ -23,7 +24,7 @@ public sealed class SchoolReport : Entity
             ChildId = childId,
             SchoolId = schoolId,
             ReportType = reportType,
-            ReportUrl = string.Empty,
+            DocumentId = documentId,
             UploadedAt = DateTime.UtcNow,
         };
     }

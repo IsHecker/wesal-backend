@@ -18,6 +18,7 @@ internal sealed class CreateComplaint : IEndpoint
         {
             var result = await sender.Send(new CreateComplaintCommand(
                 SharedData.FatherId,
+                request.DocumentId,
                 request.Type,
                 request.Description));
 
@@ -29,5 +30,5 @@ internal sealed class CreateComplaint : IEndpoint
         .WithOpenApiName(nameof(CreateComplaint));
     }
 
-    internal readonly record struct Request(string Type, string Description);
+    internal readonly record struct Request(string Type, Guid? DocumentId, string Description);
 }

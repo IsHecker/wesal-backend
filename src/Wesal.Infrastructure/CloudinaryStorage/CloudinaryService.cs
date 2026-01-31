@@ -43,7 +43,8 @@ internal sealed class CloudinaryService : ICloudinaryService
                 PublicId = $"wesal/documents/{Guid.NewGuid()}",
                 UseFilename = true,
                 UniqueFilename = true,
-                Overwrite = false
+                Overwrite = false,
+                AssetFolder = "Wesal/documents"
             };
 
             var uploadResult = await _cloudinary.UploadLargeAsync(

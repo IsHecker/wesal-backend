@@ -745,11 +745,6 @@ Notifications: 2 unread
 - Force password change on first login (School accounts)
 - Role-based access control enforcement
 
-## 13. Notifications
-- Generate system notifications for events
-- Send notifications to users
-- Track notification status
-
 
 
 # Confusion Points
@@ -768,4 +763,5 @@ Notifications: 2 unread
 - Should Notifications be only for parents, or courts and court staff can also get notifications.
 - Should there be multiple school accounts under the main school account just like court admin account that can create court staff accounts.
 - Ensure the system and background jobs stops processing old and closed cases, and their associated entities.
+- Problem in time in the system because of using UTC.
 
