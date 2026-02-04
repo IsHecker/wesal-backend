@@ -1,7 +1,9 @@
-﻿using MediatR;
+﻿using System.Security.Claims;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Families.EnrollFamily;
 using Wesal.Application.Families.EnrollFamily.Dtos;
 using Wesal.Contracts.Families;
@@ -16,10 +18,13 @@ internal sealed class EnrollFamily : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(ApiEndpoints.Families.Enroll, async (Request request, ISender sender) =>
+        app.MapPost(ApiEndpoints.Families.Enroll, async (
+            Request request,
+            ClaimsPrincipal user,
+            ISender sender) =>
         {
             var result = await sender.Send(new EnrollFamilyCommand(
-                SharedData.StaffUserId,
+                user.GetRoleId(),
                 request.Father.ToDto(),
                 request.Mother.ToDto(),
                 request.Children.Select(c => c.ToDto())));
@@ -30,7 +35,8 @@ internal sealed class EnrollFamily : IEndpoint
         .Produces<EnrollFamilyResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
-        .WithOpenApiName(nameof(EnrollFamily));
+        .WithOpenApiName(nameof(EnrollFamily))
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 
     internal readonly record struct Request(

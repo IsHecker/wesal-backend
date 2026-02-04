@@ -12,7 +12,6 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.VisitationLocations.ListVisitationLocations;
 
 internal sealed class ListVisitationLocationsQueryHandler(
-    ICourtStaffRepository staffRepository,
     IWesalDbContext context)
     : IQueryHandler<ListVisitationLocationsQuery, PagedResponse<VisitationLocationResponse>>
 {
@@ -20,11 +19,7 @@ internal sealed class ListVisitationLocationsQueryHandler(
         ListVisitationLocationsQuery request,
         CancellationToken cancellationToken)
     {
-        var staff = await staffRepository.GetByUserIdWithCourtAsync(request.UserId, cancellationToken);
-        if (staff is null)
-            return UserErrors.NotFound(request.UserId);
-
-        var query = BuildQuery(request.Name, staff.Court.Id);
+        var query = BuildQuery(request.Name, request.CourtId);
 
         var totalCount = await query.CountAsync(cancellationToken);
 

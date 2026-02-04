@@ -18,7 +18,7 @@ public sealed class Alimony : Entity
     public DateOnly StartDate { get; private set; }
 
     // When this obligation ends (could be years later)
-    public DateOnly EndDate { get; private set; }
+    public DateOnly? EndDate { get; private set; }
 
     public DateOnly? LastGeneratedDate { get; private set; } = null;
 
@@ -45,6 +45,18 @@ public sealed class Alimony : Entity
             StartDate = startDate,
             EndDate = endDate,
         };
+    }
+
+    public void Update(
+        long amount,
+        AlimonyFrequency frequency,
+        DateOnly startDate,
+        DateOnly? endDate)
+    {
+        Amount = amount;
+        Frequency = frequency;
+        StartDate = startDate;
+        EndDate = endDate;
     }
 
     public void UpdateLastGeneratedDate(DateOnly visitationDate)

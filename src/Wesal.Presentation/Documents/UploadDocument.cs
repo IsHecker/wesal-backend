@@ -1,10 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Documents.UploadDocument;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -15,9 +15,12 @@ internal sealed class UploadDocument : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(ApiEndpoints.Documents.Upload, async ([FromForm] Request request, ISender sender) =>
+        app.MapPost(ApiEndpoints.Documents.Upload, async (
+            [FromForm] Request request,
+            ClaimsPrincipal user,
+            ISender sender) =>
         {
-            var result = await sender.Send(new UploadDocumentCommand(SharedData.StaffId, request.File));
+            var result = await sender.Send(new UploadDocumentCommand(user.GetRoleId(), request.File));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
@@ -26,6 +29,7 @@ internal sealed class UploadDocument : IEndpoint
         .Produces<Guid>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithOpenApiName(nameof(UploadDocument))
+        .RequireAuthorization()
         .DisableAntiforgery();
     }
 

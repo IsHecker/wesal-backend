@@ -6,7 +6,7 @@ internal sealed class CreateCustodyCommandValidator : AbstractValidator<CreateCu
 {
     public CreateCustodyCommandValidator()
     {
-        RuleFor(x => x.StaffId).NotEmpty();
+        RuleFor(x => x.CourtId).NotEmpty();
         RuleFor(x => x.CourtCaseId).NotEmpty();
         RuleFor(x => x.CustodianId).NotEmpty();
 

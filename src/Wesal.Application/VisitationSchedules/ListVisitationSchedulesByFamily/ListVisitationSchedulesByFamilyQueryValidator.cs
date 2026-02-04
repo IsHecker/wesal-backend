@@ -7,7 +7,6 @@ internal sealed class ListVisitationSchedulesByFamilyQueryValidator
 {
     public ListVisitationSchedulesByFamilyQueryValidator()
     {
-        RuleFor(x => x.StaffId).NotEmpty();
         RuleFor(x => x.FamilyId).NotEmpty();
     }
 }

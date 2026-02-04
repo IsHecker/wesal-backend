@@ -21,7 +21,7 @@ internal sealed class ValidationBehaviour<TRequest, TResponse>(
         ValidationFailure[] validationFailures = await ValidateAsync(request);
 
         if (validationFailures.Length == 0)
-            return await next();
+            return await next(cancellationToken);
 
 
         if (!typeof(TResponse).IsGenericType &&
@@ -48,7 +48,7 @@ internal sealed class ValidationBehaviour<TRequest, TResponse>(
     private async Task<ValidationFailure[]> ValidateAsync(TRequest request)
     {
         if (!validators.Any())
-            return Array.Empty<ValidationFailure>();
+            return [];
 
         var context = new ValidationContext<TRequest>(request);
 

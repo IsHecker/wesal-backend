@@ -1,14 +1,12 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Messaging;
-using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.VisitationLocations.UpdateVisitationLocation;
 
 internal sealed class UpdateVisitationLocationCommandHandler(
-    IVisitationLocationRepository visitLocationRepository,
-    ICourtStaffRepository courtStaffRepository)
+    IVisitationLocationRepository visitLocationRepository)
     : ICommandHandler<UpdateVisitationLocationCommand>
 {
     public async Task<Result> Handle(
@@ -19,11 +17,7 @@ internal sealed class UpdateVisitationLocationCommandHandler(
         if (location is null)
             return VisitationLocationErrors.NotFound(request.LocationId);
 
-        var staff = await courtStaffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
-        if (staff is null)
-            return UserErrors.NotFound(request.UserId);
-
-        if (location.CourtId != staff.CourtId)
+        if (location.CourtId != request.CourtId)
             return VisitationLocationErrors.Unauthorized();
 
         location.Update(

@@ -1,11 +1,9 @@
+using Wesal.Domain.Common.Abstractions;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.UserDevices;
 
-/// <summary>
-/// Represents a user's registered device for push notifications
-/// </summary>
-public sealed class UserDevice : Entity
+public sealed class UserDevice : Entity, IHasUserId
 {
     public Guid UserId { get; private set; }
     public string DeviceToken { get; private set; } = null!;

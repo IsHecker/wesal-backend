@@ -4,6 +4,8 @@ internal static class ApiEndpoints
 {
     private const string ApiBase = "api";
 
+    private const string AuthenticationBase = $"{ApiBase}/auth";
+    private const string UsersBase = $"{ApiBase}/users";
     private const string CourtsBase = $"{ApiBase}/courts";
     private const string ParentsBase = $"{ApiBase}/parents";
     private const string SchoolsBase = $"{ApiBase}/schools";
@@ -16,7 +18,6 @@ internal static class ApiEndpoints
     private const string visitationsBase = $"{ApiBase}/visitations";
     private const string visitationLocationsBase = $"{ApiBase}/visitation-locations";
     private const string PaymentsDueBase = $"{ApiBase}/payments-due";
-    private const string PaymentsBase = $"{ApiBase}/payments";
     private const string AlimoniesBase = $"{ApiBase}/alimonies";
     private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
     private const string NotificationsBase = $"{ApiBase}/notifications";
@@ -32,6 +33,7 @@ internal static class ApiEndpoints
     internal static class Parents
     {
         public const string Profile = $"{ParentsBase}/me";
+        public const string UpdateProfile = $"{ParentsBase}/{{parentId:guid}}";
     }
 
     internal static class Families
@@ -40,7 +42,9 @@ internal static class ApiEndpoints
         public const string ListByCourt = $"{Courts.Me}/families";
 
         public const string Enroll = FamiliesBase;
+        public const string Children = $"{GetById}/children";
         public const string GetByParent = FamiliesBase;
+        public const string Delete = GetById;
     }
 
     internal static class Children
@@ -69,8 +73,11 @@ internal static class ApiEndpoints
 
     internal static class Custodies
     {
+        public const string GetById = $"{CustodiesBase}/{{custodyId:guid}}";
         public const string GetByFamily = $"{CustodiesBase}/{{familyId:guid}}";
         public const string Create = CustodiesBase;
+        public const string Update = GetById;
+        public const string Delete = GetById;
     }
 
     internal static class CustodyRequests
@@ -82,8 +89,12 @@ internal static class ApiEndpoints
 
     internal static class VisitationSchedules
     {
+        public const string GetById = $"{VisitationSchedulesBase}/{{scheduleId:guid}}";
+
         public const string ListByFamily = $"{Families.GetById}/visitation-schedules";
         public const string Create = VisitationSchedulesBase;
+        public const string Update = GetById;
+        public const string Delete = GetById;
     }
 
     internal static class Visitations
@@ -99,7 +110,9 @@ internal static class ApiEndpoints
     {
         public const string List = visitationLocationsBase;
         public const string Create = visitationLocationsBase;
-        public const string Update = $"{visitationLocationsBase}/{{locationId:guid}}";
+        public const string GetById = $"{visitationLocationsBase}/{{locationId:guid}}";
+        public const string Update = GetById;
+        public const string Delete = GetById;
     }
 
     internal static class PaymentsDue
@@ -116,7 +129,7 @@ internal static class ApiEndpoints
 
     internal static class Notifications
     {
-        public const string ListByUser = $"{NotificationsBase}/me";
+        public const string ListByParent = $"{NotificationsBase}/me";
 
         public const string MarkAsRead = $"{NotificationsBase}/{{notificationId:guid}}/read";
         public const string UnreadCount = $"{NotificationsBase}/unread-count";
@@ -130,7 +143,11 @@ internal static class ApiEndpoints
 
     internal static class Alimonies
     {
+        public const string GetById = $"{AlimoniesBase}/{{alimonyId:guid}}";
+        public const string GetByFamily = $"{Families.GetById}/alimony";
         public const string Create = AlimoniesBase;
+        public const string Update = GetById;
+        public const string Delete = GetById;
     }
 
     internal static class Complaints
@@ -151,5 +168,24 @@ internal static class ApiEndpoints
         public const string Upload = DocumentsBase;
         public const string GetById = $"{DocumentsBase}/{{documentId:guid}}";
         public const string Delete = GetById;
+    }
+
+    public static class Auth
+    {
+        public const string SignInSystemAdmin = $"{AuthenticationBase}/system-admin/sign-in";
+        public const string SignInFamilyCourt = $"{AuthenticationBase}/family-court/sign-in";
+        public const string SignInCourtStaff = $"{AuthenticationBase}/court-staff/sign-in";
+        public const string SignInParent = $"{AuthenticationBase}/parent/sign-in";
+        public const string SignInSchool = $"{AuthenticationBase}/school/sign-in";
+        public const string SignInVisitCenterStaff = $"{AuthenticationBase}/visit-center-staff/sign-in";
+    }
+
+    public static class Users
+    {
+        public const string CreateSystemAdmin = $"{UsersBase}/system-admin";
+        public const string CreateFamilyCourt = $"{UsersBase}/family-courts";
+        public const string CreateCourtStaff = $"{UsersBase}/court-staff";
+        public const string CreateVisitCenterStaff = $"{UsersBase}/visit-center-staff";
+        public const string ChangePassword = $"{UsersBase}/change-password";
     }
 }

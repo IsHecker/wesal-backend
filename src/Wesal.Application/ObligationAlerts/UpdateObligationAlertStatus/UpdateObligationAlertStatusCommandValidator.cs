@@ -12,9 +12,9 @@ internal sealed class UpdateObligationAlertStatusCommandValidator : AbstractVali
             .NotEmpty()
             .WithMessage("Alert ID is required");
 
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.CourtId)
             .NotEmpty()
-            .WithMessage("Staff ID is required");
+            .WithMessage("Court ID is required");
 
         RuleFor(x => x.Status)
             .MustBeEnumValue<UpdateObligationAlertStatusCommand, AlertStatus>();

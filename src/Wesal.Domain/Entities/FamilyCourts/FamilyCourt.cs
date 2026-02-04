@@ -1,8 +1,9 @@
+using Wesal.Domain.Common.Abstractions;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.FamilyCourts;
 
-public sealed class FamilyCourt : Entity
+public sealed class FamilyCourt : Entity, IHasUserId
 {
     public Guid UserId { get; private set; }
 
@@ -15,6 +16,8 @@ public sealed class FamilyCourt : Entity
     private FamilyCourt() { }
 
     public static FamilyCourt Create(
+        Guid userId,
+        string email,
         string name,
         string governorate,
         string address,
@@ -22,6 +25,8 @@ public sealed class FamilyCourt : Entity
     {
         return new FamilyCourt
         {
+            UserId = userId,
+            Email = email,
             Name = name,
             Governorate = governorate,
             Address = address,

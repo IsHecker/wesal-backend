@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.VisitationSchedules.CreateVisitationSchedule;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -15,9 +17,11 @@ internal sealed class CreateVisitationSchedule : IEndpoint
     {
         app.MapPost(ApiEndpoints.VisitationSchedules.Create, async (
             Request request,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new CreateVisitationScheduleCommand(
+                user.GetCourtId(),
                 request.CourtCaseId,
                 request.ParentId,
                 request.LocationId,
@@ -33,7 +37,8 @@ internal sealed class CreateVisitationSchedule : IEndpoint
         .Produces<Guid>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(CreateVisitationSchedule));
+        .WithOpenApiName(nameof(CreateVisitationSchedule))
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 
     internal sealed record Request(
@@ -42,7 +47,7 @@ internal sealed class CreateVisitationSchedule : IEndpoint
         Guid LocationId,
         string Frequency,
         DateOnly StartDate,
-        DateOnly EndDate,
+        DateOnly? EndDate,
         TimeOnly StartTime,
         TimeOnly EndTime);
 }

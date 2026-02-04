@@ -26,7 +26,7 @@ internal sealed class MakeAlimonyPaymentCommandHandler(
         var alimony = await alimonyRepository.GetByIdAsync(paymentDue.AlimonyId, cancellationToken)
             ?? throw new InvalidOperationException();
 
-        if (alimony.PayerId != request.UserId)
+        if (alimony.PayerId != request.ParentId)
             return PaymentErrors.Unauthorized("You are not authorized to make this payment");
 
         if (paymentDue.IsPaid)

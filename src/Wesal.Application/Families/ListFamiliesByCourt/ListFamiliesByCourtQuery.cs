@@ -6,5 +6,5 @@ using Wesal.Contracts.Families;
 namespace Wesal.Application.Families.ListFamiliesByCourt;
 
 public sealed record ListFamiliesByCourtQuery(
-    Guid StaffId,
+    Guid CourtId,
     Pagination Pagination) : IQuery<PagedResponse<FamilyResponse>>;

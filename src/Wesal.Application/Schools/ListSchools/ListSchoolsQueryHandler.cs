@@ -20,6 +20,8 @@ internal sealed class ListSchoolsQueryHandler(
         ListSchoolsQuery request,
         CancellationToken cancellationToken)
     {
+        // TODO: Search by governorate or court id.
+
         var staff = await staffRepository.GetByUserIdWithCourtAsync(request.UserId, cancellationToken);
         if (staff is null)
             return CourtStaffErrors.NotFound(request.UserId);

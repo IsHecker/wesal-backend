@@ -735,18 +735,6 @@ Notifications: 2 unread
 
 ---
 
-# All Features/Use Cases from the Document
-
-## 1. User Management
-- Create Court Admin account (by Platform Admin)
-- Create Court Staff account (by Court Admin)
-- Create Parent user accounts (by Court Staff)
-- Create School accounts (by Court Staff/System auto-generation)
-- Force password change on first login (School accounts)
-- Role-based access control enforcement
-
-
-
 # Confusion Points
 
 - Should Court case-related entities(custody, visitations, and alimonies) be created only once for a family and updated when needed, or it can be created multiple times per family.

@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.UserDevices.UnregisterDevice;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -16,10 +17,11 @@ internal sealed class UnregisterDevice : IEndpoint
     {
         app.MapDelete(ApiEndpoints.UserDevices.UnregisterDevice, async (
             string deviceToken,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new UnregisterDeviceCommand(
-                SharedData.FatherId,
+                user.GetRoleId(),
                 deviceToken));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
@@ -27,6 +29,7 @@ internal sealed class UnregisterDevice : IEndpoint
         .WithTags(Tags.UserDevices)
         .Produces(StatusCodes.Status204NoContent)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithOpenApiName(nameof(UnregisterDevice));
+        .WithOpenApiName(nameof(UnregisterDevice))
+        .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 }

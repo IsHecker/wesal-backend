@@ -20,7 +20,7 @@ internal sealed class MarkNotificationAsReadCommandHandler(
         if (notification is null)
             return NotificationErrors.NotFound(request.NotificationId);
 
-        if (notification.RecipientId != request.UserId)
+        if (notification.RecipientId != request.ParentId)
             return NotificationErrors.NotificationMismatch;
 
         notification.MarkAsRead();

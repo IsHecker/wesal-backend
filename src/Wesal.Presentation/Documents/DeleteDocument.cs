@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Documents.DeleteDocument;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -23,6 +24,7 @@ internal sealed class DeleteDocument : IEndpoint
         .Produces(StatusCodes.Status204NoContent)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithOpenApiName(nameof(DeleteDocument));
+        .WithOpenApiName(nameof(DeleteDocument))
+        .RequireAuthorization();
     }
 }

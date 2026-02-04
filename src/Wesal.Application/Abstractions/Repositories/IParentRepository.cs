@@ -7,5 +7,7 @@ public interface IParentRepository : IRepository<Parent>
 {
     Task<Parent?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
+    Task<Parent?> GetByNationalIdAsync(string nationalId, CancellationToken cancellationToken = default);
+
     Task<bool> ExistsByNationalIdAsync(string nationalId, CancellationToken cancellationToken = default);
 }

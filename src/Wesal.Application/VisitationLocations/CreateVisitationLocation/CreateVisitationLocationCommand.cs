@@ -3,7 +3,7 @@ using Wesal.Application.Messaging;
 namespace Wesal.Application.VisitationLocations.CreateVisitationLocation;
 
 public record struct CreateVisitationLocationCommand(
-    Guid UserId,
+    Guid StaffId,
     string Name,
     string Address,
     string Governorate,

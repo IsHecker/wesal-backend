@@ -18,7 +18,7 @@ public sealed class VisitationSchedule : Entity
     public DateOnly StartDate { get; private set; }
 
     // When this obligation ends (could be years later)
-    public DateOnly EndDate { get; private set; }
+    public DateOnly? EndDate { get; private set; }
 
     public DateOnly? LastGeneratedDate { get; private set; } = null;
 
@@ -32,7 +32,7 @@ public sealed class VisitationSchedule : Entity
         Guid locationId,
         VisitationFrequency frequency,
         DateOnly startDate,
-        DateOnly endDate,
+        DateOnly? endDate,
         TimeOnly startTime,
         TimeOnly endTime)
     {
@@ -69,5 +69,21 @@ public sealed class VisitationSchedule : Entity
             VisitationFrequency.Monthly => DateTime.DaysInMonth(targetDate.Year, targetDate.Month),
             _ => throw new NotImplementedException()
         };
+    }
+
+    public void Update(
+        Guid locationId,
+        VisitationFrequency frequency,
+        TimeOnly startTime,
+        TimeOnly endTime,
+        DateOnly startDate,
+        DateOnly? endDate)
+    {
+        LocationId = locationId;
+        Frequency = frequency;
+        StartTime = startTime;
+        EndTime = endTime;
+        StartDate = startDate;
+        EndDate = endDate;
     }
 }

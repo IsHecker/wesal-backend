@@ -12,4 +12,14 @@ public static class VisitationScheduleErrors
 
     public static Error NotFound(Guid id) =>
         Error.NotFound("VisitationSchedule.NotFound", $"Visitation schedule with ID '{id}' not found");
+
+    public static readonly Error HasCompletedVisitations =
+        Error.Validation(
+            "VisitationSchedule.HasCompletedVisitations",
+            "Cannot modify or delete a visitation schedule that has completed visitations. They are legal evidence.");
+
+    public static readonly Error CannotModifyClosedCase =
+        Error.Validation(
+            "VisitationSchedule.CannotModifyClosedCase",
+            "Cannot modify a visitation schedule for a closed court case.");
 }

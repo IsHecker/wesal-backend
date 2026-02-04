@@ -1,7 +1,8 @@
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Data;
+using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
+using Wesal.Contracts.Users;
 using Wesal.Domain.Entities.Children;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Parents;
@@ -11,19 +12,19 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Families.EnrollFamily;
 
 internal sealed class EnrollFamilyCommandHandler(
-    IRepository<User> userRepository,
     ICourtStaffRepository staffRepository,
     IParentRepository parentRepository,
     IFamilyRepository familyRepository,
-    IChildRepository childRepository) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
+    IChildRepository childRepository,
+    IUserService userService) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
 {
     public async Task<Result<EnrollFamilyResponse>> Handle(
         EnrollFamilyCommand request,
         CancellationToken cancellationToken)
     {
-        var staff = await staffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        var staff = await staffRepository.GetByIdAsync(request.StaffId, cancellationToken);
         if (staff is null)
-            return UserErrors.NotFound(request.UserId);
+            return UserErrors.NotFound(request.StaffId);
 
         // TODO: Father can be in many families.
         if (await parentRepository.ExistsByNationalIdAsync(request.Father.NationalId, cancellationToken))
@@ -32,11 +33,11 @@ internal sealed class EnrollFamilyCommandHandler(
         if (await parentRepository.ExistsByNationalIdAsync(request.Mother.NationalId, cancellationToken))
             return FamilyErrors.ParentAlreadyExists(request.Mother.NationalId);
 
-        var fatherUser = User.Create(UserRole.Parent, request.Father.NationalId, "");
-        var motherUser = User.Create(UserRole.Parent, request.Father.NationalId, "");
+        var fatherUser = await userService.CreateAsync(UserRole.Parent, cancellationToken);
+        var motherUser = await userService.CreateAsync(UserRole.Parent, cancellationToken);
 
         var father = Parent.Create(
-            fatherUser.Id,
+            fatherUser.User.Id,
             staff.CourtId,
             request.Father.NationalId,
             request.Father.FullName,
@@ -48,7 +49,7 @@ internal sealed class EnrollFamilyCommandHandler(
             request.Father.Email);
 
         var mother = Parent.Create(
-            motherUser.Id,
+            motherUser.User.Id,
             staff.CourtId,
             request.Mother.NationalId,
             request.Mother.FullName,
@@ -59,14 +60,9 @@ internal sealed class EnrollFamilyCommandHandler(
             request.Mother.Phone,
             request.Mother.Email);
 
-        // TODO: Create User accounts with for both parents temporary passwords
-
-        await parentRepository.AddRangeAsync([father, mother], cancellationToken);
-
-        await userRepository.AddRangeAsync([fatherUser, motherUser], cancellationToken);
-
         var family = Family.Create(staff.CourtId, father.Id, mother.Id);
 
+        await parentRepository.AddRangeAsync([father, mother], cancellationToken);
         await familyRepository.AddAsync(family, cancellationToken);
 
         foreach (var childDto in request.Children ?? [])
@@ -81,6 +77,9 @@ internal sealed class EnrollFamilyCommandHandler(
             await childRepository.AddAsync(child, cancellationToken);
         }
 
-        return new EnrollFamilyResponse(family.Id, "", "");
+        return new EnrollFamilyResponse(
+            family.Id,
+            new UserCredentialResponse(father.Id, father.NationalId, fatherUser.TemporaryPassword),
+            new UserCredentialResponse(mother.Id, mother.NationalId, motherUser.TemporaryPassword));
     }
 }

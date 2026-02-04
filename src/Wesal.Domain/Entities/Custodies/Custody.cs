@@ -30,4 +30,11 @@ public sealed class Custody : Entity
             EndAt = endAt,
         };
     }
+
+    public void Update(Guid newCustodianId, DateTime startAt, DateTime? endAt)
+    {
+        CustodianId = newCustodianId;
+        StartAt = startAt;
+        EndAt = endAt;
+    }
 }

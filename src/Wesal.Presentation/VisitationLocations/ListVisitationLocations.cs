@@ -1,12 +1,13 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Data;
 using Wesal.Application.VisitationLocations.ListVisitationLocations;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.VisitationLocations;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -20,10 +21,11 @@ internal sealed class ListVisitationLocations : IEndpoint
         app.MapGet(ApiEndpoints.VisitationLocations.List, async (
             [AsParameters] QueryParams query,
             [AsParameters] Pagination pagination,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ListVisitationLocationsQuery(
-                SharedData.StaffUserId,
+                user.GetCourtId(),
                 query.Name,
                 pagination));
 
@@ -31,7 +33,8 @@ internal sealed class ListVisitationLocations : IEndpoint
         })
         .WithTags(Tags.VisitationLocations)
         .Produces<PagedResponse<VisitationLocationResponse>>(StatusCodes.Status200OK)
-        .WithOpenApiName(nameof(ListVisitationLocations));
+        .WithOpenApiName(nameof(ListVisitationLocations))
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
     internal sealed record QueryParams(string? Name = null);

@@ -27,6 +27,7 @@ internal sealed class ListCourtCasesByFamily : IEndpoint
         .WithTags(Tags.CourtCases)
         .Produces<CourtCaseResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(ListCourtCasesByFamily));
+        .WithOpenApiName(nameof(ListCourtCasesByFamily))
+        .RequireAuthorization();
     }
 }

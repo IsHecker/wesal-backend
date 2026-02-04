@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.VisitationLocations.UpdateVisitationLocation;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -17,11 +18,12 @@ internal sealed class UpdateVisitationLocation : IEndpoint
         app.MapPut(ApiEndpoints.VisitationLocations.Update, async (
             Guid locationId,
             Request request,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new UpdateVisitationLocationCommand(
+                user.GetRoleId(),
                 locationId,
-                SharedData.StaffUserId,
                 request.Name,
                 request.Address,
                 request.Governorate,
@@ -36,7 +38,8 @@ internal sealed class UpdateVisitationLocation : IEndpoint
         .Produces(StatusCodes.Status204NoContent)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(UpdateVisitationLocation));
+        .WithOpenApiName(nameof(UpdateVisitationLocation))
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
     internal record struct Request(
@@ -46,6 +49,5 @@ internal sealed class UpdateVisitationLocation : IEndpoint
         string? ContactNumber,
         int MaxConcurrentVisits,
         TimeOnly OpeningTime,
-        TimeOnly ClosingTime
-    );
+        TimeOnly ClosingTime);
 }

@@ -1,12 +1,13 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Data;
 using Wesal.Application.VisitationSchedules.ListVisitationSchedulesByFamily;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.VisitationSchedules;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -20,10 +21,11 @@ internal sealed class ListVisitationSchedulesByFamily : IEndpoint
         app.MapGet(ApiEndpoints.VisitationSchedules.ListByFamily, async (
             Guid familyId,
             [AsParameters] Pagination pagination,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ListVisitationSchedulesByFamilyQuery(
-                SharedData.StaffId,
+                user.GetRoleId(),
                 familyId,
                 pagination));
 
@@ -33,6 +35,7 @@ internal sealed class ListVisitationSchedulesByFamily : IEndpoint
         .Produces<PagedResponse<VisitationScheduleResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(ListVisitationSchedulesByFamily));
+        .WithOpenApiName(nameof(ListVisitationSchedulesByFamily))
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 }

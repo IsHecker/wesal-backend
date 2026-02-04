@@ -6,7 +6,7 @@ public sealed class UnregisterDeviceCommandValidator : AbstractValidator<Unregis
 {
     public UnregisterDeviceCommandValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.ParentId)
             .NotEmpty()
             .WithMessage("UserId is required");
 

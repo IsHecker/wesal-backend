@@ -1,10 +1,12 @@
+using Wesal.Domain.Common.Abstractions;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.VisitCenterStaffs;
 
-public sealed class VisitCenterStaff : Entity
+public sealed class VisitCenterStaff : Entity, IHasUserId
 {
     public Guid UserId { get; private set; }
+    public Guid CourtId { get; private set; }
 
     public Guid LocationId { get; private set; }
 
@@ -16,6 +18,7 @@ public sealed class VisitCenterStaff : Entity
 
     public static VisitCenterStaff Create(
         Guid userId,
+        Guid courtId,
         Guid locationId,
         string email,
         string fullName,
@@ -23,8 +26,9 @@ public sealed class VisitCenterStaff : Entity
     {
         return new VisitCenterStaff
         {
-            LocationId = locationId,
             UserId = userId,
+            CourtId = courtId,
+            LocationId = locationId,
             FullName = fullName,
             Email = email,
             Phone = phone

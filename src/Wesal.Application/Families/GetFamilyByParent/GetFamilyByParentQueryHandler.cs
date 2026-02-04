@@ -1,17 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Data;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
 using Wesal.Domain.Entities.Families;
-using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Families.GetFamilyByParent;
 
 internal sealed class GetFamilyByParentQueryHandler(
-    IRepository<User> userRepository,
     IParentRepository parentRepository,
     IWesalDbContext context)
     : IQueryHandler<GetFamilyByParentQuery, FamilyResponse>
@@ -20,13 +17,9 @@ internal sealed class GetFamilyByParentQueryHandler(
         GetFamilyByParentQuery request,
         CancellationToken cancellationToken)
     {
-        var isUserExist = await userRepository.ExistsAsync(request.UserId, cancellationToken);
-        if (!isUserExist)
-            return UserErrors.NotFound(request.UserId);
-
         // TODO: support multiple families for Father.
 
-        var parent = await parentRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        var parent = await parentRepository.GetByIdAsync(request.ParentId, cancellationToken);
 
         var family = await context.Families
             .Include(family => family.Father)
@@ -36,7 +29,7 @@ internal sealed class GetFamilyByParentQueryHandler(
                 || family.MotherId == parent!.Id, cancellationToken);
 
         if (family is null)
-            return FamilyErrors.NotFoundByParent(request.UserId);
+            return FamilyErrors.NotFoundByParent(request.ParentId);
 
         return family.ToResponse();
     }

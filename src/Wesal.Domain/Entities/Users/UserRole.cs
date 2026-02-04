@@ -1,10 +1,11 @@
 namespace Wesal.Domain.Entities.Users;
 
-public enum UserRole
+public static class UserRole
 {
-    FamilyCourt,
-    CourtStaff,
-    VisitCenterStaff,
-    Parent,
-    School
+    public const string SystemAdmin = nameof(SystemAdmin);
+    public const string FamilyCourt = nameof(FamilyCourt);
+    public const string CourtStaff = nameof(CourtStaff);
+    public const string VisitCenterStaff = nameof(VisitCenterStaff);
+    public const string Parent = nameof(Parent);
+    public const string School = nameof(School);
 }

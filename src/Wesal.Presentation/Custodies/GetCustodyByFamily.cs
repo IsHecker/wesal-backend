@@ -23,6 +23,7 @@ internal sealed class GetCustodyByFamily : IEndpoint
         .WithTags(Tags.Custodies)
         .Produces<CustodyResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(GetCustodyByFamily));
+        .WithOpenApiName(nameof(GetCustodyByFamily))
+        .RequireAuthorization();
     }
 }

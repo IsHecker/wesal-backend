@@ -3,7 +3,7 @@ using Wesal.Application.Messaging;
 namespace Wesal.Application.Alimonies.CreateAlimony;
 
 public record struct CreateAlimonyCommand(
-    Guid UserId,
+    Guid CourtId,
     Guid CourtCaseId,
     Guid PayerId,
     Guid RecipientId,

@@ -1,18 +1,15 @@
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Data;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.CourtCases;
-using Wesal.Domain.Entities.CourtStaffs;
+using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Parents;
-using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Alimonies.CreateAlimony;
 
 internal sealed class CreateAlimonyCommandHandler(
-    IRepository<User> userRepository,
     ICourtCaseRepository courtCaseRepository,
     IFamilyRepository familyRepository,
     IParentRepository parentRepository,
@@ -23,10 +20,6 @@ internal sealed class CreateAlimonyCommandHandler(
         CreateAlimonyCommand request,
         CancellationToken cancellationToken)
     {
-        var isUserExist = await userRepository.ExistsAsync(request.UserId, cancellationToken);
-        if (!isUserExist)
-            return CourtStaffErrors.NotFound(request.UserId);
-
         var courtCase = await courtCaseRepository.GetByIdAsync(request.CourtCaseId, cancellationToken);
         if (courtCase is null)
             return CourtCaseErrors.NotFound(request.CourtCaseId);
@@ -54,6 +47,9 @@ internal sealed class CreateAlimonyCommandHandler(
         CourtCase courtCase,
         CancellationToken cancellationToken)
     {
+        if (courtCase.CourtId != request.CourtId)
+            return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
+
         var family = await familyRepository.GetByIdAsync(courtCase.FamilyId, cancellationToken)
             ?? throw new InvalidOperationException();
 
@@ -70,13 +66,13 @@ internal sealed class CreateAlimonyCommandHandler(
             return ParentErrors.NotFound(request.RecipientId);
 
         if (family.FatherId != request.PayerId && family.MotherId != request.PayerId)
-            return AlimonyErrors.PayerNotInFamily();
+            return AlimonyErrors.PayerNotInFamily;
 
         if (family.FatherId != request.RecipientId && family.MotherId != request.RecipientId)
-            return AlimonyErrors.RecipientNotInFamily();
+            return AlimonyErrors.RecipientNotInFamily;
 
         if (request.PayerId == request.RecipientId)
-            return AlimonyErrors.PayerAndRecipientSame();
+            return AlimonyErrors.PayerAndRecipientSame;
 
         return Result.Success;
     }

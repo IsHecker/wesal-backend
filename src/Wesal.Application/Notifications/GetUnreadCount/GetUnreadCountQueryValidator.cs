@@ -6,7 +6,7 @@ public sealed class GetUnreadCountQueryValidator : AbstractValidator<GetUnreadCo
 {
     public GetUnreadCountQueryValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.ParentId)
             .NotEmpty()
             .WithMessage("UserId is required");
     }

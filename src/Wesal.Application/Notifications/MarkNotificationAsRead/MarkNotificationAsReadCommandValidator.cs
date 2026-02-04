@@ -10,7 +10,7 @@ public sealed class MarkNotificationAsReadCommandValidator : AbstractValidator<M
             .NotEmpty()
             .WithMessage("NotificationId is required");
 
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.ParentId)
             .NotEmpty()
             .WithMessage("UserId is required");
     }

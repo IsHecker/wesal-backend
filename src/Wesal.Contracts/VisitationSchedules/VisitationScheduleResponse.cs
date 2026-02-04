@@ -8,6 +8,6 @@ public record struct VisitationScheduleResponse(
     Guid LocationId,
     string Frequency,
     DateOnly StartDate,
-    DateOnly EndDate,
+    DateOnly? EndDate,
     TimeOnly StartTime,
     TimeOnly EndTime);

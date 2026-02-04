@@ -6,5 +6,6 @@ namespace Wesal.Application.Abstractions.Repositories;
 public interface ICourtStaffRepository : IRepository<CourtStaff>
 {
     Task<CourtStaff?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
-    Task<CourtStaff?> GetByUserIdWithCourtAsync(Guid userId, CancellationToken cancellationToken);
+    Task<CourtStaff?> GetByUserIdWithCourtAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
 }

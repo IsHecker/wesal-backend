@@ -4,19 +4,25 @@ namespace Wesal.Domain.Entities.Users;
 
 public sealed class User : Entity
 {
-    public UserRole Role { get; private set; }
-    public string Username { get; private set; } = null!;
-    public string? Password { get; private set; } = null!;
+    public string Role { get; private set; } = null!;
+    public string PasswordHash { get; private set; } = null!;
+    public bool PasswordChangeRequired { get; private set; }
 
     private User() { }
 
-    public static User Create(UserRole role, string userName, string? password = null)
+    public static User Create(string role, string password)
     {
         return new User
         {
             Role = role,
-            Username = userName,
-            Password = password
+            PasswordHash = password,
+            PasswordChangeRequired = true
         };
+    }
+
+    public void ChangePassword(string newPassword)
+    {
+        PasswordHash = newPassword;
+        PasswordChangeRequired = false;
     }
 }

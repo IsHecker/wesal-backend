@@ -6,6 +6,6 @@ public sealed class ListFamiliesByCourtQueryValidator : AbstractValidator<ListFa
 {
     public ListFamiliesByCourtQueryValidator()
     {
-        RuleFor(x => x.StaffId).NotEmpty();
+        RuleFor(x => x.CourtId).NotEmpty();
     }
 }

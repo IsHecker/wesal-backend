@@ -6,7 +6,7 @@ public sealed class ListSchoolReportsByChildQueryValidator : AbstractValidator<L
 {
     public ListSchoolReportsByChildQueryValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.SchoolId).NotEmpty();
         RuleFor(x => x.ChildId).NotEmpty();
     }
 }

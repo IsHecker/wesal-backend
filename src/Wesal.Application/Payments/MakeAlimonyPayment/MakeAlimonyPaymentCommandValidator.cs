@@ -8,9 +8,9 @@ internal sealed class MakeAlimonyPaymentCommandValidator : AbstractValidator<Mak
 {
     public MakeAlimonyPaymentCommandValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.ParentId)
             .NotEmpty()
-            .WithMessage("Payer ID is required");
+            .WithMessage("Parent ID is required");
 
         RuleFor(x => x.PaymentMethod)
             .NotEmpty()

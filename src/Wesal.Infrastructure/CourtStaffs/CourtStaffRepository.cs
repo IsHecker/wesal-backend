@@ -9,13 +9,19 @@ namespace Wesal.Infrastructure.CourtStaffs;
 internal sealed class CourtStaffRepository(WesalDbContext context)
     : Repository<CourtStaff>(context), ICourtStaffRepository
 {
+    public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        return context.CourtStaffs
+            .AnyAsync(staff => staff.Email == email, cancellationToken);
+    }
+
     public Task<CourtStaff?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return context.CourtStaffs
             .FirstOrDefaultAsync(staff => staff.UserId == userId, cancellationToken);
     }
 
-    public Task<CourtStaff?> GetByUserIdWithCourtAsync(Guid userId, CancellationToken cancellationToken)
+    public Task<CourtStaff?> GetByUserIdWithCourtAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return context.CourtStaffs
             .Include(staff => staff.Court)

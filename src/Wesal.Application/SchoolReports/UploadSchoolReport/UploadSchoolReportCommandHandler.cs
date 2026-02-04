@@ -3,7 +3,6 @@ using Wesal.Application.Data;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Children;
-using Wesal.Domain.Entities.Documents;
 using Wesal.Domain.Entities.SchoolReports;
 using Wesal.Domain.Entities.Schools;
 using Wesal.Domain.Results;
@@ -11,27 +10,23 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.SchoolReports.UploadSchoolReport;
 
 internal sealed class UploadSchoolReportCommandHandler(
-    ISchoolRepository schoolRepository,
     IChildRepository childRepository,
-    IRepository<SchoolReport> schoolReportRepository,
-    IRepository<Document> documentRepository)
+    IRepository<SchoolReport> schoolReportRepository)
     : ICommandHandler<UploadSchoolReportCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(
         UploadSchoolReportCommand request,
         CancellationToken cancellationToken)
     {
-        var school = await schoolRepository.GetByIdAsync(request.SchooldId, cancellationToken);
-        if (school is null)
-            return SchoolErrors.NotFound(request.SchooldId);
-
-        var validationResult = await ValidateReport(request, school.Id, cancellationToken);
+        var validationResult = await ValidateReport(request, request.SchooldId, cancellationToken);
         if (validationResult.IsFailure)
             return validationResult.Error;
 
+        // TODO: add report uploading
+
         var report = SchoolReport.Create(
             request.ChildId,
-            school.Id,
+            request.SchooldId,
             request.DocumentId,
             request.ReportType.ToEnum<SchoolReportType>());
 

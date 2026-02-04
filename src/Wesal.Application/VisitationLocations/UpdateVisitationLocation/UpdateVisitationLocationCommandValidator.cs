@@ -1,5 +1,4 @@
 using FluentValidation;
-using Wesal.Application.VisitationLocations.CreateVisitationLocation;
 
 namespace Wesal.Application.VisitationLocations.UpdateVisitationLocation;
 
@@ -7,9 +6,9 @@ public sealed class UpdateVisitationLocationCommandValidator : AbstractValidator
 {
     public UpdateVisitationLocationCommandValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.CourtId)
             .NotEmpty()
-            .WithMessage("Staff ID is required");
+            .WithMessage("Court ID is required");
 
         RuleFor(x => x.Name)
             .NotEmpty()

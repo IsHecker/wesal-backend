@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Payments.MakeAlimonyPayment;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -14,10 +15,14 @@ internal sealed class MakeAlimonyPayment : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(ApiEndpoints.Payments.MakeAlimony, async (Guid paymentDueId, Request request, ISender sender) =>
+        app.MapPost(ApiEndpoints.Payments.MakeAlimony, async (
+            Guid paymentDueId,
+            Request request,
+            ClaimsPrincipal user,
+            ISender sender) =>
         {
             var result = await sender.Send(new MakeAlimonyPaymentCommand(
-                SharedData.FatherUserId,
+                user.GetRoleId(),
                 paymentDueId,
                 request.PaymentMethod));
 
@@ -28,7 +33,8 @@ internal sealed class MakeAlimonyPayment : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(MakeAlimonyPayment));
+        .WithOpenApiName(nameof(MakeAlimonyPayment))
+        .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 
     internal readonly record struct Request(string PaymentMethod);

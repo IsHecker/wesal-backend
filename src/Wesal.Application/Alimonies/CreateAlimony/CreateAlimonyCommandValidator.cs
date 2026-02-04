@@ -8,7 +8,6 @@ public sealed class CreateAlimonyCommandValidator : AbstractValidator<CreateAlim
 {
     public CreateAlimonyCommandValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.CourtCaseId).NotEmpty();
         RuleFor(x => x.PayerId).NotEmpty();
         RuleFor(x => x.RecipientId).NotEmpty();

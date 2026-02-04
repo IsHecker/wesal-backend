@@ -1,15 +1,14 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.CourtCases;
-using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Custodies;
+using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Custodies.CreateCustody;
 
 internal sealed class CreateCustodyCommandHandler(
-    ICourtStaffRepository courtStaffRepository,
     ICourtCaseRepository courtCaseRepository,
     IFamilyRepository familyRepository,
     IParentRepository parentRepository,
@@ -20,15 +19,11 @@ internal sealed class CreateCustodyCommandHandler(
         CreateCustodyCommand request,
         CancellationToken cancellationToken)
     {
-        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
-        if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
-
         var courtCase = await courtCaseRepository.GetByIdAsync(request.CourtCaseId, cancellationToken);
         if (courtCase is null)
             return CourtCaseErrors.NotFound(request.CourtCaseId);
 
-        var validationResult = await ValidateCustody(request, courtCase.FamilyId, cancellationToken);
+        var validationResult = await ValidateCustody(request, courtCase, cancellationToken);
         if (validationResult.IsFailure)
             return validationResult.Error;
 
@@ -46,10 +41,13 @@ internal sealed class CreateCustodyCommandHandler(
 
     private async Task<Result> ValidateCustody(
         CreateCustodyCommand request,
-        Guid familyId,
+        CourtCase courtCase,
         CancellationToken cancellationToken)
     {
-        var family = await familyRepository.GetByIdAsync(familyId, cancellationToken)
+        if (courtCase.CourtId != request.CourtId)
+            return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
+
+        var family = await familyRepository.GetByIdAsync(courtCase.FamilyId, cancellationToken)
             ?? throw new InvalidOperationException();
 
         var custodyExists = await custodyRepository.ExistsByCourtCaseIdAsync(request.CourtCaseId, cancellationToken);

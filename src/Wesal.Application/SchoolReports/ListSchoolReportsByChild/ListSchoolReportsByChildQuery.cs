@@ -6,6 +6,6 @@ using Wesal.Contracts.SchoolReports;
 namespace Wesal.Application.SchoolReports.ListSchoolReportsByChild;
 
 public record struct ListSchoolReportsByChildQuery(
-    Guid UserId,
+    Guid SchoolId,
     Guid ChildId,
     Pagination Pagination) : IQuery<PagedResponse<SchoolReportResponse>>;

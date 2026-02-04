@@ -1,6 +1,8 @@
+using Wesal.Contracts.Users;
+
 namespace Wesal.Contracts.Families;
 
 public record struct EnrollFamilyResponse(
     Guid FamilyId,
-    string FatherTemporaryPassword,
-    string MotherTemporaryPassword);
+    UserCredentialResponse FatherCredential,
+    UserCredentialResponse MotherCredential);

@@ -6,9 +6,9 @@ public sealed class ListVisitationLocationsQueryValidator : AbstractValidator<Li
 {
     public ListVisitationLocationsQueryValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.CourtId)
             .NotEmpty()
-            .WithMessage("Staff ID is required");
+            .WithMessage("Court ID is required");
 
         RuleFor(x => x.Name)
             .MaximumLength(100)

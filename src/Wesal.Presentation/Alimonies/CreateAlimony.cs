@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Alimonies.CreateAlimony;
-using Wesal.Domain;
+using Wesal.Application.Authentication;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -16,10 +17,11 @@ internal sealed class CreateAlimony : IEndpoint
     {
         app.MapPost(ApiEndpoints.Alimonies.Create, async (
             Request request,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var command = new CreateAlimonyCommand(
-                SharedData.StaffUserId,
+                user.GetCourtId(),
                 request.CourtCaseId,
                 request.PayerId,
                 request.RecipientId,
@@ -36,7 +38,8 @@ internal sealed class CreateAlimony : IEndpoint
         .Produces<Guid>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(CreateAlimony));
+        .WithOpenApiName(nameof(CreateAlimony))
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 
     internal record struct Request(

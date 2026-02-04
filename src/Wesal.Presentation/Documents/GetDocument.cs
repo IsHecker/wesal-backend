@@ -23,6 +23,7 @@ internal sealed class GetDocument : IEndpoint
         .WithTags(Tags.Documents)
         .Produces<DocumentResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(GetDocument));
+        .WithOpenApiName(nameof(GetDocument))
+        .RequireAuthorization();
     }
 }

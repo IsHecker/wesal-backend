@@ -46,6 +46,23 @@ using Wesal.Infrastructure.Visitations.VisitationReminder;
 using Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
 using Wesal.Infrastructure.VisitCenterStaffs;
 using Wesal.Presentation.Endpoints;
+using Microsoft.AspNetCore.Identity;
+using Wesal.Domain.Entities.Users;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Wesal.Infrastructure.Options;
+using Wesal.Infrastructure.Authentication;
+using Wesal.Infrastructure.Users;
+using Wesal.Infrastructure.FamilyCourts;
+using Wesal.Application.Authentication;
+using Wesal.Application.Authentication.Credentials;
+using Wesal.Infrastructure.Authentication.Strategies;
+using Wesal.Application.Abstractions.Authentication;
+using Wesal.Infrastructure.Authentication.Services;
+using Microsoft.AspNetCore.Http;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Wesal.Infrastructure;
 
@@ -67,8 +84,9 @@ public static class DependencyInjection
         services.AddOptions(configuration);
         services.AddCache();
         services.AddDbContext(configuration);
-        services.AddNotificationServices(configuration);
-        services.AddDocumentServices();
+        services.AddAuthenticationInternal(configuration);
+        services.AddNotification(configuration);
+        services.AddDocumentServices(configuration);
         services.AddRepositories();
         services.AddServices();
         services.AddBackgroundJobs(configuration);
@@ -104,9 +122,6 @@ public static class DependencyInjection
 
         services.Configure<ComplaintOptions>(
             configuration.GetSection(ComplaintOptions.SectionName));
-
-        services.Configure<CloudinaryOptions>(
-            configuration.GetSection(CloudinaryOptions.SectionName));
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -130,6 +145,7 @@ public static class DependencyInjection
         services.AddScoped<IComplaintRepository, ComplaintRepository>();
         services.AddScoped<IComplianceMetricsRepository, ComplianceMetricsRepository>();
         services.AddScoped<IUserDeviceRepository, UserDeviceRepository>();
+        services.AddScoped<IFamilyCourtRepository, FamilyCourtRepository>();
     }
 
     private static void AddServices(this IServiceCollection services)
@@ -178,23 +194,23 @@ public static class DependencyInjection
         services.ConfigureOptions<PaymentDueReminderJobConfiguration>();
     }
 
-    private static void AddDocumentServices(this IServiceCollection services)
+    private static void AddDocumentServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<CloudinaryOptions>(
+            configuration.GetSection(CloudinaryOptions.SectionName));
+
         services.AddScoped<ICloudinaryService, CloudinaryService>();
     }
 
-    public static IServiceCollection AddNotificationServices(
+    public static IServiceCollection AddNotification(
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var serviceAccount = configuration.GetSection("FirebaseCloudMessaging").Get<JsonCredentialParameters>();
+        var serviceAccount = configuration.GetSection("FirebaseCloudMessaging")
+            .Get<JsonCredentialParameters>();
 
         if (serviceAccount is null)
-        {
-            throw new InvalidOperationException(
-                "Firebase service account key path is not configured. " +
-                "Please set Fcm:ServiceAccountKeyPath in appsettings.json");
-        }
+            throw new InvalidOperationException("Firebase service account key path is not configured.");
 
         if (FirebaseApp.DefaultInstance == null)
         {
@@ -207,6 +223,84 @@ public static class DependencyInjection
         services.AddSingleton(FirebaseMessaging.DefaultInstance);
         services.AddScoped<FcmService>();
         services.AddScoped<INotificationService, NotificationService>();
+
+        return services;
+    }
+
+    internal static IServiceCollection AddAuthenticationInternal(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()!;
+        services.AddSingleton(jwtOptions);
+
+        JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
+
+        services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer((options) =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    RoleClaimType = CustomClaims.Role,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = false,
+                    ValidateIssuerSigningKey = true,
+                    RequireExpirationTime = false,
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = 401;
+                        return context.Response.WriteAsJsonAsync(new
+                        {
+                            message = "Authentication token is missing or invalid"
+                        });
+                    },
+                    OnForbidden = context =>
+                    {
+                        context.Response.StatusCode = 403;
+                        return context.Response.WriteAsJsonAsync(new
+                        {
+                            message = "You do not have permission to access this resource."
+                        });
+                    }
+                };
+            });
+
+        services.AddAuthorization();
+
+        services.AddAuthorizationBuilder()
+            .AddPolicy(CustomPolicies.SystemAdminOnly, policy => policy.RequireRole(UserRole.SystemAdmin))
+            .AddPolicy(CustomPolicies.FamilyCourtAdminOnly, policy => policy.RequireRole(UserRole.FamilyCourt))
+            .AddPolicy(CustomPolicies.CourtStaffOnly, policy => policy.RequireRole(UserRole.CourtStaff))
+            .AddPolicy(CustomPolicies.CourtManagement, policy => policy.RequireRole(UserRole.FamilyCourt, UserRole.CourtStaff))
+            .AddPolicy(CustomPolicies.ParentsOnly, policy => policy.RequireRole(UserRole.Parent))
+            .AddPolicy(CustomPolicies.SchoolsOnly, policy => policy.RequireRole(UserRole.School))
+            .AddPolicy(CustomPolicies.VisitCenterStaffOnly, policy => policy.RequireRole(UserRole.VisitCenterStaff));
+
+        services.AddHttpContextAccessor();
+
+        services.AddSingleton<TokenGeneratorService>();
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+        services.AddScoped<IUserService, UserService>();
+
+        services.AddScoped<AuthenticationService>();
+
+        services.AddScoped<IAuthenticationStrategy<EmailPasswordCredentials>, EmailPasswordAuthenticationStrategy>();
+        services.AddScoped<IAuthenticationStrategy<NationalIdPasswordCredentials>, NationalIdPasswordAuthenticationStrategy>();
+        services.AddScoped<IAuthenticationStrategy<UsernamePasswordCredentials>, UsernamePasswordAuthenticationStrategy>();
 
         return services;
     }

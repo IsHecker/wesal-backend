@@ -10,24 +10,18 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Application.Families.ListFamiliesByCourt;
 
-internal sealed class ListFamiliesByCourtQueryHandler(
-    ICourtStaffRepository courtStaffRepository,
-    IWesalDbContext context)
+internal sealed class ListFamiliesByCourtQueryHandler(IWesalDbContext context)
     : IQueryHandler<ListFamiliesByCourtQuery, PagedResponse<FamilyResponse>>
 {
     public async Task<Result<PagedResponse<FamilyResponse>>> Handle(
         ListFamiliesByCourtQuery request,
         CancellationToken cancellationToken)
     {
-        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
-        if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
-
         var query = context.Families
             .Include(family => family.Father)
             .Include(family => family.Mother)
             .Include(family => family.Children)
-            .Where(family => family.CourtId == staff.CourtId)
+            .Where(family => family.CourtId == request.CourtId)
             .OrderByDescending(family => family.CreatedAt);
 
         var totalCount = await query.CountAsync(cancellationToken);

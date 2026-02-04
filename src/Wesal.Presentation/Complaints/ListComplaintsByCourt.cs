@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -6,7 +7,6 @@ using Wesal.Application.Complaints.ListComplaintsByCourt;
 using Wesal.Application.Data;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.Complaints;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -19,10 +19,11 @@ internal sealed class ListComplaintsByCourt : IEndpoint
     {
         app.MapGet(ApiEndpoints.Complaints.ListByCourt, async (
             [AsParameters] Pagination pagination,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ListComplaintsByCourtQuery(
-                SharedData.StaffId,
+                user.GetRoleId(),
                 pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -30,6 +31,7 @@ internal sealed class ListComplaintsByCourt : IEndpoint
         .WithTags(Tags.Complaints)
         .Produces<PagedResponse<ComplaintResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(ListComplaintsByCourt));
+        .WithOpenApiName(nameof(ListComplaintsByCourt))
+        .RequireAuthorization();
     }
 }

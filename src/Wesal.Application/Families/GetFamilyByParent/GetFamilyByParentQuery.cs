@@ -3,4 +3,4 @@ using Wesal.Contracts.Families;
 
 namespace Wesal.Application.Families.GetFamilyByParent;
 
-public record struct GetFamilyByParentQuery(Guid UserId) : IQuery<FamilyResponse>;
+public record struct GetFamilyByParentQuery(Guid ParentId) : IQuery<FamilyResponse>;

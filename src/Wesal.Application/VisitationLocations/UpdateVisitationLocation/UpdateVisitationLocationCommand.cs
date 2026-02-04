@@ -3,8 +3,8 @@ using Wesal.Application.Messaging;
 namespace Wesal.Application.VisitationLocations.UpdateVisitationLocation;
 
 public record struct UpdateVisitationLocationCommand(
+    Guid CourtId,
     Guid LocationId,
-    Guid UserId,
     string Name,
     string Address,
     string Governorate,

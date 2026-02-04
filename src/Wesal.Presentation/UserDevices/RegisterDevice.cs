@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.UserDevices.RegisterDevice;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -16,10 +17,11 @@ internal sealed class RegisterDevice : IEndpoint
     {
         app.MapPost(ApiEndpoints.UserDevices.RegisterDevice, async (
             Request request,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new RegisterDeviceCommand(
-                SharedData.FatherId,
+                user.GetRoleId(),
                 request.DeviceToken,
                 request.Platform));
 
@@ -28,7 +30,8 @@ internal sealed class RegisterDevice : IEndpoint
         .WithTags(Tags.UserDevices)
         .Produces<Guid>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithOpenApiName(nameof(RegisterDevice));
+        .WithOpenApiName(nameof(RegisterDevice))
+        .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 
     internal record struct Request(string DeviceToken, string Platform);

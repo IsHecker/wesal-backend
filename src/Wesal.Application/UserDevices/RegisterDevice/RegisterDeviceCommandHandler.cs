@@ -14,14 +14,13 @@ internal sealed class RegisterDeviceCommandHandler(
         RegisterDeviceCommand request,
         CancellationToken cancellationToken)
     {
-        // Check if device token already exists for this user
         var existingDevice = await deviceRepository
-            .GetByUserIdAndTokenAsync(request.UserId, request.DeviceToken, cancellationToken);
+            .GetByUserIdAndTokenAsync(request.ParentId, request.DeviceToken, cancellationToken);
 
         if (existingDevice is null)
         {
             var device = UserDevice.Create(
-                request.UserId,
+                request.ParentId,
                 request.DeviceToken,
                 request.Platform.ToEnum<DevicePlatform>());
 
@@ -30,7 +29,6 @@ internal sealed class RegisterDeviceCommandHandler(
             return device.Id;
         }
 
-        // Reactivate if it was deactivated
         if (!existingDevice.IsActive)
         {
             existingDevice.Activate();

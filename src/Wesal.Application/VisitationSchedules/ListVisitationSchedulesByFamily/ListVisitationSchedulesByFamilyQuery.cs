@@ -6,6 +6,6 @@ using Wesal.Contracts.VisitationSchedules;
 namespace Wesal.Application.VisitationSchedules.ListVisitationSchedulesByFamily;
 
 public record struct ListVisitationSchedulesByFamilyQuery(
-    Guid StaffId,
+    Guid CourtId,
     Guid FamilyId,
     Pagination Pagination) : IQuery<PagedResponse<VisitationScheduleResponse>>;

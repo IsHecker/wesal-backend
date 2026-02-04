@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -6,7 +7,6 @@ using Wesal.Application.CustodyRequests.ListCustodyRequests;
 using Wesal.Application.Data;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.CustodyRequests;
-using Wesal.Domain;
 using Wesal.Domain.Entities.Users;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -21,11 +21,13 @@ internal sealed class ListCustodyRequests : IEndpoint
         app.MapGet(ApiEndpoints.CustodyRequests.ListByCourt, async (
             [AsParameters] QueryParams query,
             [AsParameters] Pagination pagination,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ListCustodyRequestsQuery(
-                SharedData.StaffId,
-                UserRole.CourtStaff, // TODO: Extract user role from token.
+                user.GetRoleId(),
+                UserRole.CourtStaff,
+                query.FamilyId,
                 query.Status,
                 pagination));
 
@@ -36,5 +38,5 @@ internal sealed class ListCustodyRequests : IEndpoint
         .WithOpenApiName(nameof(ListCustodyRequests));
     }
 
-    internal record struct QueryParams(string? Status = null);
+    internal record struct QueryParams(Guid? FamilyId = null, string? Status = null);
 }

@@ -17,7 +17,7 @@ namespace Wesal.Infrastructure.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.20")
+                .HasAnnotation("ProductVersion", "8.0.23")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -55,7 +55,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("EndDate")
+                    b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
 
                     b.Property<Guid>("FamilyId")
@@ -672,6 +672,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly>("BirthDate")
@@ -702,6 +703,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -895,6 +897,10 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
@@ -905,6 +911,40 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("Schools");
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.SystemAdmins.SystemAdmin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("SystemAdmin");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.UserDevices.UserDevice", b =>
@@ -957,7 +997,11 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Password")
+                    b.Property<bool>("PasswordChangeRequired")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
@@ -966,10 +1010,6 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -980,6 +1020,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourtId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1086,7 +1129,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateOnly>("EndDate")
+                    b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
 
                     b.Property<TimeOnly>("EndTime")
@@ -1495,6 +1538,15 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasOne("Wesal.Domain.Entities.Users.User", null)
                         .WithOne()
                         .HasForeignKey("Wesal.Domain.Entities.Schools.School", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.SystemAdmins.SystemAdmin", b =>
+                {
+                    b.HasOne("Wesal.Domain.Entities.Users.User", null)
+                        .WithOne()
+                        .HasForeignKey("Wesal.Domain.Entities.SystemAdmins.SystemAdmin", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

@@ -1,10 +1,10 @@
 using Wesal.Application.Messaging;
-using Wesal.Contracts.Schools;
+using Wesal.Contracts.Users;
 
 namespace Wesal.Application.Schools.RegisterSchool;
 
 public record struct RegisterSchoolCommand(
-    Guid UserId,
+    Guid CourtId,
     string Name,
     string Address,
-    string? ContactNumber = null) : ICommand<RegisterSchoolResponse>;
+    string? ContactNumber = null) : ICommand<UserCredentialResponse>;

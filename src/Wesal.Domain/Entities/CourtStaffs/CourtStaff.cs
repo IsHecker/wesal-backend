@@ -1,9 +1,10 @@
+using Wesal.Domain.Common.Abstractions;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.FamilyCourts;
 
 namespace Wesal.Domain.Entities.CourtStaffs;
 
-public sealed class CourtStaff : Entity
+public sealed class CourtStaff : Entity, IHasUserId
 {
     public Guid UserId { get; private set; }
 

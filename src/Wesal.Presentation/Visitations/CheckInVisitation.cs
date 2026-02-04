@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Visitations.CheckInVisitation;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -16,9 +17,10 @@ internal sealed class CheckInVisitation : IEndpoint
     {
         app.MapPatch(ApiEndpoints.Visitations.CheckIn, async (
             Guid visitationId,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new CheckInVisitationCommand(visitationId, SharedData.CenterStaffUserId));
+            var result = await sender.Send(new CheckInVisitationCommand(user.GetRoleId(), visitationId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })
@@ -27,6 +29,7 @@ internal sealed class CheckInVisitation : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(CheckInVisitation));
+        .WithOpenApiName(nameof(CheckInVisitation))
+        .RequireAuthorization(CustomPolicies.VisitCenterStaffOnly);
     }
 }

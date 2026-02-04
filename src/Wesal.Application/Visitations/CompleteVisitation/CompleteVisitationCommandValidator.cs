@@ -10,8 +10,8 @@ internal sealed class CompleteVisitationCommandValidator : AbstractValidator<Com
             .NotEmpty()
             .WithMessage("Visitation ID is required");
 
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.CenterStaffId)
             .NotEmpty()
-            .WithMessage("Staff ID is required");
+            .WithMessage("Center Staff ID is required");
     }
 }

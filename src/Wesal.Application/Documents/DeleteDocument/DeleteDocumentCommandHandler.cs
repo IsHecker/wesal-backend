@@ -15,6 +15,8 @@ internal sealed class DeleteDocumentCommandHandler(
         DeleteDocumentCommand request,
         CancellationToken cancellationToken)
     {
+        // TODO: Authorize if the user owns this document in all other document actions.
+
         var document = await documentRepository.GetByIdAsync(
             request.DocumentId,
             cancellationToken);

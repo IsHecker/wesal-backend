@@ -8,7 +8,7 @@ public sealed class RegisterDeviceCommandValidator : AbstractValidator<RegisterD
 {
     public RegisterDeviceCommandValidator()
     {
-        RuleFor(x => x.UserId)
+        RuleFor(x => x.ParentId)
             .NotEmpty()
             .WithMessage("UserId is required");
 

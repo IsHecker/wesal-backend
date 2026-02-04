@@ -3,8 +3,8 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.CustodyRequests.ProcessCustodyRequest;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -18,10 +18,10 @@ internal sealed class ProcessCustodyRequest : IEndpoint
         app.MapPatch(ApiEndpoints.CustodyRequests.Process, async (
             Guid requestId,
             Request request,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ProcessCustodyRequestCommand(
-                SharedData.StaffId,
                 requestId,
                 request.IsApproved,
                 request.DecisionNote));
@@ -32,7 +32,8 @@ internal sealed class ProcessCustodyRequest : IEndpoint
         .Produces(StatusCodes.Status204NoContent)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(ProcessCustodyRequest));
+        .WithOpenApiName(nameof(ProcessCustodyRequest))
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 
     internal record struct Request(

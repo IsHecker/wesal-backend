@@ -13,7 +13,6 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.SchoolReports.ListSchoolReportsByChild;
 
 internal sealed class ListSchoolReportsByChildQueryHandler(
-    ISchoolRepository schoolRepository,
     IChildRepository childRepository,
     IWesalDbContext context)
     : IQueryHandler<ListSchoolReportsByChildQuery, PagedResponse<SchoolReportResponse>>
@@ -22,15 +21,11 @@ internal sealed class ListSchoolReportsByChildQueryHandler(
         ListSchoolReportsByChildQuery request,
         CancellationToken cancellationToken)
     {
-        var school = await schoolRepository.GetByUserIdAsync(request.UserId, cancellationToken);
-        if (school is null)
-            return UserErrors.NotFound(request.UserId);
-
         var child = await childRepository.GetByIdAsync(request.ChildId, cancellationToken);
         if (child is null)
             return ChildErrors.NotFound(request.ChildId);
 
-        if (child.SchoolId != school.Id)
+        if (child.SchoolId != request.SchoolId)
             return SchoolReportErrors.ChildNotInSchool();
 
         var query = context.SchoolReports

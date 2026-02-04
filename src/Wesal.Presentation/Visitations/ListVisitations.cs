@@ -33,7 +33,8 @@ internal sealed class ListVisitations : IEndpoint
         .WithTags(Tags.Visitations)
         .Produces<PagedResponse<VisitationResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(ListVisitations));
+        .WithOpenApiName(nameof(ListVisitations))
+        .RequireAuthorization();
     }
 
     internal record struct QueryParams(

@@ -1,11 +1,12 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Data;
 using Wesal.Application.ObligationAlerts.ListObligationAlerts;
 using Wesal.Contracts.ObligationAlerts;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -18,11 +19,12 @@ internal sealed class ListObligationAlerts : IEndpoint
     {
         app.MapGet(ApiEndpoints.ObligationAlerts.List, async (
             [AsParameters] QueryParams query,
+            ClaimsPrincipal user,
             [AsParameters] Pagination pagination,
             ISender sender) =>
         {
             var result = await sender.Send(new ListObligationAlertsQuery(
-                SharedData.StaffUserId,
+                user.GetCourtId(),
                 query.Status,
                 query.Type,
                 pagination));
@@ -32,7 +34,8 @@ internal sealed class ListObligationAlerts : IEndpoint
         .WithTags(Tags.ObligationAlerts)
         .Produces<ObligationAlertsResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
-        .WithOpenApiName(nameof(ListObligationAlerts));
+        .WithOpenApiName(nameof(ListObligationAlerts))
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 
     internal record struct QueryParams(string? Status = null, string? Type = null);

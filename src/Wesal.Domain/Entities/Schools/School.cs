@@ -1,10 +1,12 @@
+using Wesal.Domain.Common.Abstractions;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.Schools;
 
-public sealed class School : Entity
+public sealed class School : Entity, IHasUserId
 {
     public Guid UserId { get; private set; }
+    public string Username { get; private set; } = null!;
 
     public string? Email { get; private set; } = null!;
     public string Name { get; private set; } = null!;
@@ -16,6 +18,7 @@ public sealed class School : Entity
 
     public static School Create(
         Guid userId,
+        string userName,
         string name,
         string address,
         string governorate,
@@ -24,6 +27,7 @@ public sealed class School : Entity
         return new School
         {
             UserId = userId,
+            Username = userName,
             Name = name,
             Address = address,
             Governorate = governorate,

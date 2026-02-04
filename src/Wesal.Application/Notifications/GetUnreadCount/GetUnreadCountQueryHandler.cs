@@ -15,7 +15,7 @@ internal sealed class GetUnreadCountQueryHandler(
         CancellationToken cancellationToken)
     {
         var count = await dbContext.Notifications
-            .Where(n => n.RecipientId == request.UserId
+            .Where(n => n.RecipientId == request.ParentId
                 && n.Status == NotificationStatus.Sent)
             .CountAsync(cancellationToken);
 

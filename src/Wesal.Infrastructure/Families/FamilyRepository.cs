@@ -14,4 +14,11 @@ internal sealed class FamilyRepository(WesalDbContext context)
         return context.Families
             .FirstOrDefaultAsync(family => family.FatherId == parentId || family.MotherId == parentId, cancellationToken);
     }
+
+    public Task<bool> IsParentInFamilyAsync(Guid parentId, Guid familyId, CancellationToken cancellationToken = default)
+    {
+        return context.Families
+            .AnyAsync(family => family.Id == familyId && (family.FatherId == parentId || family.MotherId == parentId),
+                cancellationToken);
+    }
 }

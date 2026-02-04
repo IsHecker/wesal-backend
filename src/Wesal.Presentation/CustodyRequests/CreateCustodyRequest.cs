@@ -1,9 +1,10 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.CustodyRequests.CreateCustodyRequest;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -16,10 +17,11 @@ internal sealed class CreateCustodyRequest : IEndpoint
     {
         app.MapPost(ApiEndpoints.CustodyRequests.Create, async (
             Request request,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new CreateCustodyRequestCommand(
-                SharedData.FatherId,
+                user.GetRoleId(),
                 request.StartDate,
                 request.EndDate,
                 request.Reason));
@@ -30,7 +32,8 @@ internal sealed class CreateCustodyRequest : IEndpoint
         .Produces<Guid>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(CreateCustodyRequest));
+        .WithOpenApiName(nameof(CreateCustodyRequest))
+        .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 
     internal record struct Request(

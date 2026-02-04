@@ -13,7 +13,7 @@ internal sealed class UnregisterDeviceCommandHandler(
         CancellationToken cancellationToken)
     {
         var device = await deviceRepository.GetByUserIdAndTokenAsync(
-            request.UserId,
+            request.ParentId,
             request.DeviceToken,
             cancellationToken);
 

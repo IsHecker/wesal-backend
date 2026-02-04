@@ -7,7 +7,6 @@ public sealed class ProcessCustodyRequestCommandValidator : AbstractValidator<Pr
     public ProcessCustodyRequestCommandValidator()
     {
         RuleFor(x => x.RequestId).NotEmpty();
-        RuleFor(x => x.StaffId).NotEmpty();
 
         RuleFor(x => x.DecisionNote)
             .NotEmpty()

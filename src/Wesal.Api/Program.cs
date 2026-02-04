@@ -3,6 +3,7 @@ using Serilog;
 using Wesal.Api.Extensions;
 using Wesal.Api.Middleware;
 using Wesal.Infrastructure;
+using Wesal.Infrastructure.Authentication.Middlewares;
 using Wesal.Presentation.Endpoints;
 
 internal class Program
@@ -24,6 +25,8 @@ internal class Program
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerDocumentation();
+
+        builder.Configuration.AddJsonFile($"secrets.json", true, true);
 
         builder.Services.AddWesal(builder.Configuration);
 
@@ -47,6 +50,7 @@ internal class Program
 
         app.UseSerilogRequestLogging();
         app.UseExceptionHandler();
+        app.UseMiddleware<MustChangePasswordMiddleware>();
         app.MapEndpoints();
 
         app.Run();

@@ -1,10 +1,11 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.Schools.RegisterSchool;
-using Wesal.Contracts.Schools;
-using Wesal.Domain;
+using Wesal.Contracts.Users;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -17,10 +18,11 @@ internal sealed class RegisterSchool : IEndpoint
     {
         app.MapPost(ApiEndpoints.Schools.Register, async (
             Request request,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new RegisterSchoolCommand(
-                SharedData.StaffUserId,
+                user.GetCourtId(),
                 request.Name,
                 request.Address,
                 request.ContactNumber));
@@ -28,10 +30,11 @@ internal sealed class RegisterSchool : IEndpoint
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
         .WithTags(Tags.Schools)
-        .Produces<RegisterSchoolResponse>(StatusCodes.Status200OK)
+        .Produces<UserCredentialResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
-        .WithOpenApiName(nameof(RegisterSchool));
+        .WithOpenApiName(nameof(RegisterSchool))
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 
     internal record struct Request(

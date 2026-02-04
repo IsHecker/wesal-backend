@@ -31,4 +31,9 @@ public static class VisitationErrors
         Error.Validation(
             "Visitation.NotScheduledForToday",
             "This visitation is not scheduled for today");
+
+    public static readonly Error InUseByVisitations =
+        Error.Validation(
+            "VisitationLocation.InUseByVisitations",
+            "Cannot delete a visitation location that is referenced by existing visitations.");
 }

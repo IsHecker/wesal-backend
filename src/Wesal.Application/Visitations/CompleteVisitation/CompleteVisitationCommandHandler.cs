@@ -5,6 +5,7 @@ using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.Visitations;
+using Wesal.Domain.Entities.VisitCenterStaffs;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Visitations.CompleteVisitation;
@@ -24,9 +25,9 @@ internal sealed class CompleteVisitationCommandHandler(
         if (visitation is null)
             return VisitationErrors.NotFound(request.VisitationId);
 
-        var staff = await centerStaffRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        var staff = await centerStaffRepository.GetByIdAsync(request.CenterStaffId, cancellationToken);
         if (staff is null)
-            return UserErrors.NotFound(request.UserId);
+            return VisitCenterStaffErrors.NotFound(request.CenterStaffId);
 
         var CompleteResult = visitation.Complete(staff, options.Value.CheckInGracePeriodMinutes);
         if (CompleteResult.IsFailure)

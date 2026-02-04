@@ -1,7 +1,6 @@
 using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.Families;
-using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
 
 namespace Wesal.Domain.Entities.CustodyRequests;

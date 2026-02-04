@@ -5,6 +5,7 @@ using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.PaymentsDue;
 using Wesal.Domain.Entities.Families;
+using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.PaymentsDue.ListPaymentsDueByFamily;
@@ -22,6 +23,17 @@ internal sealed class ListPaymentsDueByFamilyQueryHandler(
 
         if (!isFamilyExist)
             return FamilyErrors.NotFound(request.FamilyId);
+
+        if (request.UserRole == UserRole.Parent)
+        {
+            var isParentInFamily = await familyRepository.IsParentInFamilyAsync(
+                request.UserId,
+                request.FamilyId,
+                cancellationToken);
+
+            if (!isParentInFamily)
+                return FamilyErrors.ParentNotInFamily;
+        }
 
         var paymentsDue = context.PaymentsDue
             .Where(paymentDue => paymentDue.FamilyId == request.FamilyId);
