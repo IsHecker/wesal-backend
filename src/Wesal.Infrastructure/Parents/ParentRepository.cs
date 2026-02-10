@@ -24,4 +24,11 @@ internal sealed class ParentRepository(WesalDbContext context)
         return context.Parents
             .FirstOrDefaultAsync(school => school.UserId == userId, cancellationToken);
     }
+
+    public Task<Parent> GetByStripeAccountIdAsync(string accountId, CancellationToken cancellationToken = default)
+    {
+        return context.Parents
+            .AsTracking()
+            .FirstAsync(w => w.StripeConnectAccountId == accountId, cancellationToken);
+    }
 }

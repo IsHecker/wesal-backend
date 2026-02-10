@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Data;
-using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.VisitationLocations;
-using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Results;
 

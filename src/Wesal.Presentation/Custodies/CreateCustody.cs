@@ -23,7 +23,7 @@ internal sealed class CreateCustody : IEndpoint
             var result = await sender.Send(new CreateCustodyCommand(
                 user.GetCourtId(),
                 request.CourtCaseId,
-                request.CustodianId,
+                request.CustodialParentId,
                 request.StartAt,
                 request.EndAt));
 
@@ -39,7 +39,7 @@ internal sealed class CreateCustody : IEndpoint
 
     internal record struct Request(
         Guid CourtCaseId,
-        Guid CustodianId,
+        Guid CustodialParentId,
         DateTime StartAt,
         DateTime? EndAt);
 }

@@ -57,7 +57,7 @@ internal sealed class EmailPasswordAuthenticationStrategy(
             credentials.Password,
             authResult.Value.roleId,
             authResult.Value.courtId,
-            cancellationToken);
+            cancellationToken: cancellationToken);
     }
 
     private async Task<Result<(Guid userId, Guid roleId, Guid? courtId)>> AuthenticateRoleAsync<TEntity>(

@@ -12,9 +12,9 @@ internal sealed class UpdateComplaintStatusCommandValidator : AbstractValidator<
             .NotEmpty()
             .WithMessage("Alert ID is required");
 
-        RuleFor(x => x.StaffId)
+        RuleFor(x => x.CourtId)
             .NotEmpty()
-            .WithMessage("Staff ID is required");
+            .WithMessage("Court ID is required");
 
         RuleFor(x => x.Status)
             .MustBeEnumValue<UpdateComplaintStatusCommand, ComplaintStatus>();

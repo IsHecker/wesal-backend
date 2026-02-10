@@ -17,10 +17,11 @@ internal sealed class CheckInVisitation : IEndpoint
     {
         app.MapPatch(ApiEndpoints.Visitations.CheckIn, async (
             Guid visitationId,
+            Request requst,
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new CheckInVisitationCommand(user.GetRoleId(), visitationId));
+            var result = await sender.Send(new CheckInVisitationCommand(user.GetRoleId(), requst.NationalId, visitationId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })
@@ -32,4 +33,6 @@ internal sealed class CheckInVisitation : IEndpoint
         .WithOpenApiName(nameof(CheckInVisitation))
         .RequireAuthorization(CustomPolicies.VisitCenterStaffOnly);
     }
+
+    internal record struct Request(string NationalId);
 }

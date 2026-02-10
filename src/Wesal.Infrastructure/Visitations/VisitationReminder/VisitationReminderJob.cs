@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Quartz;
 using Wesal.Application.Abstractions.Services;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Infrastructure.Database;
@@ -22,10 +23,15 @@ internal sealed class VisitationReminderJob(
 
         foreach (var visitation in upcomingVisitations)
         {
-            var notification = NotificationTemplate.UpcomingVisitation(visitation);
+            visitation.MarkAsNotified();
 
-            await notificationService.SendNotificationAsync(
-                notification,
+            var schedule = visitation.VisitationSchedule;
+
+            await notificationService.SendNotificationsAsync(
+                [
+                    NotificationTemplate.UpcomingVisitation(schedule.CustodialParentId, visitation.StartAt),
+                    NotificationTemplate.UpcomingVisitation(schedule.NonCustodialParentId, visitation.StartAt)
+                ],
                 new Dictionary<string, string>
                 {
                     ["visitationId"] = visitation.Id.ToString()
@@ -36,14 +42,16 @@ internal sealed class VisitationReminderJob(
 
     private async Task<List<Visitation>> GetUpcomingVisitationsAsync(CancellationToken cancellationToken)
     {
-        var daysBefore = options.ReminderDaysBeforeVisitation;
+        var targetStart = EgyptTime.Now.AddDays(options.ReminderDaysBeforeVisitation);
 
-        var reminderThreshold = DateTime.UtcNow.AddDays(daysBefore).Date;
-        var reminderWindowEnd = reminderThreshold.AddDays(daysBefore + 1);
+        var from = targetStart.AddHours(-1);
+        var to = targetStart.AddHours(1);
 
         return await dbContext.Visitations
-            .Where(visitation => visitation.StartAt >= reminderThreshold
-                && visitation.StartAt < reminderWindowEnd
+            .AsTracking()
+            .Include(v => v.VisitationSchedule)
+            .Where(visitation => !visitation.IsNotified
+                && from <= visitation.StartAt && visitation.StartAt <= to
                 && visitation.Status == VisitationStatus.Scheduled)
             .ToListAsync(cancellationToken);
     }

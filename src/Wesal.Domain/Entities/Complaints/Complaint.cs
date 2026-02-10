@@ -36,7 +36,7 @@ public sealed class Complaint : Entity
             DocumentId = documentId,
             Type = type,
             Description = description,
-            FiledAt = DateTime.UtcNow,
+            FiledAt = EgyptTime.Now,
             Status = ComplaintStatus.Pending
         };
     }
@@ -46,7 +46,7 @@ public sealed class Complaint : Entity
         return status switch
         {
             ComplaintStatus.UnderReview => MarkAsUnderReview(),
-            ComplaintStatus.Resolved => MarkAsResolved(resolutionNotes!, DateTime.UtcNow),
+            ComplaintStatus.Resolved => MarkAsResolved(resolutionNotes!, EgyptTime.Now),
             _ => ComplaintErrors.CannotUpdateStatus(status)
         };
     }

@@ -7,7 +7,8 @@ public sealed class Custody : Entity
     public Guid CourtCaseId { get; private set; }
     public Guid FamilyId { get; private set; }
 
-    public Guid CustodianId { get; private set; }
+    public Guid CustodialParentId { get; private set; }
+    public Guid NonCustodialParentId { get; private set; }
 
     public DateTime StartAt { get; private set; }
     public DateTime? EndAt { get; private set; }
@@ -17,7 +18,8 @@ public sealed class Custody : Entity
     public static Custody Create(
         Guid courtCaseId,
         Guid familyId,
-        Guid custodianId,
+        Guid custodialParentId,
+        Guid nonCustodialParentId,
         DateTime startAt,
         DateTime? endAt = null)
     {
@@ -25,15 +27,16 @@ public sealed class Custody : Entity
         {
             CourtCaseId = courtCaseId,
             FamilyId = familyId,
-            CustodianId = custodianId,
+            CustodialParentId = custodialParentId,
+            NonCustodialParentId = nonCustodialParentId,
             StartAt = startAt,
             EndAt = endAt,
         };
     }
 
-    public void Update(Guid newCustodianId, DateTime startAt, DateTime? endAt)
+    public void Update(Guid newCustodialParentId, DateTime startAt, DateTime? endAt)
     {
-        CustodianId = newCustodianId;
+        CustodialParentId = newCustodialParentId;
         StartAt = startAt;
         EndAt = endAt;
     }

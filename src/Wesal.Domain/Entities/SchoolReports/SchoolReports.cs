@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.SchoolReports;
@@ -25,7 +26,7 @@ public sealed class SchoolReport : Entity
             SchoolId = schoolId,
             ReportType = reportType,
             DocumentId = documentId,
-            UploadedAt = DateTime.UtcNow,
+            UploadedAt = EgyptTime.Now,
         };
     }
 }

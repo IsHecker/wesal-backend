@@ -6,7 +6,8 @@ using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Results;
 
 internal sealed class DeleteVisitationLocationCommandHandler(
-    IVisitationLocationRepository visitationLocationRepository)
+    IVisitationLocationRepository visitationLocationRepository,
+    IVisitationRepository visitationRepository)
     : ICommandHandler<DeleteVisitationLocationCommand>
 {
     public async Task<Result> Handle(
@@ -14,17 +15,12 @@ internal sealed class DeleteVisitationLocationCommandHandler(
         CancellationToken cancellationToken)
     {
         var location = await visitationLocationRepository.GetByIdAsync(request.LocationId, cancellationToken);
-
         if (location is null)
             return VisitationLocationErrors.NotFound(request.LocationId);
 
-        // TODO: Handle Deletion if it's still in use.
-
-        // --- Any visitation (past or future) referencing this location blocks deletion ---
-        // var isInUse = await visitationRepository
-        //     .ExistsByLocationIdAsync(request.LocationId, cancellationToken);
-        // if (isInUse)
-        //     return VisitationLocationErrors.InUseByVisitations;
+        var isInUse = await visitationRepository.ExistsByLocationIdAsync(request.LocationId, cancellationToken);
+        if (isInUse)
+            return VisitationLocationErrors.InUseByVisitations;
 
         if (location!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(VisitationLocation));

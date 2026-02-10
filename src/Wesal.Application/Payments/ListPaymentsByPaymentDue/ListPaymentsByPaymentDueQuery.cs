@@ -5,5 +5,5 @@ using Wesal.Contracts.Payments;
 
 namespace Wesal.Application.Payments.ListPaymentsByPaymentDue;
 
-public record struct ListPaymentsByPaymentDueQuery(Guid PaymetDueId, Pagination Pagination)
+public record struct ListPaymentsByPaymentDueQuery(Guid PaymentDueId, Pagination Pagination)
     : IQuery<PagedResponse<PaymentResponse>>;

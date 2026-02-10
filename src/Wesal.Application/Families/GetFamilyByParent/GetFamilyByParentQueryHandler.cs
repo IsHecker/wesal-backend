@@ -11,26 +11,25 @@ namespace Wesal.Application.Families.GetFamilyByParent;
 internal sealed class GetFamilyByParentQueryHandler(
     IParentRepository parentRepository,
     IWesalDbContext context)
-    : IQueryHandler<GetFamilyByParentQuery, FamilyResponse>
+    : IQueryHandler<GetFamilyByParentQuery, IEnumerable<FamilyResponse>>
 {
-    public async Task<Result<FamilyResponse>> Handle(
+    public async Task<Result<IEnumerable<FamilyResponse>>> Handle(
         GetFamilyByParentQuery request,
         CancellationToken cancellationToken)
     {
-        // TODO: support multiple families for Father.
-
         var parent = await parentRepository.GetByIdAsync(request.ParentId, cancellationToken);
 
-        var family = await context.Families
+        var families = await context.Families
             .Include(family => family.Father)
             .Include(family => family.Mother)
             .Include(family => family.Children)
-            .FirstOrDefaultAsync(family => family.FatherId == parent!.Id
-                || family.MotherId == parent!.Id, cancellationToken);
+            .Where(family => family.FatherId == parent!.Id || family.MotherId == parent!.Id)
+            .Select(family => family.ToResponse())
+            .ToListAsync(cancellationToken);
 
-        if (family is null)
+        if (families.Count == 0)
             return FamilyErrors.NotFoundByParent(request.ParentId);
 
-        return family.ToResponse();
+        return families;
     }
 }

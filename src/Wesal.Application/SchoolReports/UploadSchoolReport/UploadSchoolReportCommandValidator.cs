@@ -10,6 +10,7 @@ public sealed class UploadSchoolReportCommandValidator : AbstractValidator<Uploa
     {
         RuleFor(x => x.SchooldId).NotEmpty();
         RuleFor(x => x.ChildId).NotEmpty();
+        RuleFor(x => x.DocumentId).NotEmpty();
 
         RuleFor(x => x.ReportType)
             .NotEmpty()

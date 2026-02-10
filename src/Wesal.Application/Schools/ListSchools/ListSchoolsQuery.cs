@@ -6,6 +6,6 @@ using Wesal.Contracts.Schools;
 namespace Wesal.Application.Schools.ListSchools;
 
 public sealed record ListSchoolsQuery(
-    Guid UserId,
+    Guid CourtId,
     string? Name,
     Pagination Pagination) : IQuery<PagedResponse<SchoolResponse>>;

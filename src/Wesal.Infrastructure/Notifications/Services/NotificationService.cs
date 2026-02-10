@@ -14,60 +14,79 @@ internal sealed class NotificationService(
     WesalDbContext dbContext,
     ILogger<NotificationService> logger) : INotificationService
 {
-    public async Task<Result> SendNotificationAsync(
-        Notification notification,
-        Dictionary<string, string>? data = null,
+    public async Task<Result> SendNotificationsAsync(
+        IReadOnlyList<Notification> notifications,
+        Dictionary<string, string>? sharedData = null,
         CancellationToken cancellationToken = default)
+    {
+        if (notifications.Count == 0)
+            return Result.Success;
+
+        var saveResult = await SaveNotificationBatchAsync(notifications, cancellationToken);
+        if (saveResult.IsFailure)
+            return saveResult.Error;
+
+        var result = await SendToUsersAsync(
+            notifications,
+            sharedData,
+            CancellationToken.None);
+
+        if (result.IsFailure)
+            logger.LogWarning("Failed to send push notification");
+
+        return Result.Success;
+    }
+
+    private async Task<Result> SaveNotificationBatchAsync(
+        IReadOnlyList<Notification> notifications,
+        CancellationToken cancellationToken)
     {
         try
         {
-            await notificationRepository.AddAsync(notification, cancellationToken);
+            await notificationRepository.AddRangeAsync(notifications, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            var pushData = data ?? [];
-            pushData["notificationId"] = notification.Id.ToString();
-            pushData["type"] = notification.Type.ToString();
-
-            var result = await SendToUserAsync(
-                notification,
-                pushData,
-                CancellationToken.None);
-
-            if (result.IsFailure)
-            {
-                logger.LogWarning(
-                    "Failed to send push notification for notification {NotificationId}: {Error}",
-                    notification.Id,
-                    result.Error.Description);
-            }
+            return Result.Success;
         }
         catch (Exception ex)
         {
             logger.LogError(
                 ex,
-                "Exception occurred while sending push notification for notification {NotificationId}",
-                notification.Id);
-        }
+                "Failed to save batch of {Count} notifications",
+                notifications.Count);
 
-        return Result.Success;
+            foreach (var notification in notifications)
+            {
+                dbContext.Entry(notification).State = EntityState.Detached;
+            }
+
+            return Error.Failure();
+        }
     }
 
-    private async Task<Result> SendToUserAsync(
-        Notification notification,
-        Dictionary<string, string>? data = null,
+    private async Task<Result> SendToUsersAsync(
+        IReadOnlyList<Notification> notifications,
+        Dictionary<string, string>? sharedData = null,
         CancellationToken cancellationToken = default)
     {
-        var userId = notification.RecipientId;
-        var devices = dbContext.UserDevices.Where(device => device.UserId == userId && device.IsActive);
+        var notification = notifications[0];
+
+        var userIds = notifications.Select(n => n.RecipientId);
+        var devices = dbContext.UserDevices.Where(device => userIds.Contains(device.UserId) && device.IsActive);
 
         if (!await devices.AnyAsync(cancellationToken))
         {
-            logger.LogWarning("No active devices found for user {UserId}", userId);
-            return NotificationErrors.DeviceNotFound(userId);
+            logger.LogWarning("No active devices found");
+            return Error.NotFound();
         }
 
         var deviceTokens = await devices.Select(device => device.DeviceToken).ToListAsync(cancellationToken);
 
-        return await fcmService.SendToDevicesAsync(deviceTokens, notification.Title, notification.Content, data, cancellationToken);
+        return await fcmService.SendToDevicesAsync(
+            deviceTokens,
+            notification.Title,
+            notification.Content,
+            sharedData,
+            cancellationToken);
     }
 }

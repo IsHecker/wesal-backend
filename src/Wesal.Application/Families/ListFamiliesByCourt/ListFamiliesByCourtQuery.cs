@@ -7,4 +7,5 @@ namespace Wesal.Application.Families.ListFamiliesByCourt;
 
 public sealed record ListFamiliesByCourtQuery(
     Guid CourtId,
+    string? NationalId,
     Pagination Pagination) : IQuery<PagedResponse<FamilyResponse>>;

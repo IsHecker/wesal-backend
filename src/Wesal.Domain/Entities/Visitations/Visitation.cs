@@ -8,35 +8,52 @@ namespace Wesal.Domain.Entities.Visitations;
 
 public sealed class Visitation : Entity
 {
-    public Guid FamilyId { get; private set; }
-    public Guid ParentId { get; private set; }
-    public Guid LocationId { get; private set; }
     public Guid VisitationScheduleId { get; private set; }
-    public Guid? VerifiedById { get; private set; } = null!;
+    public Guid FamilyId { get; private set; }
+    public Guid NonCustodialParentId { get; private set; }
+    public string NonCustodialNationalId { get; private set; } = null!;
+    public string CompanionNationalId { get; private set; } = null!;
+    public Guid LocationId { get; private set; }
+    public Guid? VerifiedById { get; private set; }
 
     public DateTime StartAt { get; private set; }
     public DateTime EndAt { get; private set; }
 
     public VisitationStatus Status { get; private set; }
+
+    public DateTime? NonCustodialCheckedInAt { get; private set; }
+    public DateTime? CompanionCheckedInAt { get; private set; }
     public DateTime? CompletedAt { get; private set; } = null!;
-    public DateTime? CheckedInAt { get; private set; } = null;
+
+    public bool IsNotified { get; private set; }
+
+    public bool IsNonCustodialCheckedIn => NonCustodialCheckedInAt.HasValue;
+    public bool IsCompanionCheckedIn => CompanionCheckedInAt.HasValue;
+    public bool AreBothCheckedIn => IsNonCustodialCheckedIn && IsCompanionCheckedIn;
+
+    public VisitationSchedule VisitationSchedule { get; private set; } = null!;
 
     private Visitation() { }
 
-    public static Visitation Create(VisitationSchedule schedule, DateTime visitationAt)
+    public static Visitation Create(
+        VisitationSchedule schedule,
+        DateTime visitationAt)
     {
         return new Visitation
         {
             FamilyId = schedule.FamilyId,
-            ParentId = schedule.ParentId,
+            NonCustodialParentId = schedule.NonCustodialParentId,
+            NonCustodialNationalId = schedule.NonCustodialNationalId,
+            CompanionNationalId = schedule.CustodialNationalId,
             LocationId = schedule.LocationId,
             VisitationScheduleId = schedule.Id,
             StartAt = visitationAt,
-            EndAt = visitationAt.Date + schedule.EndTime.ToTimeSpan()
+            EndAt = visitationAt.Date + schedule.EndTime.ToTimeSpan(),
+            IsNotified = false
         };
     }
 
-    public Result CheckIn(Guid staffLocationId, int gracePeriodMinutes)
+    public Result CheckIn(Guid staffLocationId, string nationalId, int gracePeriodMinutes)
     {
         var validation = ValidateTransition(
             staffLocationId,
@@ -49,13 +66,30 @@ public sealed class Visitation : Entity
         if (!IsWithinTimeWindow(StartAt, gracePeriodMinutes))
             return VisitationErrors.CheckInTooLate(StartAt, gracePeriodMinutes);
 
-        CheckedInAt = DateTime.UtcNow;
-        Status = VisitationStatus.CheckedIn;
+        if (nationalId == CompanionNationalId)
+        {
+            if (IsCompanionCheckedIn)
+                return VisitationErrors.AlreadyCheckedIn;
+
+            CompanionCheckedInAt = EgyptTime.Now;
+        }
+        else if (nationalId == NonCustodialNationalId)
+        {
+            if (IsNonCustodialCheckedIn)
+                return VisitationErrors.AlreadyCheckedIn;
+
+            NonCustodialCheckedInAt = EgyptTime.Now;
+        }
+        else
+            return VisitationErrors.NationalIdMismatch;
+
+        if (AreBothCheckedIn)
+            Status = VisitationStatus.CheckedIn;
 
         return Result.Success;
     }
 
-    public Result Complete(VisitCenterStaff staff, int gracePeriodMinutes)
+    public Result Complete(VisitCenterStaff staff, Visitation visitation, int gracePeriodMinutes)
     {
         var validation = ValidateTransition(
             staff.LocationId,
@@ -65,35 +99,41 @@ public sealed class Visitation : Entity
         if (validation.IsFailure)
             return validation;
 
-        if (DateTime.UtcNow.TimeOfDay <= EndAt.TimeOfDay)
+        if (!visitation.AreBothCheckedIn)
+            return VisitationErrors.CannotCompleteWithoutBothPartiesCheckedIn;
+
+        if (EgyptTime.Now <= EndAt)
             return VisitationErrors.CannotCompleteBeforeEndTime(EndAt);
 
         if (!IsWithinTimeWindow(EndAt, gracePeriodMinutes))
-            return VisitationErrors.CompletionWindowExpired(EndAt, gracePeriodMinutes);
+            return VisitationErrors.CompleteWindowExpired(EndAt, gracePeriodMinutes);
 
-        CompletedAt = DateTime.UtcNow;
+        CompletedAt = EgyptTime.Now;
         Status = VisitationStatus.Completed;
         VerifiedById = staff.Id;
 
         return Result.Success;
     }
 
+    public void SetCompanion(string nationalId) => CompanionNationalId = nationalId;
+
     public void MarkAsMissed() => Status = VisitationStatus.Missed;
+    public void MarkAsNotified() => IsNotified = true;
 
     private Result ValidateTransition(
         Guid staffLocationId,
         VisitationStatus requiredStatus,
         VisitationStatus targetStatus)
     {
-        var transitionResult = StatusTransition
-            .Validate(Status, requiredStatus, targetStatus);
+        var transitionResult = StatusTransition.Validate(Status, requiredStatus, targetStatus);
+
         if (transitionResult.IsFailure)
             return transitionResult.Error;
 
         if (LocationId != staffLocationId)
             return VisitationErrors.LocationMismatch;
 
-        if (DateTime.UtcNow.Date != StartAt.Date)
+        if (EgyptTime.Now.Date != StartAt.Date)
             return VisitationErrors.NotScheduledForToday;
 
         return Result.Success;
@@ -101,7 +141,7 @@ public sealed class Visitation : Entity
 
     private static bool IsWithinTimeWindow(DateTime dateTime, int gracePeriodMinutes)
     {
-        var timeNow = DateTime.UtcNow.TimeOfDay;
-        return timeNow >= dateTime.TimeOfDay && timeNow <= dateTime.AddMinutes(gracePeriodMinutes).TimeOfDay;
+        var timeNow = EgyptTime.Now;
+        return timeNow >= dateTime && timeNow <= dateTime.AddMinutes(gracePeriodMinutes);
     }
 }

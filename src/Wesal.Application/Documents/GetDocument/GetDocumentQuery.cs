@@ -3,4 +3,4 @@ using Wesal.Contracts.Documents;
 
 namespace Wesal.Application.Documents.GetDocument;
 
-public record struct GetDocumentQuery(Guid DocumentId) : IQuery<DocumentResponse>;
+public record struct GetDocumentQuery(Guid UserId, Guid DocumentId) : IQuery<DocumentResponse>;

@@ -5,13 +5,12 @@ using Microsoft.IdentityModel.Tokens;
 using Wesal.Application.Authentication;
 using Wesal.Contracts.Authentication;
 using Wesal.Domain.Entities.Users;
-using Wesal.Infrastructure.Options;
 
 namespace Wesal.Infrastructure.Authentication;
 
 public class TokenGeneratorService(JwtOptions options)
 {
-    public JwtTokenResponse GenerateToken(User user, Guid roleId, Guid? courtId = null)
+    public JwtTokenResponse GenerateToken(User user, Guid roleId, Guid? courtId = null, bool? isFather = null)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -30,7 +29,10 @@ public class TokenGeneratorService(JwtOptions options)
         };
 
         if (courtId.HasValue)
-            claims.Add(new Claim(CustomClaims.CourtId, courtId.Value.ToString()));
+            claims.Add(new(CustomClaims.CourtId, courtId.Value.ToString()));
+
+        if (isFather.HasValue)
+            claims.Add(new(CustomClaims.ParentRole, isFather.Value.ToString()));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

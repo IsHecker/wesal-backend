@@ -1,6 +1,8 @@
 using System.Transactions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Data;
+using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Behaviours;
@@ -10,8 +12,6 @@ public class UnitOfWorkBehaviour<TRequest, TResponse>(IUnitOfWork unitOfWork)
     where TRequest : IBaseRequest
     where TResponse : Result
 {
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
-
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
@@ -27,15 +27,32 @@ public class UnitOfWorkBehaviour<TRequest, TResponse>(IUnitOfWork unitOfWork)
             scopeOptions,
             TransactionScopeAsyncFlowOption.Enabled))
         {
-            var response = await next();
+            var response = await next(cancellationToken);
 
             if (response.IsFailure)
                 return response;
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            UpdateEntityDates(unitOfWork);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             scope.Complete();
             return response;
+        }
+    }
+
+    private static void UpdateEntityDates(IUnitOfWork unitOfWork)
+    {
+        var context = (DbContext)unitOfWork;
+
+        var entities = context
+            .ChangeTracker
+            .Entries<Entity>()
+            .Where(entry => entry.State == EntityState.Modified)
+            .Select(entry => entry.Entity);
+
+        foreach (var entity in entities)
+        {
+            entity.UpdatedAt = DateTime.UtcNow;
         }
     }
 }

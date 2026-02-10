@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Extensions;
 using Wesal.Application.Visitations;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Infrastructure.Database;
@@ -36,6 +36,7 @@ internal sealed class DetectMissedVisitationsJob(
     private Task<List<Visitation>> GetMissedVisitationsAsync(int batchSize, CancellationToken cancellationToken)
     {
         return dbContext.Visitations
+            .Include(visit => visit.VisitationSchedule)
             .Where(IsMissed)
             .Where(visit => visit.Status != VisitationStatus.Completed
                 && visit.Status != VisitationStatus.Missed)
@@ -48,28 +49,65 @@ internal sealed class DetectMissedVisitationsJob(
         visitation.MarkAsMissed();
         dbContext.Visitations.Update(visitation);
 
-        await alertService.RecordViolationAsync(
-            visitation.ParentId,
-            ViolationType.MissedVisit,
-            visitation.Id,
-            $@"Missed the scheduled visitation 
-            on {visitation.StartAt} at {visitation.StartAt.TimeOfDay}.",
-            cancellationToken);
+        var (parentIds, type, message) = ResolveViolation(visitation);
+
+        foreach (var parentId in parentIds)
+        {
+            await alertService.RecordViolationAsync(parentId, type, visitation.Id, message, cancellationToken);
+        }
 
         await RecordVisitationMissedAsync(visitation, cancellationToken);
+    }
+
+    private static (Guid[] parentIds, ViolationType type, string message) ResolveViolation(Visitation visitation)
+    {
+        //$@"Missed the scheduled visitation on {visitation.StartAt} at {visitation.StartAt.TimeOfDay}."
+        //$@"Failed to end the visitation on time. 
+        // The visit scheduled to end at {visitation.EndAt} exceeded the allowed grace period."
+
+        var custodialId = visitation.VisitationSchedule.CustodialParentId;
+        var nonCustodialId = visitation.NonCustodialParentId;
+
+        // No one showed up
+        if (!visitation.IsNonCustodialCheckedIn && !visitation.IsCompanionCheckedIn)
+            return (
+                [custodialId],
+                ViolationType.MissedVisit,
+                $@"Neither party attended the scheduled visitation on {visitation.StartAt}.");
+
+        // Only companion missed the visit
+        if (!visitation.IsCompanionCheckedIn)
+            return (
+                [custodialId],
+                ViolationType.MissedVisit,
+                $@"Children were not delivered for the visitation scheduled on {visitation.StartAt}.");
+
+        // Only custodial parent missed the visit
+        if (!visitation.IsNonCustodialCheckedIn)
+            return (
+                [nonCustodialId],
+                ViolationType.MissedVisit,
+                $@"Did not attend the visitation scheduled on {visitation.StartAt}.");
+
+        // Both checked in but overstayed
+        return (
+            [custodialId, nonCustodialId],
+            ViolationType.OverstayedVisit,
+            $@"Failed to end the visitation on time. 
+            The visit scheduled to end at {visitation.EndAt} exceeded the allowed grace period.");
     }
 
     private async Task RecordVisitationMissedAsync(Visitation visitation, CancellationToken cancellationToken)
     {
         var metrics = await metricsRepository.GetAsync(
             visitation.FamilyId,
-            visitation.ParentId,
-            DateTime.UtcNow.ToDateOnly(),
+            visitation.NonCustodialParentId,
+            EgyptTime.Today,
             cancellationToken) ?? throw new InvalidOperationException();
 
         metrics.RecordVisitationMissed();
     }
 
     private Expression<Func<Visitation, bool>> IsMissed =>
-        visit => DateTime.UtcNow >= visit.EndAt.AddMinutes(visitationOptions.CheckOutGracePeriodMinutes);
+        visit => EgyptTime.Now >= visit.EndAt.AddMinutes(visitationOptions.CheckOutGracePeriodMinutes);
 }

@@ -7,7 +7,6 @@ using Wesal.Contracts.Common;
 using Wesal.Contracts.SchoolReports;
 using Wesal.Domain.Entities.Children;
 using Wesal.Domain.Entities.SchoolReports;
-using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.SchoolReports.ListSchoolReportsByChild;

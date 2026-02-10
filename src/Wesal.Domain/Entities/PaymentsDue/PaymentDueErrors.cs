@@ -9,7 +9,7 @@ public static class PaymentDueErrors
         Error.NotFound("PaymentDue.NotFound", $"Payment due with ID '{id}' was not found");
 
     public static Error IsAlreadyPaid =>
-        Error.NotFound("PaymentDue.IsAlreadyPaid", $"Payment due is already paid");
+        Error.Validation("PaymentDue.IsAlreadyPaid", $"Payment due is already paid");
 
     public static Error DueDatePassed =>
         Error.NotFound("PaymentDue.DueDatePassed", $"Due date has passed for this payment");

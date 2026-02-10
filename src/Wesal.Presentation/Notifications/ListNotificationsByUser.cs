@@ -7,7 +7,6 @@ using Wesal.Application.Authentication;
 using Wesal.Application.Data;
 using Wesal.Application.Notifications.ListNotificationsByParentQuery;
 using Wesal.Contracts.Notifications;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;

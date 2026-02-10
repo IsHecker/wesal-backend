@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.Documents;
@@ -31,7 +32,7 @@ public sealed class Document : Entity
             MimeType = mimeType,
             CloudinaryPublicId = cloudinaryPublicId,
             CloudinaryUrl = cloudinaryUrl,
-            UploadedAt = DateTime.UtcNow
+            UploadedAt = EgyptTime.Now
         };
     }
 }

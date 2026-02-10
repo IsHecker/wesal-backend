@@ -29,14 +29,16 @@ internal sealed class UpdateCustodyCommandHandler(
             return CustodyErrors.CannotModifyClosedCase;
 
         var isInFamily = await familyRepository.IsParentInFamilyAsync(
-            request.NewCustodianId,
+            request.NewCustodialParentId,
             custody.FamilyId,
             cancellationToken);
 
         if (!isInFamily)
             return CustodyErrors.NewCustodianNotInFamily;
 
-        custody.Update(request.NewCustodianId, request.StartAt, request.EndAt);
+        custody.Update(request.NewCustodialParentId, request.StartAt, request.EndAt);
+
+        custodyRepository.Update(custody);
 
         return Result.Success;
     }

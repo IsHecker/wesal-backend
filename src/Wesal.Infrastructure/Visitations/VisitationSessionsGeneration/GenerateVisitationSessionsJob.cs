@@ -1,13 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
-using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
-using Wesal.Application.Extensions;
-using Wesal.Domain.Entities.Compliances;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitationSchedules;
+using Wesal.Infrastructure.ComplianceMetrics;
 using Wesal.Infrastructure.Database;
 
 namespace Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
@@ -15,7 +14,7 @@ namespace Wesal.Infrastructure.Visitations.VisitationSessionsGeneration;
 [DisallowConcurrentExecution]
 internal sealed class GenerateVisitationSessionsJob(
     IOptions<GenerateVisitationSessionsOptions> options,
-    IComplianceMetricsRepository metricsRepository,
+    ComplianceMetricsService metricsService,
     INotificationService notificationService,
     WesalDbContext dbContext) : IJob
 {
@@ -23,22 +22,20 @@ internal sealed class GenerateVisitationSessionsJob(
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var now = DateTime.UtcNow;
+        var now = EgyptTime.Now;
         var currentMonth = new DateOnly(now.Year, now.Month, 1);
 
-        // Reads all active VisitationSchedule records
         var schedules = await GetSchedulesAsync(currentMonth, options.BatchSize, context.CancellationToken);
 
-        // System calculates next month's visits based on frequency
-        // Creates Visitation records if they don't exist
-        // System saves all **Visitation** sessions to database
         foreach (var schedule in schedules)
         {
             await GenerateUpcomingVisitationsAsync(schedule, context.CancellationToken);
 
-            await notificationService.SendNotificationAsync(
-                NotificationTemplate.VisitationScheduled(schedule),
-                cancellationToken: context.CancellationToken);
+            await notificationService.SendNotificationsAsync(
+            [
+                NotificationTemplate.VisitationScheduled(schedule.CustodialParentId),
+                NotificationTemplate.VisitationScheduled(schedule.NonCustodialParentId)
+            ], cancellationToken: context.CancellationToken);
         }
 
         await dbContext.SaveChangesAsync(context.CancellationToken);
@@ -50,8 +47,9 @@ internal sealed class GenerateVisitationSessionsJob(
         CancellationToken cancellationToken)
     {
         return await dbContext.VisitationSchedules
-            .Where(schedule => !schedule.LastGeneratedDate.HasValue
+            .Where(schedule => (!schedule.LastGeneratedDate.HasValue
                 || schedule.LastGeneratedDate.Value < currentMonth)
+                && !schedule.IsStopped)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }
@@ -59,15 +57,14 @@ internal sealed class GenerateVisitationSessionsJob(
     private async Task GenerateUpcomingVisitationsAsync(VisitationSchedule schedule, CancellationToken cancellationToken)
     {
         var targetDate = schedule.LastGeneratedDate.HasValue
-            ? DateTime.UtcNow.ToDateOnly()
+            ? EgyptTime.Today
             : schedule.StartDate;
 
-        // TODO: Find cleaner way to handle this creation!
-        var metrics = await GetOrCreateMetricsAsync(
+        var metrics = await metricsService.GetOrCreateMetricsAsync(
             schedule.CourtId,
             schedule.FamilyId,
-            schedule.ParentId,
-            DateTime.UtcNow.ToDateOnly(),
+            schedule.NonCustodialParentId,
+            EgyptTime.Today,
             cancellationToken);
 
         foreach (var visitationDate in GetNextVisitationDates(schedule, targetDate))
@@ -92,23 +89,5 @@ internal sealed class GenerateVisitationSessionsJob(
         {
             yield return new DateOnly(targetDate.Year, targetDate.Month, day);
         }
-    }
-
-    private async Task<ComplianceMetric> GetOrCreateMetricsAsync(
-        Guid courtId,
-        Guid familyId,
-        Guid parentId,
-        DateOnly targetDate,
-        CancellationToken cancellationToken = default)
-    {
-        var metrics = await metricsRepository.GetAsync(familyId, parentId, targetDate, cancellationToken);
-
-        if (metrics is null)
-        {
-            metrics = ComplianceMetric.Create(courtId, familyId, parentId, targetDate);
-            await metricsRepository.AddAsync(metrics, cancellationToken);
-        }
-
-        return metrics;
     }
 }

@@ -26,7 +26,7 @@ internal sealed class UploadDocumentCommandHandler(
             return DocumentErrors.UploadFailed;
 
         var document = Document.Create(
-            request.UploadedBy,
+            request.UserId,
             request.File.FileName,
             uploadResult.Value.Bytes,
             request.File.ContentType,

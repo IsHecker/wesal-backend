@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Wesal.Application.Alimonies.GetAlimonyByFamily;
+using Wesal.Application.Alimonies.GetAlimonyByCourtCase;
 using Wesal.Application.Authentication;
 using Wesal.Contracts.Alimonies;
 using Wesal.Presentation.EndpointResults;
@@ -12,16 +12,16 @@ using Wesal.Presentation.Extensions;
 
 namespace Wesal.Presentation.Alimonies
 {
-    internal sealed class GetAlimonyByFamily : IEndpoint
+    internal sealed class GetAlimonyByCourtCase : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapGet(ApiEndpoints.Alimonies.GetByFamily, async (
-                Guid familyId,
+            app.MapGet(ApiEndpoints.Alimonies.GetByCourtCase, async (
+                Guid courtCaseId,
                 ClaimsPrincipal user,
                 ISender sender) =>
             {
-                var result = await sender.Send(new GetAlimonyByFamilyQuery(user.GetCourtId(), familyId));
+                var result = await sender.Send(new GetAlimonyByCourtCaseQuery(user.GetCourtId(), courtCaseId));
 
                 return result.MatchResponse(Results.Ok, ApiResults.Problem);
             })
@@ -29,7 +29,7 @@ namespace Wesal.Presentation.Alimonies
             .Produces<AlimonyResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithOpenApiName(nameof(GetAlimonyByFamily))
+            .WithOpenApiName(nameof(GetAlimonyByCourtCase))
             .RequireAuthorization(CustomPolicies.CourtStaffOnly);
         }
     }

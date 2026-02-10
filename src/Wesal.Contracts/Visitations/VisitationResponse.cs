@@ -3,11 +3,14 @@ namespace Wesal.Contracts.Visitations;
 public record struct VisitationResponse(
     Guid Id,
     Guid FamilyId,
-    Guid ParentId,
+    Guid NonCustodialParentId,
+    string NonCustodialNationalId,
+    string CompanionNationalId,
     Guid LocationId,
     Guid VisitationScheduleId,
     DateTime StartAt,
     DateTime EndAt,
-    DateTime? CompletedAt,
     string Status,
-    DateTime? CheckedInAt);
+    DateTime? NonCustodialCheckedInAt,
+    DateTime? CompanionCheckedInAt,
+    DateTime? CompletedAt);

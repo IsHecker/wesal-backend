@@ -36,7 +36,7 @@ internal sealed class CreateVisitCenterStaffCommandHandler(
         if (isExisting)
             return UserErrors.EmailAlreadyExists(request.Email);
 
-        var userResult = await userService.CreateAsync(UserRole.FamilyCourt, cancellationToken);
+        var userResult = await userService.CreateAsync(UserRole.VisitCenterStaff, cancellationToken);
 
         var centerStaff = VisitCenterStaff.Create(
             userResult.User.Id,

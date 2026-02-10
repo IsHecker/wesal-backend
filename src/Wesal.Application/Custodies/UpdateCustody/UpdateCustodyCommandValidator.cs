@@ -9,7 +9,7 @@ internal sealed class UpdateCustodyCommandValidator : AbstractValidator<UpdateCu
             .NotEmpty()
             .WithMessage("Custody ID is required.");
 
-        RuleFor(x => x.NewCustodianId)
+        RuleFor(x => x.NewCustodialParentId)
             .NotEmpty()
             .WithMessage("New custodian ID is required.");
 

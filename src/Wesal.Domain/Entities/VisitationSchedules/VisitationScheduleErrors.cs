@@ -13,6 +13,14 @@ public static class VisitationScheduleErrors
     public static Error NotFound(Guid id) =>
         Error.NotFound("VisitationSchedule.NotFound", $"Visitation schedule with ID '{id}' not found");
 
+    public static Error NotFoundByCourtCase(Guid familyId) =>
+        Error.NotFound("VisitationSchedule.NotFound", $"Visitation schedule with court case ID '{familyId}' not found");
+
+    public static readonly Error AlreadyExistForCase =
+        Error.Validation(
+            "VisitationSchedule.AlreadyExistForCase",
+            "There's already a visitation schedule for this case");
+
     public static readonly Error HasCompletedVisitations =
         Error.Validation(
             "VisitationSchedule.HasCompletedVisitations",

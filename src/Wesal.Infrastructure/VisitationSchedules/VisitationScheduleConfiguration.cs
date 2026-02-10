@@ -30,7 +30,12 @@ internal sealed class VisitationScheduleConfiguration : IEntityTypeConfiguration
 
         builder.HasOne<Parent>()
             .WithMany()
-            .HasForeignKey(visit => visit.ParentId)
+            .HasForeignKey(visit => visit.CustodialParentId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne<Parent>()
+            .WithMany()
+            .HasForeignKey(visit => visit.NonCustodialParentId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne<VisitationLocation>()

@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.Compliances;
@@ -43,44 +44,44 @@ public sealed class ComplianceMetric : Entity
             FamilyId = familyId,
             ParentId = parentId,
             Date = new DateOnly(date.Year, date.Month, 1),
-            LastUpdatedAt = DateTime.UtcNow
+            LastUpdatedAt = EgyptTime.Now
         };
     }
 
     public void RecordVisitationScheduled()
     {
         TotalVisitationsScheduled++;
-        LastUpdatedAt = DateTime.UtcNow;
+        LastUpdatedAt = EgyptTime.Now;
     }
 
     public void RecordVisitationCompleted()
     {
         TotalVisitationsCompleted++;
-        LastUpdatedAt = DateTime.UtcNow;
+        LastUpdatedAt = EgyptTime.Now;
     }
 
     public void RecordVisitationMissed()
     {
         TotalVisitationsMissed++;
-        LastUpdatedAt = DateTime.UtcNow;
+        LastUpdatedAt = EgyptTime.Now;
     }
 
     public void RecordAlimonyDue()
     {
         TotalAlimonyPaymentsDue++;
-        LastUpdatedAt = DateTime.UtcNow;
+        LastUpdatedAt = EgyptTime.Now;
     }
 
     public void RecordAlimonyPaidOnTime()
     {
         TotalAlimonyPaymentsOnTime++;
-        LastUpdatedAt = DateTime.UtcNow;
+        LastUpdatedAt = EgyptTime.Now;
     }
 
     public void RecordAlimonyOverdue()
     {
         TotalAlimonyPaymentsOverdue++;
-        LastUpdatedAt = DateTime.UtcNow;
+        LastUpdatedAt = EgyptTime.Now;
     }
 
     public float GetViolationRate()

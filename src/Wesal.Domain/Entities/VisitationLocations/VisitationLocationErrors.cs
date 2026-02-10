@@ -13,8 +13,12 @@ public static class VisitationLocationErrors
         Error.Conflict(
             "VisitLocation.AlreadyExists",
             $"Visit location '{name}' in '{governorate}' already exists");
-    public static Error Unauthorized() =>
+    public static Error Unauthorized =>
         Error.Forbidden(
             "VisitLocation.Unauthorized",
             "You are not authorized to update this visit location");
+
+    public static readonly Error InUseByVisitations = Error.Validation(
+        "VisitationLocation.InUseByVisitations",
+        "Cannot delete a visitation location that is referenced by existing visitations.");
 }

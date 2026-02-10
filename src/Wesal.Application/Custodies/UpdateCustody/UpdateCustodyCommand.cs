@@ -5,6 +5,6 @@ namespace Wesal.Application.Custodies.UpdateCustody;
 public record struct UpdateCustodyCommand(
     Guid CourtId,
     Guid CustodyId,
-    Guid NewCustodianId,
+    Guid NewCustodialParentId,
     DateTime StartAt,
     DateTime? EndAt) : ICommand;

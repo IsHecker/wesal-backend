@@ -17,6 +17,8 @@ internal class Program
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();
 
+        builder.Services.AddMemoryCache();
+
         builder.Services.ConfigureHttpJsonOptions(opts =>
         {
             opts.SerializerOptions.Converters.Add(new JsonStringEnumConverter());

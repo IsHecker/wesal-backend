@@ -24,7 +24,7 @@ internal sealed class ListSchools : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new ListSchoolsQuery(user.GetRoleId(), query.Name, pagination));
+            var result = await sender.Send(new ListSchoolsQuery(user.GetCourtId(), query.Name, pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

@@ -1,5 +1,6 @@
 using FluentValidation;
 using Wesal.Application.Children.AddChild;
+using Wesal.Domain.Common;
 
 internal sealed class AddChildCommandValidator : AbstractValidator<AddChildCommand>
 {
@@ -20,7 +21,7 @@ internal sealed class AddChildCommandValidator : AbstractValidator<AddChildComma
         RuleFor(x => x.BirthDate)
             .NotEmpty()
             .WithMessage("Date of birth is required.")
-            .Must(dob => dob <= DateOnly.FromDateTime(DateTime.UtcNow))
+            .Must(dob => dob < EgyptTime.Today)
             .WithMessage("Date of birth must not be in the future.");
 
         RuleFor(x => x.Gender)

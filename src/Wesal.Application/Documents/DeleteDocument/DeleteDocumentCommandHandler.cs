@@ -15,14 +15,15 @@ internal sealed class DeleteDocumentCommandHandler(
         DeleteDocumentCommand request,
         CancellationToken cancellationToken)
     {
-        // TODO: Authorize if the user owns this document in all other document actions.
-
         var document = await documentRepository.GetByIdAsync(
             request.DocumentId,
             cancellationToken);
 
         if (document is null)
             return DocumentErrors.NotFound(request.DocumentId);
+
+        if (document.UploadedBy != request.UserId)
+            return DocumentErrors.CannotSeeOrModifyDocument;
 
         var deleteResult = await cloudinaryService.DeleteFileAsync(
             document.CloudinaryPublicId,

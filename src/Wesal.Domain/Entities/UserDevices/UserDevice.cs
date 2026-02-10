@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.Common.Abstractions;
 using Wesal.Domain.DomainEvents;
 
@@ -24,19 +25,19 @@ public sealed class UserDevice : Entity, IHasUserId
             UserId = userId,
             DeviceToken = deviceToken,
             Platform = platform,
-            RegisteredAt = DateTime.UtcNow,
-            LastUsedAt = DateTime.UtcNow,
+            RegisteredAt = EgyptTime.Now,
+            LastUsedAt = EgyptTime.Now,
             IsActive = true
         };
     }
 
-    public void UpdateLastUsed() => LastUsedAt = DateTime.UtcNow;
+    public void UpdateLastUsed() => LastUsedAt = EgyptTime.Now;
 
     public void Deactivate() => IsActive = false;
 
     public void Activate()
     {
         IsActive = true;
-        LastUsedAt = DateTime.UtcNow;
+        LastUsedAt = EgyptTime.Now;
     }
 }

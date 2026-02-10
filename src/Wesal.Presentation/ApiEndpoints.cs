@@ -18,6 +18,7 @@ internal static class ApiEndpoints
     private const string visitationsBase = $"{ApiBase}/visitations";
     private const string visitationLocationsBase = $"{ApiBase}/visitation-locations";
     private const string PaymentsDueBase = $"{ApiBase}/payments-due";
+    private const string PaymentsBase = $"{ApiBase}/payments";
     private const string AlimoniesBase = $"{ApiBase}/alimonies";
     private const string ObligationAlertsBase = $"{ApiBase}/obligation-alerts";
     private const string NotificationsBase = $"{ApiBase}/notifications";
@@ -67,14 +68,16 @@ internal static class ApiEndpoints
 
     internal static class CourtCases
     {
+        public const string GetById = $"{CourtCasesBase}/{{courtCaseId:guid}}";
         public const string Create = CourtCasesBase;
+        public const string Close = $"{CourtCasesBase}/close";
         public const string ListByFamily = $"{CourtCasesBase}/{{familyId:guid}}";
     }
 
     internal static class Custodies
     {
         public const string GetById = $"{CustodiesBase}/{{custodyId:guid}}";
-        public const string GetByFamily = $"{CustodiesBase}/{{familyId:guid}}";
+        public const string GetByCourtCase = $"{CourtCases.GetById}/custodies";
         public const string Create = CustodiesBase;
         public const string Update = GetById;
         public const string Delete = GetById;
@@ -91,7 +94,7 @@ internal static class ApiEndpoints
     {
         public const string GetById = $"{VisitationSchedulesBase}/{{scheduleId:guid}}";
 
-        public const string ListByFamily = $"{Families.GetById}/visitation-schedules";
+        public const string GetByCourtCase = $"{CourtCases.GetById}/visitation-schedules";
         public const string Create = VisitationSchedulesBase;
         public const string Update = GetById;
         public const string Delete = GetById;
@@ -115,16 +118,27 @@ internal static class ApiEndpoints
         public const string Delete = GetById;
     }
 
+    public static class PaymentProcessing
+    {
+        public const string CreateCheckoutSession = $"{PaymentsBase}/create-checkout-session";
+        public const string CreateOnboardingSession = $"{PaymentsBase}/onboarding-session";
+
+        public const string StripeWebhook = $"{PaymentsBase}/stripe/webhook";
+        public const string StripeConnectWebhook = $"{PaymentsBase}/stripe/connect-webhook";
+    }
+
     internal static class PaymentsDue
     {
-        public const string GetById = $"{PaymentsDueBase}/{{paymetDueId:guid}}";
+        public const string GetById = $"{PaymentsDueBase}/{{paymentDueId:guid}}";
         public const string ListByFamily = $"{Families.GetById}/payments-due";
+
+        public const string InitiateAlimonyPayment = $"{GetById}/payments";
+        public const string Withdraw = $"{GetById}/withdraw";
     }
 
     internal static class Payments
     {
         public const string ListByPaymentDue = $"{PaymentsDue.GetById}/payments";
-        public const string MakeAlimony = $"{PaymentsDue.GetById}/payments";
     }
 
     internal static class Notifications
@@ -144,7 +158,7 @@ internal static class ApiEndpoints
     internal static class Alimonies
     {
         public const string GetById = $"{AlimoniesBase}/{{alimonyId:guid}}";
-        public const string GetByFamily = $"{Families.GetById}/alimony";
+        public const string GetByCourtCase = $"{CourtCases.GetById}/alimony";
         public const string Create = AlimoniesBase;
         public const string Update = GetById;
         public const string Delete = GetById;

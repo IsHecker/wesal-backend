@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
@@ -38,7 +39,7 @@ internal sealed class ListPaymentsDueByFamilyQueryHandler(
         var paymentsDue = context.PaymentsDue
             .Where(paymentDue => paymentDue.FamilyId == request.FamilyId);
 
-        _ = paymentsDue.TryGetNonEnumeratedCount(out var totalCount);
+        var totalCount = await paymentsDue.CountAsync(cancellationToken);
 
         return await paymentsDue
             .OrderByDescending(p => p.DueDate)
@@ -49,7 +50,6 @@ internal sealed class ListPaymentsDueByFamilyQueryHandler(
                 paymentDue.Amount,
                 paymentDue.DueDate,
                 paymentDue.Status.ToString(),
-                paymentDue.PaymentId,
                 paymentDue.PaidAt))
             .ToPagedResponseAsync(request.Pagination, totalCount);
     }

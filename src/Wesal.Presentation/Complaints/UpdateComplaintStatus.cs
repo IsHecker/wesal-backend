@@ -22,7 +22,7 @@ internal sealed class UpdateComplaintStatus : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new UpdateComplaintStatusCommand(
-                user.GetRoleId(),
+                user.GetCourtId(),
                 complaintId,
                 request.Status,
                 request.ResolutionNotes));

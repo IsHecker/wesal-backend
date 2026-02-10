@@ -18,11 +18,11 @@ internal sealed class ListPaymentsByPaymentDue : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Payments.ListByPaymentDue, async (
-            Guid paymetDueId,
+            Guid paymentDueId,
             [AsParameters] Pagination pagination,
             ISender sender) =>
         {
-            var result = await sender.Send(new ListPaymentsByPaymentDueQuery(paymetDueId, pagination));
+            var result = await sender.Send(new ListPaymentsByPaymentDueQuery(paymentDueId, pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

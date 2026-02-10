@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Extensions;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Payments;
@@ -70,7 +70,7 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
         var metrics = await metricsRepository.GetAsync(
             alimony.FamilyId,
             alimony.PayerId,
-            DateTime.UtcNow.ToDateOnly(),
+            EgyptTime.Today,
             cancellationToken) ?? throw new InvalidOperationException();
 
         metrics.RecordAlimonyOverdue();
@@ -82,5 +82,5 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
             || due.Status != PaymentStatus.Paid;
 
     private static readonly Expression<Func<PaymentDue, bool>> IsDueDatePassed =
-        due => due.DueDate <= DateOnly.FromDateTime(DateTime.UtcNow);
+        due => due.DueDate <= EgyptTime.Today;
 }

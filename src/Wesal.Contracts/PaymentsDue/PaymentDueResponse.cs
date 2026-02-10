@@ -6,5 +6,4 @@ public record struct PaymentDueResponse(
     long Amount,
     DateOnly DueDate,
     string Status,
-    Guid? PaymentId = null,
     DateTime? PaidAt = null);

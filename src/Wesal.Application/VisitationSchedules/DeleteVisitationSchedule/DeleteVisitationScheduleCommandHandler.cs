@@ -1,5 +1,4 @@
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Data;
 using Wesal.Application.Messaging;
 using Wesal.Application.VisitationSchedules.DeleteVisitationSchedule;
 using Wesal.Domain.Entities.CourtCases;
@@ -8,8 +7,9 @@ using Wesal.Domain.Entities.VisitationSchedules;
 using Wesal.Domain.Results;
 
 internal sealed class DeleteVisitationScheduleCommandHandler(
-    IRepository<VisitationSchedule> scheduleRepository,
-    ICourtCaseRepository courtCaseRepository)
+    IVisitationScheduleRepository scheduleRepository,
+    ICourtCaseRepository courtCaseRepository,
+    IVisitationRepository visitationRepository)
     : ICommandHandler<DeleteVisitationScheduleCommand>
 {
     public async Task<Result> Handle(
@@ -31,15 +31,12 @@ internal sealed class DeleteVisitationScheduleCommandHandler(
         if (courtCase!.Status == CourtCaseStatus.Closed)
             return VisitationScheduleErrors.CannotModifyClosedCase;
 
-        // TODO: Hard block: completed or checked-in visitations are legal evidence ---
-        // var hasCompleted = await visitationRepository
-        //     .HasCompletedByScheduleIdAsync(request.ScheduleId, cancellationToken);
-        // if (hasCompleted)
-        //     return VisitationScheduleErrors.HasCompletedVisitations;
+        var hasCompleted = await visitationRepository
+            .HasCompletedByScheduleIdAsync(request.ScheduleId, cancellationToken);
+        if (hasCompleted)
+            return VisitationScheduleErrors.HasCompletedVisitations;
 
-        // TODO: Safe to delete: cancel all remaining pending visitations first ---
-        // await visitationRepository
-        //     .CancelPendingByScheduleIdAsync(request.ScheduleId, cancellationToken);
+        await visitationRepository.DeleteScheduledByScheduleIdAsync(request.ScheduleId, cancellationToken);
 
         scheduleRepository.Delete(schedule);
 

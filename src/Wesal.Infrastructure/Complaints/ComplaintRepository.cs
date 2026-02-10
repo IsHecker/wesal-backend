@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Complaints;
 using Wesal.Infrastructure.Data;
 using Wesal.Infrastructure.Database;
@@ -12,6 +13,6 @@ internal sealed class ComplaintRepository(WesalDbContext context)
     public Task<int> GetMonthCountByParentIdAsync(Guid parentId, CancellationToken cancellationToken = default)
     {
         return context.Complaints
-            .CountAsync(complaint => complaint.FiledAt.Month == DateTime.UtcNow.Month, cancellationToken);
+            .CountAsync(complaint => complaint.FiledAt.Month == EgyptTime.Now.Month, cancellationToken);
     }
 }

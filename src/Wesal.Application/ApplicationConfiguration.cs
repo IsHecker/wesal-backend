@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
 using MediatR;
-using MediatR.Extensions.RegisterGenericHandlers;
 using Microsoft.Extensions.DependencyInjection;
 using Wesal.Application.Authentication.Credentials;
 using Wesal.Application.Authentication.SignIn;
-using Wesal.Application.Authentication.SignIn.Validators;
 using Wesal.Application.Behaviours;
 using Wesal.Contracts.Authentication;
 using Wesal.Domain.Results;

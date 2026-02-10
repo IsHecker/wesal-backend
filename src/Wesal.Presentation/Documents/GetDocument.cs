@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -14,9 +15,12 @@ internal sealed class GetDocument : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.Documents.GetById, async (Guid documentId, ISender sender) =>
+        app.MapGet(ApiEndpoints.Documents.GetById, async (
+            Guid documentId,
+            ClaimsPrincipal user,
+            ISender sender) =>
         {
-            var result = await sender.Send(new GetDocumentQuery(documentId));
+            var result = await sender.Send(new GetDocumentQuery(user.GetRoleId(), documentId));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

@@ -9,5 +9,7 @@ public interface IParentRepository : IRepository<Parent>
 
     Task<Parent?> GetByNationalIdAsync(string nationalId, CancellationToken cancellationToken = default);
 
+    Task<Parent> GetByStripeAccountIdAsync(string nationalId, CancellationToken cancellationToken = default);
+
     Task<bool> ExistsByNationalIdAsync(string nationalId, CancellationToken cancellationToken = default);
 }

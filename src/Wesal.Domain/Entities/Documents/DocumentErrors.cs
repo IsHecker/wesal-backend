@@ -19,15 +19,10 @@ public static class DocumentErrors
             "Documents.DeleteFailed",
             "Failed to delete document from external storage");
 
-    public static readonly Error FileTooLarge =
-        Error.Validation(
-            "Documents.FileTooLarge",
-            "File size exceeds the maximum allowed limit of 10MB");
-
-    public static readonly Error InvalidFileType =
-        Error.Validation(
-            "Documents.InvalidFileType",
-            "File type is not allowed. Accepted types: PDF, DOC, DOCX, JPG, PNG");
+    public static readonly Error CannotSeeOrModifyDocument =
+        Error.Forbidden(
+            "Documents.CannotModifyDocument",
+            "You're not allowed to see or modify this document.");
 
     public static readonly Error FileRequired =
         Error.Validation(

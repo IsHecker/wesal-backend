@@ -5,14 +5,14 @@ using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.Schools;
-using Wesal.Domain.Entities.CourtStaffs;
+using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Schools;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Schools.ListSchools;
 
 internal sealed class ListSchoolsQueryHandler(
-    ICourtStaffRepository staffRepository,
+    IFamilyCourtRepository courtRepository,
     IWesalDbContext context)
     : IQueryHandler<ListSchoolsQuery, PagedResponse<SchoolResponse>>
 {
@@ -20,13 +20,11 @@ internal sealed class ListSchoolsQueryHandler(
         ListSchoolsQuery request,
         CancellationToken cancellationToken)
     {
-        // TODO: Search by governorate or court id.
+        var court = await courtRepository.GetByIdAsync(request.CourtId, cancellationToken);
+        if (court is null)
+            return FamilyCourtErrors.NotFound(request.CourtId);
 
-        var staff = await staffRepository.GetByUserIdWithCourtAsync(request.UserId, cancellationToken);
-        if (staff is null)
-            return CourtStaffErrors.NotFound(request.UserId);
-
-        var query = BuildQuery(request.Name, staff.Court.Governorate);
+        var query = BuildQuery(request.Name, court.Governorate);
 
         var totalCount = await query.CountAsync(cancellationToken);
 

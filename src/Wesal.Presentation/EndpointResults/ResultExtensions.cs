@@ -1,5 +1,4 @@
-﻿using Wesal.Domain;
-using Wesal.Domain.Results;
+﻿using Wesal.Domain.Results;
 
 namespace Wesal.Presentation.EndpointResults;
 

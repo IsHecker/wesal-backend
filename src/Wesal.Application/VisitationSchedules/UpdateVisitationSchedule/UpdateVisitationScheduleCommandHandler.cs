@@ -10,9 +10,11 @@ using Wesal.Domain.Entities.VisitationSchedules;
 using Wesal.Domain.Results;
 
 internal sealed class UpdateVisitationScheduleCommandHandler(
-    IRepository<VisitationSchedule> visitationScheduleRepository,
+    IVisitationScheduleRepository visitationScheduleRepository,
     IVisitationLocationRepository visitationLocationRepository,
-    ICourtCaseRepository courtCaseRepository)
+    IVisitationRepository visitationRepository,
+    ICourtCaseRepository courtCaseRepository,
+    IUnitOfWork unitOfWork)
     : ICommandHandler<UpdateVisitationScheduleCommand>
 {
     public async Task<Result> Handle(
@@ -33,17 +35,6 @@ internal sealed class UpdateVisitationScheduleCommandHandler(
         if (courtCase!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
 
-        // TODO: Block if any visitation from this schedule is already completed (legal evidence) ---
-        // var hasCompleted = await visitationRepository
-        //     .HasCompletedByScheduleIdAsync(request.ScheduleId, cancellationToken);
-        // if (hasCompleted)
-        //     return VisitationScheduleErrors.HasCompletedVisitations;
-
-        // TODO: Cancel all future pending visitations generated from this schedule.
-        //     The background job / caller is responsible for triggering regeneration. ---
-        // await visitationRepository
-        //     .CancelPendingByScheduleIdAsync(request.ScheduleId, cancellationToken);
-
         var isLocationExist = await visitationLocationRepository.ExistsAsync(
             request.LocationId,
             cancellationToken);
@@ -58,6 +49,13 @@ internal sealed class UpdateVisitationScheduleCommandHandler(
             request.EndTime,
             request.StartDate,
             request.EndDate);
+
+        visitationScheduleRepository.Update(schedule);
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await visitationRepository
+            .DeleteScheduledByScheduleIdAsync(request.ScheduleId, cancellationToken);
 
         return Result.Success;
     }

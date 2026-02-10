@@ -22,6 +22,8 @@ public sealed class Alimony : Entity
 
     public DateOnly? LastGeneratedDate { get; private set; } = null;
 
+    public bool IsStopped { get; private set; }
+
     private Alimony() { }
 
     public static Alimony Create(
@@ -57,15 +59,18 @@ public sealed class Alimony : Entity
         Frequency = frequency;
         StartDate = startDate;
         EndDate = endDate;
+        LastGeneratedDate = null;
     }
 
-    public void UpdateLastGeneratedDate(DateOnly visitationDate)
+    public void UpdateLastGeneratedDate(DateOnly lastDate)
     {
-        if (LastGeneratedDate.HasValue && visitationDate < LastGeneratedDate.Value)
+        if (LastGeneratedDate.HasValue && lastDate < LastGeneratedDate.Value)
             throw new InvalidOperationException();
 
-        LastGeneratedDate = visitationDate;
+        LastGeneratedDate = lastDate;
     }
+
+    public void Stop() => IsStopped = true;
 
     public int GetFrequencyInDays(DateOnly targetDate)
     {

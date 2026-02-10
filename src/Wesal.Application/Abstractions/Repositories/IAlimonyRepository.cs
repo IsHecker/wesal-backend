@@ -5,6 +5,6 @@ namespace Wesal.Application.Abstractions.Repositories;
 
 public interface IAlimonyRepository : IRepository<Alimony>
 {
-    Task<Alimony?> GetByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken = default);
     Task<bool> ExistsByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default);
+    Task<Alimony> GetByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default);
 }

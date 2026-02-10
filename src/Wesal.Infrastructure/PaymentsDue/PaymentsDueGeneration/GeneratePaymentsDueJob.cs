@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
-using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
-using Wesal.Application.Extensions;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.PaymentsDue;
+using Wesal.Infrastructure.ComplianceMetrics;
 using Wesal.Infrastructure.Database;
 
 namespace Wesal.Infrastructure.PaymentsDue.PaymentsDueGeneration;
@@ -14,7 +14,7 @@ namespace Wesal.Infrastructure.PaymentsDue.PaymentsDueGeneration;
 [DisallowConcurrentExecution]
 internal sealed class GeneratePaymentsDueJob(
     IOptions<GeneratePaymentsDueOptions> options,
-    IComplianceMetricsRepository metricsRepository,
+    ComplianceMetricsService metricsService,
     INotificationService notificationService,
     WesalDbContext dbContext) : IJob
 {
@@ -22,7 +22,7 @@ internal sealed class GeneratePaymentsDueJob(
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var now = DateTime.UtcNow;
+        var now = EgyptTime.Now;
         var currentMonth = new DateOnly(now.Year, now.Month, 1);
 
         var alimonies = await GetAlimoniesAsync(currentMonth, options.BatchSize, context.CancellationToken);
@@ -31,8 +31,8 @@ internal sealed class GeneratePaymentsDueJob(
         {
             await GenerateUpcomingPaymentsDueAsync(alimony, context.CancellationToken);
 
-            await notificationService.SendNotificationAsync(
-                NotificationTemplate.AlimoniesScheduled(alimony),
+            await notificationService.SendNotificationsAsync(
+                [NotificationTemplate.AlimoniesScheduled(alimony.PayerId)],
                 cancellationToken: context.CancellationToken);
         }
 
@@ -45,8 +45,9 @@ internal sealed class GeneratePaymentsDueJob(
         CancellationToken cancellationToken)
     {
         return await dbContext.Alimonies
-            .Where(alimony => !alimony.LastGeneratedDate.HasValue
+            .Where(alimony => (!alimony.LastGeneratedDate.HasValue
                 || alimony.LastGeneratedDate.Value < currentMonth)
+                && !alimony.IsStopped)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }
@@ -54,19 +55,17 @@ internal sealed class GeneratePaymentsDueJob(
     private async Task GenerateUpcomingPaymentsDueAsync(Alimony alimony, CancellationToken cancellationToken)
     {
         var targetDate = alimony.LastGeneratedDate.HasValue
-            ? DateTime.UtcNow.ToDateOnly()
+            ? EgyptTime.Today
             : alimony.StartDate;
 
-        var metrics = await metricsRepository.GetAsync(
+        var metrics = await metricsService.GetOrCreateMetricsAsync(
+            alimony.CourtId,
             alimony.FamilyId,
             alimony.PayerId,
             targetDate,
             cancellationToken);
 
-        if (metrics is null)
-            return;
-
-        foreach (var dueAt in GetNextVisitationDates(alimony, targetDate))
+        foreach (var dueAt in GetNextPaymentDueDates(alimony, targetDate))
         {
             var paymentDue = PaymentDue.Create(alimony, dueAt);
             alimony.UpdateLastGeneratedDate(dueAt);
@@ -79,7 +78,7 @@ internal sealed class GeneratePaymentsDueJob(
         dbContext.Alimonies.Update(alimony);
     }
 
-    private static IEnumerable<DateOnly> GetNextVisitationDates(Alimony alimony, DateOnly targetDate)
+    private static IEnumerable<DateOnly> GetNextPaymentDueDates(Alimony alimony, DateOnly targetDate)
     {
         var lastDayInMonth = DateTime.DaysInMonth(targetDate.Year, targetDate.Month);
 

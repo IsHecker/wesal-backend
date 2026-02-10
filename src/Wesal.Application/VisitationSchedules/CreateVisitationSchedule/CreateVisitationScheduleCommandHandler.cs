@@ -1,9 +1,7 @@
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Data;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.FamilyCourts;
-using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Entities.VisitationSchedules;
 using Wesal.Domain.Results;
@@ -12,10 +10,10 @@ namespace Wesal.Application.VisitationSchedules.CreateVisitationSchedule;
 
 internal sealed class CreateVisitationScheduleCommandHandler(
     ICourtCaseRepository courtCaseRepository,
-    IFamilyRepository familyRepository,
+    ICustodyRepository custodyRepository,
     IParentRepository parentRepository,
-    IRepository<VisitationLocation> visitLocationRepository,
-    IRepository<VisitationSchedule> visitationScheduleRepository)
+    IVisitationLocationRepository visitLocationRepository,
+    IVisitationScheduleRepository visitationScheduleRepository)
     : ICommandHandler<CreateVisitationScheduleCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(
@@ -30,6 +28,11 @@ internal sealed class CreateVisitationScheduleCommandHandler(
         if (validationResult.IsFailure)
             return validationResult.Error;
 
+        var custody = await custodyRepository.GetByFamilyIdAsync(courtCase.FamilyId, cancellationToken);
+
+        var custodialParent = await parentRepository.GetByIdAsync(custody!.CustodialParentId, cancellationToken);
+        var nonCustodialParent = await parentRepository.GetByIdAsync(custody.NonCustodialParentId, cancellationToken);
+
         if (!Enum.TryParse<VisitationFrequency>(request.Frequency, out var frequency))
             return VisitationScheduleErrors.InvalidFrequency(request.Frequency);
 
@@ -37,7 +40,8 @@ internal sealed class CreateVisitationScheduleCommandHandler(
             courtCase.CourtId,
             request.CourtCaseId,
             courtCase.FamilyId,
-            request.ParentId,
+            custodialParent!,
+            nonCustodialParent!,
             request.LocationId,
             frequency,
             request.StartDate,
@@ -58,14 +62,9 @@ internal sealed class CreateVisitationScheduleCommandHandler(
         if (courtCase.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
 
-        var isParentExist = await parentRepository.ExistsAsync(request.ParentId, cancellationToken);
-        if (!isParentExist)
-            return ParentErrors.NotFound(request.ParentId);
-
-        var isInFamily = await familyRepository.IsParentInFamilyAsync(request.ParentId, courtCase.FamilyId, cancellationToken);
-
-        if (isInFamily)
-            return VisitationScheduleErrors.ParentNotInFamily();
+        var isScheduleExist = await visitationScheduleRepository.ExistsByCourtCaseIdAsync(courtCase.Id, cancellationToken);
+        if (isScheduleExist)
+            return VisitationScheduleErrors.AlreadyExistForCase;
 
         var isLocationExist = await visitLocationRepository.ExistsAsync(request.LocationId, cancellationToken);
         if (!isLocationExist)

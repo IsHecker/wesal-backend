@@ -8,6 +8,8 @@ public sealed class Parent : Entity, IHasUserId
     public Guid UserId { get; private set; }
     public Guid CourtId { get; private set; }
 
+    public bool IsFather { get; private set; }
+
     public string? Email { get; private set; }
 
     public string NationalId { get; private set; } = null!;
@@ -17,27 +19,35 @@ public sealed class Parent : Entity, IHasUserId
     public string? Job { get; private set; }
     public string Address { get; private set; } = null!;
     public string Phone { get; private set; } = null!;
-
     public int ViolationCount { get; private set; }
+
+    public string StripeCustomerId { get; private set; } = null!;
+    public string StripeConnectAccountId { get; private set; } = null!;
+    public bool IsOnboardingComplete { get; private set; }
+
+    public bool IsPayoutMethodConfigured =>
+        StripeConnectAccountId is not null && IsOnboardingComplete;
 
     private Parent() { }
 
     public static Parent Create(
         Guid userId,
         Guid courtId,
+        bool isFather,
         string nationalId,
         string fullName,
         DateOnly birthDate,
         string gender,
         string address,
         string phone,
-        string? job = null,
-        string? email = null)
+        string? job,
+        string? email)
     {
         return new Parent
         {
             UserId = userId,
             CourtId = courtId,
+            IsFather = isFather,
             NationalId = nationalId,
             FullName = fullName,
             BirthDate = birthDate,
@@ -45,7 +55,8 @@ public sealed class Parent : Entity, IHasUserId
             Job = job,
             Address = address,
             Phone = phone,
-            Email = email
+            Email = email,
+            IsOnboardingComplete = false
         };
     }
 
@@ -53,16 +64,22 @@ public sealed class Parent : Entity, IHasUserId
     public void ResetViolationCount() => ViolationCount = 0;
 
     public void UpdateProfile(
-        string fullName,
         string? email,
         string? job,
         string address,
         string phone)
     {
-        FullName = fullName;
         Email = email;
         Job = job;
         Address = address;
         Phone = phone;
     }
+
+    public void SetupStripe(string stripeCustomerId, string stripeConnectAccountId)
+    {
+        StripeCustomerId = stripeCustomerId;
+        StripeConnectAccountId = stripeConnectAccountId;
+    }
+
+    public void CompleteOnboarding() => IsOnboardingComplete = true;
 }

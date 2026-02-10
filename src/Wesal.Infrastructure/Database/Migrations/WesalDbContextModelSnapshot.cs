@@ -65,6 +65,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsStopped")
+                        .HasColumnType("bit");
+
                     b.Property<DateOnly?>("LastGeneratedDate")
                         .HasColumnType("date");
 
@@ -257,6 +260,12 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ClosureNotes")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("CourtId")
                         .HasColumnType("uniqueidentifier");
 
@@ -349,13 +358,16 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("CustodianId")
+                    b.Property<Guid>("CustodialParentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("EndAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("FamilyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("NonCustodialParentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartAt")
@@ -369,9 +381,11 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("CourtCaseId")
                         .IsUnique();
 
-                    b.HasIndex("CustodianId");
+                    b.HasIndex("CustodialParentId");
 
                     b.HasIndex("FamilyId");
+
+                    b.HasIndex("NonCustodialParentId");
 
                     b.ToTable("Custodies");
                 });
@@ -575,17 +589,10 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EntityType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime?>("ReadAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("RecipientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RelatedEntityId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("SentAt")
@@ -608,8 +615,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecipientId", "RelatedEntityId", "EntityType")
-                        .IsUnique();
+                    b.HasIndex("RecipientId");
 
                     b.ToTable("Notifications");
                 });
@@ -695,6 +701,12 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsFather")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsOnboardingComplete")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Job")
                         .HasColumnType("nvarchar(max)");
 
@@ -703,6 +715,14 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StripeConnectAccountId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StripeCustomerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -736,12 +756,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("AlimonyId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<long>("Amount")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -755,8 +769,10 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<Guid>("PaymentDueId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("PaymentIntentId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ReceiptUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
@@ -767,8 +783,6 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AlimonyId");
 
                     b.HasIndex("PaymentDueId");
 
@@ -796,6 +810,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsNotified")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("datetime2");
 
@@ -807,6 +824,12 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("WithdrawalStatus")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("WithdrawnAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -1129,6 +1152,13 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CustodialNationalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CustodialParentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateOnly?>("EndDate")
                         .HasColumnType("date");
 
@@ -1142,13 +1172,20 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsStopped")
+                        .HasColumnType("bit");
+
                     b.Property<DateOnly?>("LastGeneratedDate")
                         .HasColumnType("date");
 
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ParentId")
+                    b.Property<string>("NonCustodialNationalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("NonCustodialParentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateOnly>("StartDate")
@@ -1166,11 +1203,13 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("CourtId");
 
+                    b.HasIndex("CustodialParentId");
+
                     b.HasIndex("FamilyId");
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("NonCustodialParentId");
 
                     b.ToTable("VisitationSchedules");
                 });
@@ -1181,8 +1220,12 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("CheckedInAt")
+                    b.Property<DateTime?>("CompanionCheckedInAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("CompanionNationalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("datetime2");
@@ -1196,10 +1239,20 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<Guid>("FamilyId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsNotified")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ParentId")
+                    b.Property<DateTime?>("NonCustodialCheckedInAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NonCustodialNationalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("NonCustodialParentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartAt")
@@ -1224,13 +1277,28 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("NonCustodialParentId");
 
                     b.HasIndex("VerifiedById");
 
                     b.HasIndex("VisitationScheduleId");
 
                     b.ToTable("Visitations");
+                });
+
+            modelBuilder.Entity("Wesal.Infrastructure.PaymentGateway.ProcessedStripeEvents.ProcessedStripeEvent", b =>
+                {
+                    b.Property<string>("EventId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("ProcessedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("EventId");
+
+                    b.HasIndex("ProcessedAt");
+
+                    b.ToTable("ProcessedStripeEvents");
                 });
 
             modelBuilder.Entity("FamilyChild", b =>
@@ -1374,13 +1442,19 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
-                        .HasForeignKey("CustodianId")
+                        .HasForeignKey("CustodialParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Wesal.Domain.Entities.Families.Family", null)
                         .WithMany()
                         .HasForeignKey("FamilyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
+                        .WithMany()
+                        .HasForeignKey("NonCustodialParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
@@ -1477,12 +1551,6 @@ namespace Wesal.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Wesal.Domain.Entities.Payments.Payment", b =>
                 {
-                    b.HasOne("Wesal.Domain.Entities.Alimonies.Alimony", null)
-                        .WithMany()
-                        .HasForeignKey("AlimonyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Wesal.Domain.Entities.PaymentsDue.PaymentDue", null)
                         .WithMany()
                         .HasForeignKey("PaymentDueId")
@@ -1598,6 +1666,12 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
+                        .WithMany()
+                        .HasForeignKey("CustodialParentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Wesal.Domain.Entities.Families.Family", null)
                         .WithMany()
                         .HasForeignKey("FamilyId")
@@ -1612,7 +1686,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
-                        .HasForeignKey("ParentId")
+                        .HasForeignKey("NonCustodialParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
@@ -1633,20 +1707,22 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasOne("Wesal.Domain.Entities.Parents.Parent", null)
                         .WithMany()
-                        .HasForeignKey("ParentId")
+                        .HasForeignKey("NonCustodialParentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Wesal.Domain.Entities.CourtStaffs.CourtStaff", null)
+                    b.HasOne("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", null)
                         .WithMany()
                         .HasForeignKey("VerifiedById")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Wesal.Domain.Entities.VisitationSchedules.VisitationSchedule", null)
+                    b.HasOne("Wesal.Domain.Entities.VisitationSchedules.VisitationSchedule", "VisitationSchedule")
                         .WithMany()
                         .HasForeignKey("VisitationScheduleId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
+
+                    b.Navigation("VisitationSchedule");
                 });
 #pragma warning restore 612, 618
         }

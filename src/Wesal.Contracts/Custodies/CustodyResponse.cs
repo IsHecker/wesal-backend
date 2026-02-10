@@ -4,6 +4,6 @@ public record struct CustodyResponse(
     Guid Id,
     Guid CourtCaseId,
     Guid FamilyId,
-    Guid CustodianId,
+    Guid CustodialParentId,
     DateTime StartAt,
     DateTime? EndAt);

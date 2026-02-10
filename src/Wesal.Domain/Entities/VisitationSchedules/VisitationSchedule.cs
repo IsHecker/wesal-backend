@@ -1,4 +1,5 @@
 using Wesal.Domain.DomainEvents;
+using Wesal.Domain.Entities.Parents;
 
 namespace Wesal.Domain.Entities.VisitationSchedules;
 
@@ -7,9 +8,12 @@ public sealed class VisitationSchedule : Entity
     public Guid CourtId { get; private set; }
     public Guid CourtCaseId { get; private set; }
     public Guid FamilyId { get; private set; }
-    public Guid ParentId { get; private set; }
-
+    public Guid CustodialParentId { get; private set; }
+    public string CustodialNationalId { get; private set; } = null!;
+    public Guid NonCustodialParentId { get; private set; }
+    public string NonCustodialNationalId { get; private set; } = null!;
     public Guid LocationId { get; private set; }
+
     public VisitationFrequency Frequency { get; private set; }
 
     public TimeOnly StartTime { get; private set; }
@@ -20,7 +24,9 @@ public sealed class VisitationSchedule : Entity
     // When this obligation ends (could be years later)
     public DateOnly? EndDate { get; private set; }
 
-    public DateOnly? LastGeneratedDate { get; private set; } = null;
+    public DateOnly? LastGeneratedDate { get; private set; }
+
+    public bool IsStopped { get; private set; }
 
     private VisitationSchedule() { }
 
@@ -28,7 +34,8 @@ public sealed class VisitationSchedule : Entity
         Guid courtId,
         Guid courtCaseId,
         Guid familyId,
-        Guid parentId,
+        Parent custodialParent,
+        Parent nonCustodialParent,
         Guid locationId,
         VisitationFrequency frequency,
         DateOnly startDate,
@@ -41,7 +48,10 @@ public sealed class VisitationSchedule : Entity
             CourtId = courtId,
             CourtCaseId = courtCaseId,
             FamilyId = familyId,
-            ParentId = parentId,
+            CustodialParentId = custodialParent.Id,
+            CustodialNationalId = custodialParent.NationalId,
+            NonCustodialParentId = nonCustodialParent.Id,
+            NonCustodialNationalId = nonCustodialParent.NationalId,
             LocationId = locationId,
             Frequency = frequency,
             StartDate = startDate,
@@ -52,13 +62,15 @@ public sealed class VisitationSchedule : Entity
         };
     }
 
-    public void UpdateLastGeneratedDate(DateOnly visitationDate)
+    public void UpdateLastGeneratedDate(DateOnly lastDate)
     {
-        if (LastGeneratedDate.HasValue && visitationDate < LastGeneratedDate.Value)
+        if (LastGeneratedDate.HasValue && lastDate < LastGeneratedDate.Value)
             throw new InvalidOperationException();
 
-        LastGeneratedDate = visitationDate;
+        LastGeneratedDate = lastDate;
     }
+
+    public void Stop() => IsStopped = true;
 
     public int GetFrequencyInDays(DateOnly targetDate)
     {
@@ -85,5 +97,6 @@ public sealed class VisitationSchedule : Entity
         EndTime = endTime;
         StartDate = startDate;
         EndDate = endDate;
+        LastGeneratedDate = null;
     }
 }

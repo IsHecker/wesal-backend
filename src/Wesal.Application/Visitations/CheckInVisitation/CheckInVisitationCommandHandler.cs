@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Data;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Entities.Visitations;
@@ -9,7 +8,7 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Visitations.CheckInVisitation;
 
 internal sealed class CheckInVisitationCommandHandler(
-    IRepository<Visitation> visitationRepository,
+    IVisitationRepository visitationRepository,
     IVisitCenterStaffRepository centerStaffRepository,
     IOptions<VisitationOptions> options)
     : ICommandHandler<CheckInVisitationCommand>
@@ -22,11 +21,11 @@ internal sealed class CheckInVisitationCommandHandler(
         if (visitation is null)
             return VisitationErrors.NotFound(request.VisitationId);
 
-        var staff = await centerStaffRepository.GetByIdAsync(request.CenterStaffId, cancellationToken);
-        if (staff is null)
+        var centerStaff = await centerStaffRepository.GetByIdAsync(request.CenterStaffId, cancellationToken);
+        if (centerStaff is null)
             return UserErrors.NotFound(request.CenterStaffId);
 
-        var checkInResult = visitation.CheckIn(staff.LocationId, options.Value.CheckInGracePeriodMinutes);
+        var checkInResult = visitation.CheckIn(centerStaff.LocationId, request.NationalId, options.Value.CheckInGracePeriodMinutes);
         if (checkInResult.IsFailure)
             return checkInResult.Error;
 

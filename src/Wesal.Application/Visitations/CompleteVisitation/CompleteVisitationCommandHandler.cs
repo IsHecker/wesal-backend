@@ -1,9 +1,7 @@
 using Microsoft.Extensions.Options;
 using Wesal.Application.Abstractions.Repositories;
-using Wesal.Application.Data;
-using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
-using Wesal.Domain.Entities.Users;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitCenterStaffs;
 using Wesal.Domain.Results;
@@ -11,7 +9,7 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Visitations.CompleteVisitation;
 
 internal sealed class CompleteVisitationCommandHandler(
-    IRepository<Visitation> visitationRepository,
+    IVisitationRepository visitationRepository,
     IVisitCenterStaffRepository centerStaffRepository,
     IComplianceMetricsRepository metricsRepository,
     IOptions<VisitationOptions> options)
@@ -29,7 +27,7 @@ internal sealed class CompleteVisitationCommandHandler(
         if (staff is null)
             return VisitCenterStaffErrors.NotFound(request.CenterStaffId);
 
-        var CompleteResult = visitation.Complete(staff, options.Value.CheckInGracePeriodMinutes);
+        var CompleteResult = visitation.Complete(staff, visitation, options.Value.CheckInGracePeriodMinutes);
         if (CompleteResult.IsFailure)
             return CompleteResult.Error;
 
@@ -43,8 +41,8 @@ internal sealed class CompleteVisitationCommandHandler(
     {
         var metrics = await metricsRepository.GetAsync(
             visitation.FamilyId,
-            visitation.ParentId,
-            DateTime.UtcNow.ToDateOnly(),
+            visitation.NonCustodialParentId,
+            EgyptTime.Today,
             cancellationToken) ?? throw new InvalidOperationException();
 
         metrics.RecordVisitationCompleted();

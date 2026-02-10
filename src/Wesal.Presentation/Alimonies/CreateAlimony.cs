@@ -20,17 +20,13 @@ internal sealed class CreateAlimony : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var command = new CreateAlimonyCommand(
+            var result = await sender.Send(new CreateAlimonyCommand(
                 user.GetCourtId(),
                 request.CourtCaseId,
-                request.PayerId,
-                request.RecipientId,
                 request.Amount,
                 request.Frequency,
                 request.StartDate,
-                request.EndDate);
-
-            var result = await sender.Send(command);
+                request.EndDate));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
@@ -44,8 +40,6 @@ internal sealed class CreateAlimony : IEndpoint
 
     internal record struct Request(
         Guid CourtCaseId,
-        Guid PayerId,
-        Guid RecipientId,
         long Amount,
         string Frequency,
         DateOnly StartDate,

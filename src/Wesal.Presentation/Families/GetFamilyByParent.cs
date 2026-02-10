@@ -23,8 +23,9 @@ internal sealed class GetFamilyByParent : IEndpoint
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
         .WithTags(Tags.Families)
-        .Produces<FamilyResponse>(StatusCodes.Status200OK)
+        .Produces<IEnumerable<FamilyResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .WithOpenApiName(nameof(GetFamilyByParent))
         .RequireAuthorization(CustomPolicies.ParentsOnly);
     }

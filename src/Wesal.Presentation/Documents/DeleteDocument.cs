@@ -1,8 +1,8 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Wesal.Application.Authentication;
 using Wesal.Application.Documents.DeleteDocument;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -14,9 +14,12 @@ internal sealed class DeleteDocument : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapDelete(ApiEndpoints.Documents.Delete, async (Guid documentId, ISender sender) =>
+        app.MapDelete(ApiEndpoints.Documents.Delete, async (
+            Guid documentId,
+            ClaimsPrincipal user,
+            ISender sender) =>
         {
-            var result = await sender.Send(new DeleteDocumentCommand(documentId));
+            var result = await sender.Send(new DeleteDocumentCommand(user.GetRoleId(), documentId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })

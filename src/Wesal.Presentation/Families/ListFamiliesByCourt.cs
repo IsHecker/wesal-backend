@@ -19,12 +19,14 @@ internal sealed class ListFamiliesByCourt : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Families.ListByCourt, async (
+            [AsParameters] QueryParams query,
             [AsParameters] Pagination pagination,
             ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ListFamiliesByCourtQuery(
                 user.GetCourtId(),
+                query.NationalId,
                 pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -35,4 +37,6 @@ internal sealed class ListFamiliesByCourt : IEndpoint
         .WithOpenApiName(nameof(ListFamiliesByCourt))
         .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
+
+    internal record struct QueryParams(string? NationalId = null);
 }

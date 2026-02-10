@@ -51,7 +51,6 @@ using Wesal.Domain.Entities.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Wesal.Infrastructure.Options;
 using Wesal.Infrastructure.Authentication;
 using Wesal.Infrastructure.Users;
 using Wesal.Infrastructure.FamilyCourts;
@@ -62,7 +61,13 @@ using Wesal.Application.Abstractions.Authentication;
 using Wesal.Infrastructure.Authentication.Services;
 using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using Wesal.Application.Documents;
+using Wesal.Infrastructure.Visitations;
+using Wesal.Infrastructure.VisitationSchedules;
+using Wesal.Infrastructure.PaymentGateway;
+using Wesal.Application.Abstractions.PaymentGateway;
+using Wesal.Infrastructure.PaymentGateway.StripeEvents;
+using Wesal.Infrastructure.PaymentGateway.ProcessedStripeEvents;
 
 namespace Wesal.Infrastructure;
 
@@ -90,6 +95,7 @@ public static class DependencyInjection
         services.AddRepositories();
         services.AddServices();
         services.AddBackgroundJobs(configuration);
+        services.AddStripe(configuration);
     }
 
     public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
@@ -122,6 +128,9 @@ public static class DependencyInjection
 
         services.Configure<ComplaintOptions>(
             configuration.GetSection(ComplaintOptions.SectionName));
+
+        services.Configure<DocumentOptions>(
+            configuration.GetSection(DocumentOptions.SectionName));
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -134,10 +143,10 @@ public static class DependencyInjection
         services.AddScoped<IChildRepository, ChildRepository>();
         services.AddScoped<ICourtCaseRepository, CourtCaseRepository>();
         services.AddScoped<ICustodyRepository, CustodyRepository>();
+        services.AddScoped<IVisitationRepository, VisitationRepository>();
         services.AddScoped<IVisitationLocationRepository, VisitationLocationRepository>();
         services.AddScoped<IAlimonyRepository, AlimonyRepository>();
         services.AddScoped<IPaymentDueRepository, PaymentDueRepository>();
-        services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<ICourtStaffRepository, CourtStaffRepository>();
         services.AddScoped<IObligationAlertRepository, ObligationAlertRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
@@ -146,11 +155,13 @@ public static class DependencyInjection
         services.AddScoped<IComplianceMetricsRepository, ComplianceMetricsRepository>();
         services.AddScoped<IUserDeviceRepository, UserDeviceRepository>();
         services.AddScoped<IFamilyCourtRepository, FamilyCourtRepository>();
+        services.AddScoped<IVisitationScheduleRepository, VisitationScheduleRepository>();
     }
 
     private static void AddServices(this IServiceCollection services)
     {
         services.AddScoped<ObligationAlertService>();
+        services.AddScoped<ComplianceMetricsService>();
     }
 
     private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
@@ -227,7 +238,23 @@ public static class DependencyInjection
         return services;
     }
 
-    internal static IServiceCollection AddAuthenticationInternal(
+    private static void AddStripe(this IServiceCollection services, IConfiguration configuration)
+    {
+        var stripeOptions = configuration.GetSection(StripeOptions.SectionName).Get<StripeOptions>()!;
+        services.AddSingleton(stripeOptions);
+
+        Stripe.StripeConfiguration.ApiKey = stripeOptions.SecretKey;
+
+        services.AddHttpClient<CurrencyConverter>();
+
+        services.AddScoped<ProcessedStripeEventRepository>();
+
+        services.AddScoped<IStripeEventDispatcher, StripeEventDispatcher>();
+
+        services.AddScoped<IStripeGateway, StripeGateway>();
+    }
+
+    private static IServiceCollection AddAuthenticationInternal(
         this IServiceCollection services,
         IConfiguration configuration)
     {
@@ -301,6 +328,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthenticationStrategy<EmailPasswordCredentials>, EmailPasswordAuthenticationStrategy>();
         services.AddScoped<IAuthenticationStrategy<NationalIdPasswordCredentials>, NationalIdPasswordAuthenticationStrategy>();
         services.AddScoped<IAuthenticationStrategy<UsernamePasswordCredentials>, UsernamePasswordAuthenticationStrategy>();
+
 
         return services;
     }

@@ -27,19 +27,6 @@ internal sealed class DeleteCustodyCommandHandler(
         if (courtCase!.Status == CourtCaseStatus.Closed)
             return CustodyErrors.CannotModifyClosedCase;
 
-        // TODO: Handle Deletion if it's still in use.
-
-        // // --- Block if visitation schedules exist under this custody ---
-        // var hasVisitationSchedules = await visitationScheduleRepository
-        //     .ExistsByCustodyIdAsync(request.CustodyId, cancellationToken);
-
-        // // --- Block if alimony obligations exist under this custody ---
-        // var hasAlimony = await alimonyRepository
-        //     .ExistsByCustodyIdAsync(request.CustodyId, cancellationToken);
-
-        // if (hasVisitationSchedules || hasAlimony)
-        //     return CustodyErrors.HasDependentRecords;
-
         custodyRepository.Delete(custody);
 
         return Result.Success;

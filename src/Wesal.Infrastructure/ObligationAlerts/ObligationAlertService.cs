@@ -36,7 +36,7 @@ internal sealed class ObligationAlertService(
             relatedEntityId,
             violationType,
             hasReachedMaxViolations ? AlertStatus.Pending : AlertStatus.Drafted,
-            $"Parent '{parent.FullName}' has: {violationDescription}");
+            $"For Parent '{parent.FullName}': {violationDescription}");
 
         await dbContext.ObligationAlerts.AddAsync(obligationAlert, cancellationToken);
 
@@ -88,8 +88,8 @@ internal sealed class ObligationAlertService(
     {
         var notificationContent = BuildNotificationContent(violationDescription, hasReachedMaxViolations);
 
-        await notificationService.SendNotificationAsync(
-            NotificationTemplate.ObligationAlert(obligationAlert, notificationContent),
+        await notificationService.SendNotificationsAsync(
+            [NotificationTemplate.ObligationAlert(obligationAlert.ParentId, notificationContent)],
             cancellationToken: cancellationToken);
     }
 

@@ -12,8 +12,5 @@ internal sealed class NotificationConfiguration : IEntityTypeConfiguration<Notif
         builder.HasOne<Parent>()
             .WithMany()
             .HasForeignKey(n => n.RecipientId);
-
-
-        builder.HasIndex(n => new { n.RecipientId, n.RelatedEntityId, n.EntityType }).IsUnique();
     }
 }

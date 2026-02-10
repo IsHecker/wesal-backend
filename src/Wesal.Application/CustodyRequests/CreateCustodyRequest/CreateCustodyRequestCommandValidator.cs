@@ -1,5 +1,5 @@
 using FluentValidation;
-using Wesal.Application.Extensions;
+using Wesal.Domain.Common;
 
 namespace Wesal.Application.CustodyRequests.CreateCustodyRequest;
 
@@ -11,7 +11,7 @@ public sealed class CreateCustodyRequestCommandValidator : AbstractValidator<Cre
 
         RuleFor(x => x.StartDate)
             .NotEmpty()
-            .GreaterThanOrEqualTo(DateTime.UtcNow.ToDateOnly())
+            .GreaterThanOrEqualTo(EgyptTime.Today)
             .WithMessage("Start date cannot be in the past");
 
         RuleFor(x => x.EndDate)

@@ -7,7 +7,6 @@ using Wesal.Application.Authentication;
 using Wesal.Application.Families.EnrollFamily;
 using Wesal.Application.Families.EnrollFamily.Dtos;
 using Wesal.Contracts.Families;
-using Wesal.Domain;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -27,7 +26,7 @@ internal sealed class EnrollFamily : IEndpoint
                 user.GetRoleId(),
                 request.Father.ToDto(),
                 request.Mother.ToDto(),
-                request.Children.Select(c => c.ToDto())));
+                request.Children?.Select(c => c.ToDto())));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
@@ -42,7 +41,7 @@ internal sealed class EnrollFamily : IEndpoint
     internal readonly record struct Request(
         CreateParentRequest Father,
         CreateParentRequest Mother,
-        List<CreateChildRequest> Children);
+        List<CreateChildRequest>? Children);
 
     internal readonly record struct CreateParentRequest(
         string NationalId,
@@ -50,8 +49,8 @@ internal sealed class EnrollFamily : IEndpoint
         DateOnly BirthDate,
         string Gender,
         string? Job,
-        string? Address,
-        string? Phone,
+        string Address,
+        string Phone,
         string? Email)
     {
         internal CreateParentDto ToDto() => new(
@@ -59,11 +58,10 @@ internal sealed class EnrollFamily : IEndpoint
             FullName,
             BirthDate,
             Gender,
-            Job,
             Address,
             Phone,
-            Email
-        );
+            Job,
+            Email);
     }
 
     internal readonly record struct CreateChildRequest(

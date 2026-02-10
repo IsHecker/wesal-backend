@@ -6,7 +6,6 @@ using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.Visitations;
 using Wesal.Domain.Entities.Families;
-using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Results;
 
@@ -21,11 +20,14 @@ internal sealed class ListVisitationsQueryHandler(
         ListVisitationsQuery request,
         CancellationToken cancellationToken)
     {
-        var validationResult = await ValidateFilters(request, cancellationToken);
-        if (validationResult.IsFailure)
-            return validationResult.Error;
+        if (request.FamilyId.HasValue)
+        {
+            var familyExists = await familyRepository.ExistsAsync(request.FamilyId.Value, cancellationToken);
+            if (!familyExists)
+                return FamilyErrors.NotFound(request.FamilyId.Value);
+        }
 
-        var query = BuildQuery(request, validationResult.Value);
+        var query = BuildQuery(request, request.NationalId);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -34,51 +36,30 @@ internal sealed class ListVisitationsQueryHandler(
             .Select(visitation => new VisitationResponse(
                 visitation.Id,
                 visitation.FamilyId,
-                visitation.ParentId,
+                visitation.NonCustodialParentId,
+                visitation.NonCustodialNationalId,
+                visitation.CompanionNationalId,
                 visitation.LocationId,
                 visitation.VisitationScheduleId,
                 visitation.StartAt,
                 visitation.EndAt,
-                visitation.CompletedAt,
                 visitation.Status.ToString(),
-                visitation.CheckedInAt))
+                visitation.NonCustodialCheckedInAt,
+                visitation.CompanionCheckedInAt,
+                visitation.CompletedAt))
             .ToPagedResponseAsync(request.Pagination, totalCount);
     }
 
-    private async Task<Result<Guid?>> ValidateFilters(
-        ListVisitationsQuery request,
-        CancellationToken cancellationToken)
-    {
-        if (request.FamilyId.HasValue)
-        {
-            var familyExists = await familyRepository.ExistsAsync(request.FamilyId.Value, cancellationToken);
-            if (!familyExists)
-                return FamilyErrors.NotFound(request.FamilyId.Value);
-        }
-
-        if (!string.IsNullOrWhiteSpace(request.NationalId))
-        {
-            var parent = await context.Parents
-                .FirstOrDefaultAsync(parent => parent.NationalId == request.NationalId, cancellationToken);
-
-            if (parent is null)
-                return ParentErrors.NotFoundByNationalId(request.NationalId);
-
-            return parent.Id;
-        }
-
-        return Guid.Empty;
-    }
-
-    private IQueryable<Visitation> BuildQuery(ListVisitationsQuery request, Guid? parentId)
+    private IQueryable<Visitation> BuildQuery(ListVisitationsQuery request, string? nationalId)
     {
         var query = context.Visitations.AsQueryable();
 
         if (request.FamilyId.HasValue)
             query = query.Where(v => v.FamilyId == request.FamilyId.Value);
 
-        if (parentId.HasValue && parentId != Guid.Empty)
-            query = query.Where(v => v.ParentId == parentId.Value);
+        if (!string.IsNullOrWhiteSpace(nationalId))
+            query = query.Where(v => nationalId == v.CompanionNationalId
+                || nationalId == v.NonCustodialNationalId);
 
         if (!string.IsNullOrWhiteSpace(request.Status))
         {
@@ -87,8 +68,15 @@ internal sealed class ListVisitationsQueryHandler(
         }
 
         if (request.Date.HasValue)
-            query = query.Where(v => v.StartAt.ToDateOnly() == request.Date.Value);
+        {
+            var startAt = new DateTime(
+                request.Date.Value.Year,
+                request.Date.Value.Month,
+                request.Date.Value.Day);
 
-        return query.OrderByDescending(v => v.StartAt.ToDateOnly());
+            query = query.Where(v => v.StartAt.Date == startAt);
+        }
+
+        return query.OrderByDescending(v => v.StartAt);
     }
 }

@@ -25,7 +25,7 @@ internal sealed class CreateCustodyRequestCommandHandler(
         if (custody is null)
             return CustodyRequestErrors.NoCustodyDecision;
 
-        if (custody.CustodianId == request.ParentId)
+        if (custody.CustodialParentId == request.ParentId)
             return CustodyRequestErrors.AlreadyCustodian;
 
         var custodyRequest = CustodyRequest.Create(

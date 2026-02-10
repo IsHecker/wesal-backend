@@ -14,4 +14,12 @@ internal sealed class CourtCaseRepository(WesalDbContext context)
         return context.CourtCases
             .AnyAsync(courtCase => courtCase.CaseNumber == caseNumber, cancellationToken);
     }
+
+    public Task<bool> HasOpenCaseByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken = default)
+    {
+        return context.CourtCases
+            .AnyAsync(courtCase => courtCase.FamilyId == familyId
+                && courtCase.Status == CourtCaseStatus.Open, cancellationToken);
+
+    }
 }

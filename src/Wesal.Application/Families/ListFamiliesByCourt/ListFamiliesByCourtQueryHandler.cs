@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Data;
-using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.Families;
-using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Families.ListFamiliesByCourt;
@@ -21,12 +19,16 @@ internal sealed class ListFamiliesByCourtQueryHandler(IWesalDbContext context)
             .Include(family => family.Father)
             .Include(family => family.Mother)
             .Include(family => family.Children)
-            .Where(family => family.CourtId == request.CourtId)
-            .OrderByDescending(family => family.CreatedAt);
+            .Where(family => family.CourtId == request.CourtId);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
+        if (!string.IsNullOrWhiteSpace(request.NationalId))
+            query = query.Where(family => family.Father.NationalId == request.NationalId
+                || family.Mother.NationalId == request.NationalId);
+
         return await query
+            .OrderByDescending(family => family.CreatedAt)
             .Paginate(request.Pagination)
             .Select(family => family.ToResponse())
             .ToPagedResponseAsync(request.Pagination, totalCount);

@@ -6,4 +6,5 @@ public static class CustomClaims
     public const string RoleId = "roleId";
     public const string CourtId = "courtId";
     public const string PasswordChangeRequired = "tmp_pwd";
+    public const string ParentRole = "parentRole";
 }

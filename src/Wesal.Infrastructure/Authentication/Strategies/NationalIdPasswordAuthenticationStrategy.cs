@@ -27,6 +27,8 @@ internal sealed class NationalIdPasswordAuthenticationStrategy(
             parent.UserId,
             credentials.Password,
             parent.Id,
-            cancellationToken: cancellationToken);
+            parent.CourtId,
+            parent.IsFather,
+            cancellationToken);
     }
 }

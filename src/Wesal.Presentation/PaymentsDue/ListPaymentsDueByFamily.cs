@@ -36,7 +36,6 @@ internal sealed class ListPaymentsDueByFamily : IEndpoint
         .Produces<PagedResponse<PaymentDueResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(ListPaymentsDueByFamily))
-        .RequireAuthorization(CustomPolicies.ParentsOnly)
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 }

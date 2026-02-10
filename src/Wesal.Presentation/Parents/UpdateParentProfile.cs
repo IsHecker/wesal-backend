@@ -24,7 +24,6 @@ internal sealed class UpdateParentProfile : IEndpoint
             var result = await sender.Send(new UpdateParentProfileCommand(
                 user.GetCourtId(),
                 parentId,
-                request.FullName,
                 request.Email,
                 request.Phone,
                 request.Address,
@@ -41,7 +40,6 @@ internal sealed class UpdateParentProfile : IEndpoint
     }
 
     internal record struct Request(
-        string FullName,
         string? Email,
         string Phone,
         string Address,

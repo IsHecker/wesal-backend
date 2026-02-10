@@ -22,7 +22,9 @@ internal sealed class UpdateParentProfileCommandHandler(
         if (parent!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(Family));
 
-        parent.UpdateProfile(request.FullName, request.Email, request.Job, request.Address, request.Phone);
+        parent.UpdateProfile(request.Email, request.Job, request.Address, request.Phone);
+
+        parentRepository.Update(parent);
 
         return Result.Success;
     }

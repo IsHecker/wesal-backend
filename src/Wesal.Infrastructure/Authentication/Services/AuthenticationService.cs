@@ -16,6 +16,7 @@ internal sealed class AuthenticationService(
         string password,
         Guid roleId,
         Guid? courtId = null,
+        bool? isFather = null,
         CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByIdAsync(userId, cancellationToken);
@@ -26,6 +27,6 @@ internal sealed class AuthenticationService(
         if (result == PasswordVerificationResult.Failed)
             return UserErrors.InvalidCredentials;
 
-        return tokenGenerator.GenerateToken(user, roleId, courtId);
+        return tokenGenerator.GenerateToken(user, roleId, courtId, isFather);
     }
 }

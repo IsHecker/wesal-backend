@@ -18,8 +18,13 @@ public sealed class PaymentDue : Entity
     public PaymentStatus Status { get; private set; }
     public DateTime? PaidAt { get; private set; }
 
+    public WithdrawalStatus? WithdrawalStatus { get; private set; }
+    public DateTime? WithdrawnAt { get; private set; } = null!;
+
+    public bool IsNotified { get; private set; }
+
     public bool IsPaid => PaidAt != null && PaymentId != null && Status == PaymentStatus.Paid;
-    public bool IsDueDatePassed => DueDate <= DateOnly.FromDateTime(DateTime.UtcNow);
+    public bool IsDueDatePassed => DueDate <= EgyptTime.Today;
 
     public Alimony Alimony { get; init; } = null!;
 
@@ -44,7 +49,9 @@ public sealed class PaymentDue : Entity
             return result.Error;
 
         PaymentId = paymentId;
-        PaidAt = DateTime.UtcNow;
+        Status = PaymentStatus.Paid;
+        PaidAt = EgyptTime.Now;
+
         return Result.Success;
     }
 
@@ -58,5 +65,15 @@ public sealed class PaymentDue : Entity
 
         Status = PaymentStatus.Overdue;
         return Result.Success;
+    }
+
+    public void MarkAsNotified() => IsNotified = true;
+
+    public void MarkWithdrawalStatusAs(WithdrawalStatus status) => WithdrawalStatus = status;
+
+    public void MarkAsWithdrawn()
+    {
+        WithdrawalStatus = Payments.WithdrawalStatus.Completed;
+        WithdrawnAt = EgyptTime.Now;
     }
 }

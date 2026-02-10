@@ -28,6 +28,13 @@ internal sealed class CreateCourtCaseHandler(
         if (family is null)
             return FamilyErrors.NotFound(request.FamilyId);
 
+        var hasOpenCase = await courtCaseRepository.HasOpenCaseByFamilyIdAsync(
+            request.FamilyId,
+            cancellationToken);
+
+        if (hasOpenCase)
+            return CourtCaseErrors.FamilyHasOpenCase;
+
         if (await courtCaseRepository.ExistsByCaseNumberAsync(request.CaseNumber, cancellationToken))
             return CourtCaseErrors.CaseNumberAlreadyExists(request.CaseNumber);
 

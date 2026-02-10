@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Entities.Visitations;
-using Wesal.Domain.Entities.VisitationSchedules;
+using Wesal.Domain.Entities.VisitCenterStaffs;
 
 namespace Wesal.Infrastructure.Visitations;
 
@@ -20,7 +19,7 @@ internal sealed class VisitationConfiguration : IEntityTypeConfiguration<Visitat
 
         builder.HasOne<Parent>()
             .WithMany()
-            .HasForeignKey(visit => visit.ParentId)
+            .HasForeignKey(visit => visit.NonCustodialParentId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne<VisitationLocation>()
@@ -28,12 +27,12 @@ internal sealed class VisitationConfiguration : IEntityTypeConfiguration<Visitat
             .HasForeignKey(visit => visit.LocationId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne<VisitationSchedule>()
+        builder.HasOne(visit => visit.VisitationSchedule)
             .WithMany()
             .HasForeignKey(visit => visit.VisitationScheduleId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne<CourtStaff>()
+        builder.HasOne<VisitCenterStaff>()
             .WithMany()
             .HasForeignKey(visit => visit.VerifiedById)
             .OnDelete(DeleteBehavior.NoAction);

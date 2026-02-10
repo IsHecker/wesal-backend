@@ -9,8 +9,6 @@ public sealed class CreateAlimonyCommandValidator : AbstractValidator<CreateAlim
     public CreateAlimonyCommandValidator()
     {
         RuleFor(x => x.CourtCaseId).NotEmpty();
-        RuleFor(x => x.PayerId).NotEmpty();
-        RuleFor(x => x.RecipientId).NotEmpty();
         RuleFor(x => x.StartDate).NotEmpty();
         RuleFor(x => x.EndDate).NotEmpty();
 
@@ -25,15 +23,8 @@ public sealed class CreateAlimonyCommandValidator : AbstractValidator<CreateAlim
         RuleFor(x => x)
             .Must(HaveValidDateRange)
             .WithMessage("Start date must be before end date");
-
-        RuleFor(x => x)
-            .Must(HaveDifferentPayerAndRecipient)
-            .WithMessage("Payer and recipient must be different");
     }
 
     private bool HaveValidDateRange(CreateAlimonyCommand command) =>
         command.StartDate < command.EndDate;
-
-    private bool HaveDifferentPayerAndRecipient(CreateAlimonyCommand command) =>
-        command.PayerId != command.RecipientId;
 }

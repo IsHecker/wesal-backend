@@ -18,6 +18,7 @@ public static class Tags
     public const string VisitationLocations = nameof(VisitationLocations);
     public const string PaymentsDue = nameof(PaymentsDue);
     public const string Payments = nameof(Payments);
+    public const string PaymentProcessing = nameof(PaymentProcessing);
     public const string Alimonies = nameof(Alimonies);
     public const string ObligationAlerts = nameof(ObligationAlerts);
     public const string Notifications = nameof(Notifications);

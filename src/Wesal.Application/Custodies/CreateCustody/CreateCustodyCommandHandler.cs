@@ -2,6 +2,7 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.Custodies;
+using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
@@ -23,14 +24,21 @@ internal sealed class CreateCustodyCommandHandler(
         if (courtCase is null)
             return CourtCaseErrors.NotFound(request.CourtCaseId);
 
-        var validationResult = await ValidateCustody(request, courtCase, cancellationToken);
+        var family = await familyRepository.GetByIdAsync(courtCase.FamilyId, cancellationToken)
+            ?? throw new InvalidOperationException();
+
+        var validationResult = await ValidateCustody(request, courtCase, family, cancellationToken);
         if (validationResult.IsFailure)
             return validationResult.Error;
+
+        var nonCustodialParentId = request.CustodialParentId == family.MotherId
+                ? family.FatherId : family.MotherId;
 
         var custody = Custody.Create(
             request.CourtCaseId,
             courtCase.FamilyId,
-            request.CustodianId,
+            request.CustodialParentId,
+            nonCustodialParentId,
             request.StartAt,
             request.EndAt);
 
@@ -42,23 +50,21 @@ internal sealed class CreateCustodyCommandHandler(
     private async Task<Result> ValidateCustody(
         CreateCustodyCommand request,
         CourtCase courtCase,
+        Family family,
         CancellationToken cancellationToken)
     {
         if (courtCase.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
 
-        var family = await familyRepository.GetByIdAsync(courtCase.FamilyId, cancellationToken)
-            ?? throw new InvalidOperationException();
-
         var custodyExists = await custodyRepository.ExistsByCourtCaseIdAsync(request.CourtCaseId, cancellationToken);
         if (custodyExists)
             return CustodyErrors.AlreadyExists(request.CourtCaseId);
 
-        var custodian = await parentRepository.GetByIdAsync(request.CustodianId, cancellationToken);
+        var custodian = await parentRepository.GetByIdAsync(request.CustodialParentId, cancellationToken);
         if (custodian is null)
-            return ParentErrors.NotFound(request.CustodianId);
+            return ParentErrors.NotFound(request.CustodialParentId);
 
-        if (family.FatherId != request.CustodianId && family.MotherId != request.CustodianId)
+        if (family.FatherId != request.CustodialParentId && family.MotherId != request.CustodialParentId)
             return CustodyErrors.CustodianNotInFamily;
 
         return Result.Success;

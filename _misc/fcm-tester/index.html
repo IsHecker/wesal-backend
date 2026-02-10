@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FCM Push Notification Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .token-section {
+            margin-bottom: 30px;
+        }
+
+        .token-section label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .token-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #495057;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .token-display.empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .notifications {
+            margin-top: 30px;
+        }
+
+        .notifications h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .notification-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification-item .title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .notification-item .body {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .notification-item .time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .instructions {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .instructions strong {
+            color: #1976D2;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🔔 FCM Push Notification Tester</h1>
+        <p class="subtitle">Test Firebase Cloud Messaging push notifications in your browser</p>
+
+        <div class="instructions">
+            <strong>Instructions:</strong><br>
+            1. Click "Request Permission" to allow notifications<br>
+            2. Copy your device token and save it<br>
+            3. Use your backend to send a test notification to this token<br>
+            4. Notifications will appear here and as browser notifications
+        </div>
+
+        <div id="status" class="status pending">
+            ⏳ Waiting for initialization...
+        </div>
+
+        <button id="requestPermission" disabled>Request Notification Permission</button>
+
+        <div class="token-section">
+            <label>Your Device Token:</label>
+            <div id="token" class="token-display empty">Token will appear here after permission is granted</div>
+            <button id="copyToken" class="copy-btn" style="display: none;">📋 Copy Token</button>
+        </div>
+
+        <div class="notifications">
+            <h2>Received Notifications</h2>
+            <div id="notificationsList">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                    </svg>
+                    <p>No notifications received yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+
+        // ========================================
+        // CONFIGURATION - EDIT THESE VALUES
+        // ========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmJqC-EhQBfpvg_nFLbfMU0oOgO-EYzTU",
+            authDomain: "wesal-83d46.firebaseapp.com",
+            projectId: "wesal-83d46",
+            storageBucket: "wesal-83d46.firebasestorage.app",
+            messagingSenderId: "188164569064",
+            appId: "1:188164569064:web:00a969a0935dd57641565d"
+        };
+
+        const vapidKey = "BPWQgBiF2u64gz2fhgdyCz9AkrB51xRZD6-q_T6fC15Bx3Shc_MocmODsIDNnJCJq5Q0rrXmP_V_xBXcMCxxZZ8"; // Web Push certificates key from Firebase Console
+        // ========================================
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
+
+        // DOM elements
+        const statusEl = document.getElementById('status');
+        const requestBtn = document.getElementById('requestPermission');
+        const tokenEl = document.getElementById('token');
+        const copyBtn = document.getElementById('copyToken');
+        const notificationsList = document.getElementById('notificationsList');
+
+        // Update status
+        function updateStatus(message, type) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Add notification to list
+        function addNotificationToList(title, body) {
+            const emptyState = notificationsList.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const notificationItem = document.createElement('div');
+            notificationItem.className = 'notification-item';
+            notificationItem.innerHTML = `
+                <div class="title">${title}</div>
+                <div class="body">${body}</div>
+                <div class="time">${new Date().toLocaleString()}</div>
+            `;
+            notificationsList.insertBefore(notificationItem, notificationsList.firstChild);
+        }
+
+        // Request notification permission
+        async function requestPermission() {
+            try {
+                updateStatus('Requesting permission...', 'pending');
+
+                const permission = await Notification.requestPermission();
+
+                if (permission === 'granted') {
+                    updateStatus('Permission granted! Getting token...', 'pending');
+
+                    const token = await getToken(messaging, { vapidKey });
+
+                    tokenEl.textContent = token;
+                    tokenEl.classList.remove('empty');
+                    copyBtn.style.display = 'block';
+
+                    updateStatus('✅ Ready to receive notifications!', 'success');
+                    requestBtn.textContent = 'Permission Granted ✓';
+                    requestBtn.disabled = true;
+
+                    console.log('FCM Token:', token);
+                } else {
+                    updateStatus('❌ Permission denied. Please allow notifications in your browser settings.', 'error');
+                }
+            } catch (error) {
+                console.error('Error getting token:', error);
+                updateStatus(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Copy token to clipboard
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(tokenEl.textContent);
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            } catch (error) {
+                alert('Failed to copy token');
+            }
+        });
+
+        // Listen for foreground messages
+        onMessage(messaging, (payload) => {
+            console.log('Message received:', payload);
+
+            const title = payload.notification?.title || 'New Notification';
+            const body = payload.notification?.body || 'You have a new notification';
+
+            addNotificationToList(title, body);
+
+            // Show browser notification if page is not focused
+            if (document.hidden) {
+                new Notification(title, {
+                    body: body,
+                    icon: payload.notification?.icon || '/icon.png',
+                    badge: '/badge.png'
+                });
+            }
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            if ('Notification' in window && 'serviceWorker' in navigator) {
+                updateStatus('Ready! Click the button to enable notifications.', 'pending');
+                requestBtn.disabled = false;
+                requestBtn.addEventListener('click', requestPermission);
+            } else {
+                updateStatus('❌ Your browser does not support notifications', 'error');
+            }
+        });
+
+        // Register service worker on page load
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/firebase-messaging-sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered:', registration);
+                })
+                .catch(err => {
+                    console.error('Service Worker registration failed:', err);
+                });
+        }
+
+        // Listen for messages from service worker
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data.type === 'FCM_MESSAGE') {
+                const payload = event.data.payload;
+                const title = payload.notification?.title || 'Notification';
+                const body = payload.notification?.body || '';
+
+                addNotificationToList(title, body);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -5,8 +5,8 @@ namespace Wesal.Application.Abstractions.Services;
 
 public interface INotificationService
 {
-    Task<Result> SendNotificationAsync(
-        Notification notification,
-        Dictionary<string, string>? data = null,
+    Task<Result> SendNotificationsAsync(
+        IReadOnlyList<Notification> notifications,
+        Dictionary<string, string>? sharedData = null,
         CancellationToken cancellationToken = default);
 }

@@ -54,7 +54,7 @@ public sealed class CustodyRequest : Entity
 
         Status = CustodyRequestStatus.Approved;
         DecisionNote = decisionNote;
-        ProcessedAt = DateTime.UtcNow;
+        ProcessedAt = EgyptTime.Now;
 
         return Result.Success;
     }
@@ -69,7 +69,7 @@ public sealed class CustodyRequest : Entity
 
         Status = CustodyRequestStatus.Rejected;
         DecisionNote = decisionNote;
-        ProcessedAt = DateTime.UtcNow;
+        ProcessedAt = EgyptTime.Now;
 
         return Result.Success;
     }

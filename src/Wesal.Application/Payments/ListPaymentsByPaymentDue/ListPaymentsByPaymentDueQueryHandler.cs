@@ -18,12 +18,12 @@ internal sealed class ListPaymentsByPaymentDueQueryHandler(
         ListPaymentsByPaymentDueQuery request,
         CancellationToken cancellationToken)
     {
-        var paymentDue = await paymentDueRepository.GetByIdAsync(request.PaymetDueId, cancellationToken);
+        var paymentDue = await paymentDueRepository.GetByIdAsync(request.PaymentDueId, cancellationToken);
         if (paymentDue is null)
-            return PaymentDueErrors.NotFound(request.PaymetDueId);
+            return PaymentDueErrors.NotFound(request.PaymentDueId);
 
         var payments = context.Payments
-            .Where(payment => payment.PaymentDueId == request.PaymetDueId);
+            .Where(payment => payment.PaymentDueId == request.PaymentDueId);
 
         _ = payments.TryGetNonEnumeratedCount(out var totalCount);
 
@@ -32,7 +32,6 @@ internal sealed class ListPaymentsByPaymentDueQueryHandler(
             .Paginate(request.Pagination)
             .Select(payment => new PaymentResponse(
                 payment.Id,
-                payment.Amount,
                 payment.Method.ToString(),
                 payment.ReceiptUrl,
                 payment.PaidAt))

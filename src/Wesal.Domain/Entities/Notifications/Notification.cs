@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 
 namespace Wesal.Domain.Entities.Notifications;
@@ -5,9 +6,7 @@ namespace Wesal.Domain.Entities.Notifications;
 public sealed class Notification : Entity
 {
     public Guid RecipientId { get; private set; }
-    public Guid RelatedEntityId { get; private set; }
 
-    public string EntityType { get; private set; } = null!;
     public string Title { get; private set; } = null!;
     public string Content { get; private set; } = null!;
     public NotificationType Type { get; private set; }
@@ -20,8 +19,6 @@ public sealed class Notification : Entity
 
     public static Notification Create(
         Guid recipientId,
-        Guid relatedEntityId,
-        string entityType,
         string title,
         string content,
         NotificationType type)
@@ -29,13 +26,11 @@ public sealed class Notification : Entity
         return new Notification
         {
             RecipientId = recipientId,
-            RelatedEntityId = relatedEntityId,
-            EntityType = entityType,
             Title = title,
             Content = content,
             Type = type,
             Status = NotificationStatus.Sent,
-            SentAt = DateTime.UtcNow,
+            SentAt = EgyptTime.Now,
             ReadAt = null
         };
     }
@@ -46,6 +41,6 @@ public sealed class Notification : Entity
             return;
 
         Status = NotificationStatus.Read;
-        ReadAt = DateTime.UtcNow;
+        ReadAt = EgyptTime.Now;
     }
 }

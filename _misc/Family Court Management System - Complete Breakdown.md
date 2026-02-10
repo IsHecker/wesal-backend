@@ -419,7 +419,7 @@ Notifications: 2 unread
 - Attendance recorded
 - Data becomes **legal evidence**
 
-## 3.6 Alimony Payment Flow
+## 3.6 ✅Alimony Payment Flow
 
 **Actors:** Payer Parent, System, Payment Gateway, Court
 
@@ -737,19 +737,57 @@ Notifications: 2 unread
 
 # Confusion Points
 
-- Should Court case-related entities(custody, visitations, and alimonies) be created only once for a family and updated when needed, or it can be created multiple times per family.
-- Should there be a full management(CRUD) for the following entities: 
-  - Alimonies
-  - CourtCases
-  - Custodies
-  - Families
-  - SchoolReports
-  - Schools
-  - VisitationLocations
-  - VisitationSchedules
-- Should visitations and alimonies be generated in advance or just one at a time.
-- Should Notifications be only for parents, or courts and court staff can also get notifications.
 - Should there be multiple school accounts under the main school account just like court admin account that can create court staff accounts.
-- Ensure the system and background jobs stops processing old and closed cases, and their associated entities.
-- Problem in time in the system because of using UTC.
 
+---
+
+# Father app view
+
+- Visitation Page
+  - Remove visitation cancellation button
+  - Remove attendance 15 min before message
+  - Display only the upcoming visitation, not the whole list
+  - Remove Request new visitation
+  - Remove Custody request outside the visitation page
+
+- Alimonies Page
+  - Remove late alimonies warning(not supported)
+  - Display only the upcoming payment due, not the whole list
+  - Remove payment history page, and display it directly in the alimonies page
+  - List payment history when clicking on the payment due
+
+- Home Page
+  - Display the whole family details, not just the children
+
+- School Reports Page
+  - List reports as downloadable pdf records instead.
+  - Reports should be listed under a specific child for organization.
+
+- Court Case Page
+  - In Custody details section, add button for custody request, and button to see request history
+
+- Add Complaints Page
+  - Display complaints history
+
+- Account Page
+  - Edit profile is directly without requests, and is only for: Email, Address, Phone, and Job
+  - Remove complaints button
+
+# Mother app view
+
+- Everything is the same as father app view with some changes
+  - Alimony Page 
+    - Withdraw paid alimonies instead of paying
+    - Provide a button for onboarding to provide bank details to withdraw money when it's not configured yet.
+
+# School web view
+
+- Login Page
+  - Login using username and password
+- Home Page
+  - List children in the school
+- Child detail Page
+  - List uploaded reports history
+  - Provide the ability to upload report
+- Account Page
+  - Only update contact info: Email and phone number

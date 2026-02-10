@@ -9,7 +9,6 @@ public sealed class CreateVisitationScheduleCommandValidator : AbstractValidator
     public CreateVisitationScheduleCommandValidator()
     {
         RuleFor(x => x.CourtCaseId).NotEmpty();
-        RuleFor(x => x.ParentId).NotEmpty();
         RuleFor(x => x.LocationId).NotEmpty();
         RuleFor(x => x.StartDate).NotEmpty();
         RuleFor(x => x.EndDate).NotEmpty();

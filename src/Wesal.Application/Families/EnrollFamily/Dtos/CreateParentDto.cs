@@ -5,7 +5,7 @@ public record struct CreateParentDto(
     string FullName,
     DateOnly BirthDate,
     string Gender,
+    string Address,
+    string Phone,
     string? Job,
-    string? Address,
-    string? Phone,
     string? Email);

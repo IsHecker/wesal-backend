@@ -41,7 +41,7 @@ public sealed class ObligationAlert : Entity
             ViolationType = violationType,
             Description = description,
             Status = status,
-            TriggeredAt = DateTime.UtcNow,
+            TriggeredAt = EgyptTime.Now,
             ResolvedAt = null,
             ResolutionNotes = null,
         };
@@ -57,7 +57,7 @@ public sealed class ObligationAlert : Entity
         return status switch
         {
             AlertStatus.UnderReview => MarkAsUnderReview(),
-            AlertStatus.Resolved => MarkAsResolved(resolutionNotes!, DateTime.UtcNow),
+            AlertStatus.Resolved => MarkAsResolved(resolutionNotes!, EgyptTime.Now),
             _ => ObligationAlertErrors.CannotUpdateStatus(status)
         };
     }

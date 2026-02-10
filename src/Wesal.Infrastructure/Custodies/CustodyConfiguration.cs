@@ -23,7 +23,12 @@ internal sealed class CustodyConfiguration : IEntityTypeConfiguration<Custody>
 
         builder.HasOne<Parent>()
             .WithMany()
-            .HasForeignKey(custody => custody.CustodianId)
+            .HasForeignKey(custody => custody.CustodialParentId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne<Parent>()
+            .WithMany()
+            .HasForeignKey(custody => custody.NonCustodialParentId)
             .OnDelete(DeleteBehavior.NoAction);
     }
 }

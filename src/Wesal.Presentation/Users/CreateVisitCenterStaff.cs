@@ -21,14 +21,12 @@ internal sealed class CreateVisitCenterStaff : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var command = new CreateVisitCenterStaffCommand(
+            var result = await sender.Send(new CreateVisitCenterStaffCommand(
                 user.GetCourtId(),
                 request.LocationId,
                 request.Email,
                 request.FullName,
-                request.Phone);
-
-            var result = await sender.Send(command);
+                request.Phone));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

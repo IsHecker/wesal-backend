@@ -7,10 +7,10 @@ public static class CustodyErrors
     public static Error NotFound(Guid id) =>
         Error.NotFound("Custody.NotFound", $"Custody with ID '{id}' was not found");
 
-    public static Error NotFoundForFamily(Guid familyId) =>
+    public static Error NotFoundForCourtCase(Guid caseId) =>
         Error.NotFound(
             "Custody.NotFoundForFamily",
-            $"No custody decision found for family with ID '{familyId}'");
+            $"No custody decision found for court case with ID '{caseId}'");
 
     public static Error AlreadyExists(Guid courtCaseId) =>
         Error.Conflict("Custody.AlreadyExists", $"Custody already exists for court case '{courtCaseId}'");

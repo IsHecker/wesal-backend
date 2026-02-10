@@ -29,17 +29,6 @@ internal sealed class RemoveChildCommandHandler(
         if (child.FamilyId != request.FamilyId)
             return ChildErrors.NotBelongsToFamily;
 
-        // TODO: Block if child has an active school link ---
-        // var hasSchoolLink = await schoolRepository
-        //     .ExistsByChildIdAsync(request.ChildId, cancellationToken);
-
-        // TODO: Block if child is referenced in any custody decision ---
-        // var hasCustodyLink = await custodyRepository
-        //     .ExistsByChildIdAsync(request.ChildId, cancellationToken);
-
-        // if (hasSchoolLink || hasCustodyLink)
-        //     return ChildErrors.HasSchoolOrCustodyLinks;
-
         childRepository.Delete(child);
 
         return Result.Success;

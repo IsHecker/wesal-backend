@@ -23,7 +23,6 @@ internal sealed class CreateVisitationSchedule : IEndpoint
             var result = await sender.Send(new CreateVisitationScheduleCommand(
                 user.GetCourtId(),
                 request.CourtCaseId,
-                request.ParentId,
                 request.LocationId,
                 request.Frequency,
                 request.StartDate,
@@ -43,7 +42,6 @@ internal sealed class CreateVisitationSchedule : IEndpoint
 
     internal sealed record Request(
         Guid CourtCaseId,
-        Guid ParentId,
         Guid LocationId,
         string Frequency,
         DateOnly StartDate,

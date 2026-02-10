@@ -1,6 +1,6 @@
 using FluentValidation;
-using Wesal.Application.Extensions;
 using Wesal.Application.Families.EnrollFamily.Dtos;
+using Wesal.Domain.Common;
 
 namespace Wesal.Application.Families.EnrollFamily.Validators;
 
@@ -19,7 +19,7 @@ internal sealed class CreateChildDtoValidator : AbstractValidator<CreateChildDto
         RuleFor(x => x.BirthDate)
             .NotEmpty()
             .WithMessage("Child birth date is required")
-            .LessThan(DateTime.UtcNow.ToDateOnly())
+            .LessThan(EgyptTime.Today)
             .WithMessage("Child birth date must be in the past");
 
         RuleFor(x => x.Gender)

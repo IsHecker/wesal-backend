@@ -1,6 +1,4 @@
 using FluentValidation;
-using Wesal.Application.Extensions;
-using Wesal.Domain.Entities.CourtCases;
 
 namespace Wesal.Application.CourtCases.CreateCourtCase;
 

@@ -18,7 +18,7 @@ internal sealed class UpdateVisitationLocationCommandHandler(
             return VisitationLocationErrors.NotFound(request.LocationId);
 
         if (location.CourtId != request.CourtId)
-            return VisitationLocationErrors.Unauthorized();
+            return VisitationLocationErrors.Unauthorized;
 
         location.Update(
             request.Name,
@@ -28,6 +28,8 @@ internal sealed class UpdateVisitationLocationCommandHandler(
             request.MaxConcurrentVisits,
             request.OpeningTime,
             request.ClosingTime);
+
+        visitLocationRepository.Update(location);
 
         return Result.Success;
     }

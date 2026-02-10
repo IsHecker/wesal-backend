@@ -26,6 +26,7 @@ using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitationSchedules;
 using Wesal.Domain.Entities.VisitCenterStaffs;
 using Wesal.Infrastructure.Extensions;
+using Wesal.Infrastructure.PaymentGateway.ProcessedStripeEvents;
 
 namespace Wesal.Infrastructure.Database;
 
@@ -56,6 +57,7 @@ internal sealed class WesalDbContext(DbContextOptions<WesalDbContext> options)
    public DbSet<Notification> Notifications { get; init; }
    public DbSet<Document> Documents { get; init; }
    public DbSet<UserDevice> UserDevices { get; init; }
+   public DbSet<ProcessedStripeEvent> ProcessedStripeEvents { get; init; }
 
    protected override void OnModelCreating(ModelBuilder modelBuilder)
    {

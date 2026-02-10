@@ -1,4 +1,6 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
+using Wesal.Domain.Results;
 
 namespace Wesal.Domain.Entities.CourtCases;
 
@@ -12,6 +14,8 @@ public sealed class CourtCase : Entity
     public DateTime FiledAt { get; private set; }
     public CourtCaseStatus Status { get; private set; }
     public string DecisionSummary { get; private set; } = null!;
+    public string? ClosureNotes { get; private set; }
+    public DateTime? ClosedAt { get; private set; }
 
     private CourtCase() { }
 
@@ -28,9 +32,21 @@ public sealed class CourtCase : Entity
             FamilyId = familyId,
             DocumentId = documentId,
             CaseNumber = caseNumber,
-            Status = CourtCaseStatus.Active,
+            Status = CourtCaseStatus.Open,
             DecisionSummary = decisionSummary,
-            FiledAt = DateTime.UtcNow,
+            FiledAt = EgyptTime.Now,
         };
+    }
+
+    public Result Close(string closureNotes)
+    {
+        if (Status == CourtCaseStatus.Closed)
+            return CourtCaseErrors.AlreadyClosed;
+
+        Status = CourtCaseStatus.Closed;
+        ClosureNotes = closureNotes;
+        ClosedAt = EgyptTime.Now;
+
+        return Result.Success;
     }
 }

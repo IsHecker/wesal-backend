@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Authentication;
-using Wesal.Application.Custodies.CreateCustody;
 using Wesal.Application.Custodies.UpdateCustody;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -25,7 +24,7 @@ internal sealed class UpdateCustody : IEndpoint
             var result = await sender.Send(new UpdateCustodyCommand(
                 user.GetCourtId(),
                 custodyId,
-                request.NewCustodianId,
+                request.NewCustodialParentId,
                 request.StartAt,
                 request.EndAt));
 
@@ -40,7 +39,7 @@ internal sealed class UpdateCustody : IEndpoint
     }
 
     internal record struct Request(
-        Guid NewCustodianId,
+        Guid NewCustodialParentId,
         DateTime StartAt,
         DateTime? EndAt);
 }
