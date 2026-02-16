@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Authentication;
-using Wesal.Application.Families.GetFamilyByParent;
+using Wesal.Application.Families.ListFamiliesByParent;
 using Wesal.Contracts.Families;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -12,13 +12,13 @@ using Wesal.Presentation.Extensions;
 
 namespace Wesal.Presentation.Families;
 
-internal sealed class GetFamilyByParent : IEndpoint
+internal sealed class ListFamiliesByParent : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Families.GetByParent, async (ClaimsPrincipal user, ISender sender) =>
         {
-            var result = await sender.Send(new GetFamilyByParentQuery(user.GetRoleId()));
+            var result = await sender.Send(new ListFamiliesByParentQuery(user.GetRoleId()));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
@@ -26,7 +26,7 @@ internal sealed class GetFamilyByParent : IEndpoint
         .Produces<IEnumerable<FamilyResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status403Forbidden)
-        .WithOpenApiName(nameof(GetFamilyByParent))
+        .WithOpenApiName(nameof(ListFamiliesByParent))
         .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 }

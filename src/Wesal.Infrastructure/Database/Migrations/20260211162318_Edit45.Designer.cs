@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Wesal.Infrastructure.Database;
 
@@ -11,9 +12,11 @@ using Wesal.Infrastructure.Database;
 namespace Wesal.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(WesalDbContext))]
-    partial class WesalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260211162318_Edit45")]
+    partial class Edit45
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,7 +37,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("FamilyId");
 
-                    b.ToTable("FamilyChild", (string)null);
+                    b.ToTable("FamilyChild");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Alimonies.Alimony", b =>
@@ -97,7 +100,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Alimonies", (string)null);
+                    b.ToTable("Alimonies");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Children.Child", b =>
@@ -135,7 +138,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("SchoolId");
 
-                    b.ToTable("Children", (string)null);
+                    b.ToTable("Children");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Complaints.Complaint", b =>
@@ -188,7 +191,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("ReporterId");
 
-                    b.ToTable("Complaints", (string)null);
+                    b.ToTable("Complaints");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Compliances.ComplianceMetric", b =>
@@ -247,7 +250,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("Date", "FamilyId", "ParentId")
                         .IsUnique();
 
-                    b.ToTable("ComplianceMetrics", (string)null);
+                    b.ToTable("ComplianceMetrics");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.CourtCases.CourtCase", b =>
@@ -300,7 +303,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("FamilyId");
 
-                    b.ToTable("CourtCases", (string)null);
+                    b.ToTable("CourtCases");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.CourtStaffs.CourtStaff", b =>
@@ -343,7 +346,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("CourtStaffs", (string)null);
+                    b.ToTable("CourtStaffs");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Custodies.Custody", b =>
@@ -387,7 +390,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("NonCustodialParentId");
 
-                    b.ToTable("Custodies", (string)null);
+                    b.ToTable("Custodies");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.CustodyRequests.CustodyRequest", b =>
@@ -444,7 +447,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("CustodyRequests", (string)null);
+                    b.ToTable("CustodyRequests");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Documents.Document", b =>
@@ -496,7 +499,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("UploadedBy");
 
-                    b.ToTable("Documents", (string)null);
+                    b.ToTable("Documents");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Families.Family", b =>
@@ -527,7 +530,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("MotherId")
                         .IsUnique();
 
-                    b.ToTable("Families", (string)null);
+                    b.ToTable("Families");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.FamilyCourts.FamilyCourt", b =>
@@ -573,7 +576,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("FamilyCourts", (string)null);
+                    b.ToTable("FamilyCourts");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Notifications.Notification", b =>
@@ -617,7 +620,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("RecipientId");
 
-                    b.ToTable("Notifications", (string)null);
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.ObligationAlerts.ObligationAlert", b =>
@@ -668,7 +671,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.ToTable("ObligationAlerts", (string)null);
+                    b.ToTable("ObligationAlerts");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Parents.Parent", b =>
@@ -747,7 +750,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Parents", (string)null);
+                    b.ToTable("Parents");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Payments.Payment", b =>
@@ -786,7 +789,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("PaymentDueId");
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.PaymentsDue.PaymentDue", b =>
@@ -842,7 +845,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsUnique()
                         .HasFilter("[PaymentId] IS NOT NULL");
 
-                    b.ToTable("PaymentsDue", (string)null);
+                    b.ToTable("PaymentsDue");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.SchoolReports.SchoolReport", b =>
@@ -884,7 +887,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("SchoolId")
                         .IsUnique();
 
-                    b.ToTable("SchoolReports", (string)null);
+                    b.ToTable("SchoolReports");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Schools.School", b =>
@@ -933,7 +936,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Schools", (string)null);
+                    b.ToTable("Schools");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.SystemAdmins.SystemAdmin", b =>
@@ -967,7 +970,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("SystemAdmin", (string)null);
+                    b.ToTable("SystemAdmin");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.UserDevices.UserDevice", b =>
@@ -1008,7 +1011,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserDevices", (string)null);
+                    b.ToTable("UserDevices");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Users.User", b =>
@@ -1036,7 +1039,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", b =>
@@ -1082,7 +1085,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("VisitCenterStaffs", (string)null);
+                    b.ToTable("VisitCenterStaffs");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.VisitationLocations.VisitationLocation", b =>
@@ -1134,7 +1137,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("Name", "Governorate")
                         .IsUnique();
 
-                    b.ToTable("VisitationLocations", (string)null);
+                    b.ToTable("VisitationLocations");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.VisitationSchedules.VisitationSchedule", b =>
@@ -1211,7 +1214,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("NonCustodialParentId");
 
-                    b.ToTable("VisitationSchedules", (string)null);
+                    b.ToTable("VisitationSchedules");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Visitations.Visitation", b =>
@@ -1283,7 +1286,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("VisitationScheduleId");
 
-                    b.ToTable("Visitations", (string)null);
+                    b.ToTable("Visitations");
                 });
 
             modelBuilder.Entity("Wesal.Infrastructure.PaymentGateway.ProcessedStripeEvents.ProcessedStripeEvent", b =>
@@ -1298,7 +1301,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasIndex("ProcessedAt");
 
-                    b.ToTable("ProcessedStripeEvents", (string)null);
+                    b.ToTable("ProcessedStripeEvents");
                 });
 
             modelBuilder.Entity("FamilyChild", b =>

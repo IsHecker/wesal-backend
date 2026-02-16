@@ -19,7 +19,7 @@ internal sealed class DeleteDocument : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new DeleteDocumentCommand(user.GetRoleId(), documentId));
+            var result = await sender.Send(new DeleteDocumentCommand(user.GetUserId(), documentId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })

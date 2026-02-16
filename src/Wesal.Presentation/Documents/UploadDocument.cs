@@ -20,7 +20,7 @@ internal sealed class UploadDocument : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new UploadDocumentCommand(user.GetRoleId(), request.File));
+            var result = await sender.Send(new UploadDocumentCommand(user.GetUserId(), request.File));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

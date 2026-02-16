@@ -20,7 +20,7 @@ internal sealed class GetDocument : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new GetDocumentQuery(user.GetRoleId(), documentId));
+            var result = await sender.Send(new GetDocumentQuery(user.GetUserId(), documentId));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

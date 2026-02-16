@@ -6,15 +6,15 @@ using Wesal.Contracts.Families;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Results;
 
-namespace Wesal.Application.Families.GetFamilyByParent;
+namespace Wesal.Application.Families.ListFamiliesByParent;
 
-internal sealed class GetFamilyByParentQueryHandler(
+internal sealed class ListFamiliesByParentQueryHandler(
     IParentRepository parentRepository,
     IWesalDbContext context)
-    : IQueryHandler<GetFamilyByParentQuery, IEnumerable<FamilyResponse>>
+    : IQueryHandler<ListFamiliesByParentQuery, IEnumerable<FamilyResponse>>
 {
     public async Task<Result<IEnumerable<FamilyResponse>>> Handle(
-        GetFamilyByParentQuery request,
+        ListFamiliesByParentQuery request,
         CancellationToken cancellationToken)
     {
         var parent = await parentRepository.GetByIdAsync(request.ParentId, cancellationToken);

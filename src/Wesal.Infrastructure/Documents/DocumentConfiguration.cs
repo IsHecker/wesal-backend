@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wesal.Domain.Entities.Documents;
+using Wesal.Domain.Entities.Users;
 
 namespace Wesal.Infrastructure.Documents;
 
@@ -8,16 +9,11 @@ internal sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
 {
     public void Configure(EntityTypeBuilder<Document> builder)
     {
-        builder.ToTable("Documents");
-
         builder.HasKey(document => document.Id);
 
         builder.Property(document => document.FileName)
             .IsRequired()
             .HasMaxLength(255);
-
-        builder.Property(document => document.FileSizeBytes)
-            .IsRequired();
 
         builder.Property(document => document.MimeType)
             .IsRequired()
@@ -31,11 +27,10 @@ internal sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
             .IsRequired()
             .HasMaxLength(1000);
 
-        builder.Property(document => document.UploadedBy)
-            .IsRequired();
-
-        builder.Property(document => document.UploadedAt)
-            .IsRequired();
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(document => document.UploadedBy)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasIndex(document => document.UploadedBy);
         builder.HasIndex(document => document.UploadedAt);
