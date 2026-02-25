@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace Wesal.Application.VisitationLocations.ListVisitationLocations;
+namespace Wesal.Application.VisitationLocations.GetVisitationLocation;
 
 public sealed class ListVisitationLocationsQueryValidator : AbstractValidator<ListVisitationLocationsQuery>
 {

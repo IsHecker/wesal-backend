@@ -9,5 +9,5 @@ public interface IVisitationScheduleRepository : IRepository<VisitationSchedule>
         Guid courtCaseId,
         CancellationToken cancellationToken = default);
 
-    Task<VisitationSchedule> GetByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default);
+    Task<VisitationSchedule?> GetByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default);
 }

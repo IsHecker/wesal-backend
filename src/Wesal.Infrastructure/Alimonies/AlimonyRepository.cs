@@ -15,9 +15,9 @@ internal sealed class AlimonyRepository(WesalDbContext context)
             .AnyAsync(alimony => alimony.CourtCaseId == courtCaseId, cancellationToken);
     }
 
-    public Task<Alimony> GetByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default)
+    public Task<Alimony?> GetByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default)
     {
         return context.Alimonies
-            .FirstAsync(alimony => alimony.CourtCaseId == courtCaseId, cancellationToken);
+            .FirstOrDefaultAsync(alimony => alimony.CourtCaseId == courtCaseId, cancellationToken);
     }
 }

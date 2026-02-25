@@ -7,7 +7,7 @@ using Wesal.Contracts.VisitationLocations;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Results;
 
-namespace Wesal.Application.VisitationLocations.ListVisitationLocations;
+namespace Wesal.Application.VisitationLocations.GetVisitationLocation;
 
 internal sealed class ListVisitationLocationsQueryHandler(
     IWesalDbContext context)

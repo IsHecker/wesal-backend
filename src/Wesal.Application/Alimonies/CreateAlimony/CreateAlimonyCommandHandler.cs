@@ -26,6 +26,8 @@ internal sealed class CreateAlimonyCommandHandler(
             return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
 
         var custody = await custodyRepository.GetByFamilyIdAsync(courtCase.FamilyId, cancellationToken);
+        if (custody is null)
+            return AlimonyErrors.CustodyNotFound;
 
         var alimonyExists = await alimonyRepository.ExistsByCourtCaseIdAsync(request.CourtCaseId, cancellationToken);
         if (alimonyExists)

@@ -34,12 +34,11 @@ internal sealed class RegisterSchool : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
         .WithOpenApiName(nameof(RegisterSchool))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
     internal record struct Request(
         string Name,
         string Address,
-        string Governorate,
         string? ContactNumber);
 }

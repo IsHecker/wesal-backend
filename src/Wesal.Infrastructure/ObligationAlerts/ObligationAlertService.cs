@@ -33,10 +33,11 @@ internal sealed class ObligationAlertService(
         var obligationAlert = ObligationAlert.Create(
             parent.CourtId,
             parent.Id,
+            parent.FullName,
             relatedEntityId,
             violationType,
             hasReachedMaxViolations ? AlertStatus.Pending : AlertStatus.Drafted,
-            $"For Parent '{parent.FullName}': {violationDescription}");
+            violationDescription);
 
         await dbContext.ObligationAlerts.AddAsync(obligationAlert, cancellationToken);
 

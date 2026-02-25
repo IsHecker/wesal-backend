@@ -5,6 +5,6 @@ namespace Wesal.Contracts.Families;
 
 public record struct FamilyResponse(
     Guid FamilyId,
-    ParentProfileResponse Father,
-    ParentProfileResponse Mother,
+    ParentResponse Father,
+    ParentResponse Mother,
     IEnumerable<ChildResponse> Children);

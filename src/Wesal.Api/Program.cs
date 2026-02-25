@@ -28,7 +28,7 @@ internal class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerDocumentation();
 
-        builder.Configuration.AddJsonFile($"secrets.json", true, true);
+        builder.Configuration.AddJsonFile($"secrets.json", true, false);
 
         builder.Services.AddWesal(builder.Configuration);
 

@@ -13,8 +13,8 @@ internal sealed class AlimonyConfiguration : IEntityTypeConfiguration<Alimony>
     public void Configure(EntityTypeBuilder<Alimony> builder)
     {
         builder.HasOne<FamilyCourt>()
-            .WithOne()
-            .HasForeignKey<Alimony>(alimony => alimony.CourtId)
+            .WithMany()
+            .HasForeignKey(alimony => alimony.CourtId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne<CourtCase>()

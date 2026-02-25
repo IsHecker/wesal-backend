@@ -17,7 +17,7 @@ internal sealed class UploadSchoolReport : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapPost(ApiEndpoints.SchoolReports.Upload, async (
-            [FromForm] Request request,
+            Request request,
             ClaimsPrincipal user,
             ISender sender) =>
         {
@@ -35,8 +35,7 @@ internal sealed class UploadSchoolReport : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UploadSchoolReport))
-        .RequireAuthorization(CustomPolicies.SchoolsOnly)
-        .DisableAntiforgery();
+        .RequireAuthorization(CustomPolicies.SchoolsOnly);
     }
 
     internal record struct Request(Guid ChildId, Guid DocumentId, string ReportType);

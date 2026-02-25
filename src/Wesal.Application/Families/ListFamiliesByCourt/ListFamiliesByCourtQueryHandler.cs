@@ -21,11 +21,11 @@ internal sealed class ListFamiliesByCourtQueryHandler(IWesalDbContext context)
             .Include(family => family.Children)
             .Where(family => family.CourtId == request.CourtId);
 
-        var totalCount = await query.CountAsync(cancellationToken);
-
         if (!string.IsNullOrWhiteSpace(request.NationalId))
             query = query.Where(family => family.Father.NationalId == request.NationalId
                 || family.Mother.NationalId == request.NationalId);
+
+        var totalCount = await query.CountAsync(cancellationToken);
 
         return await query
             .OrderByDescending(family => family.CreatedAt)

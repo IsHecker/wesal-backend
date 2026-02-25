@@ -10,8 +10,11 @@ public static class CourtCaseMapper
             courtCase.Id,
             courtCase.CourtId,
             courtCase.FamilyId,
+            courtCase.DocumentId,
             courtCase.CaseNumber,
             courtCase.FiledAt,
             courtCase.Status.ToString(),
-            courtCase.DecisionSummary);
+            courtCase.DecisionSummary,
+            courtCase.ClosureNotes,
+            courtCase.ClosedAt);
 }

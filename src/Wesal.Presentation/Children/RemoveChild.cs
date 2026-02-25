@@ -30,6 +30,6 @@ internal sealed class RemoveChild : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(RemoveChild))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 }

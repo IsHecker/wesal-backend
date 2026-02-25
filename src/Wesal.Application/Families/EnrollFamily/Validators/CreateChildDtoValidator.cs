@@ -36,6 +36,6 @@ internal sealed class CreateChildDtoValidator : AbstractValidator<CreateChildDto
 
     private bool BeValidGender(string gender)
     {
-        return gender is "Male" or "Female";
+        return gender.ToLower() is "male" or "female";
     }
 }

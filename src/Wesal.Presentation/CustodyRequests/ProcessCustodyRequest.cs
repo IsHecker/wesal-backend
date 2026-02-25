@@ -33,7 +33,7 @@ internal sealed class ProcessCustodyRequest : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(ProcessCustodyRequest))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
     internal record struct Request(

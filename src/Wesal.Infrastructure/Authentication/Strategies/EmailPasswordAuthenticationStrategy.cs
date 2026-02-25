@@ -29,21 +29,25 @@ internal sealed class EmailPasswordAuthenticationStrategy(
             UserRole.SystemAdmin => await AuthenticateRoleAsync<SystemAdmin>(
                 credentials,
                 admin => null,
+                admin => admin.FullName,
                 cancellationToken),
 
             UserRole.FamilyCourt => await AuthenticateRoleAsync<FamilyCourt>(
                 credentials,
                 court => court.Id,
+                court => court.Name,
                 cancellationToken),
 
             UserRole.CourtStaff => await AuthenticateRoleAsync<CourtStaff>(
                 credentials,
                 staff => staff.CourtId,
+                staff => staff.FullName,
                 cancellationToken),
 
             UserRole.VisitCenterStaff => await AuthenticateRoleAsync<VisitCenterStaff>(
                 credentials,
                 staff => staff.CourtId,
+                staff => staff.FullName,
                 cancellationToken),
 
             _ => throw new InvalidOperationException()
@@ -55,14 +59,16 @@ internal sealed class EmailPasswordAuthenticationStrategy(
         return await authenticationService.AuthenticateAsync(
             authResult.Value.userId,
             credentials.Password,
+            authResult.Value.username,
             authResult.Value.roleId,
             authResult.Value.courtId,
             cancellationToken: cancellationToken);
     }
 
-    private async Task<Result<(Guid userId, Guid roleId, Guid? courtId)>> AuthenticateRoleAsync<TEntity>(
+    private async Task<Result<(Guid userId, Guid roleId, string username, Guid? courtId)>> AuthenticateRoleAsync<TEntity>(
         EmailPasswordCredentials credentials,
         Func<TEntity, Guid?> courtIdSelector,
+        Func<TEntity, string> usernameSelector,
         CancellationToken cancellationToken) where TEntity : Entity, IHasUserId
     {
         var entity = await dbContext.Set<TEntity>().FirstOrDefaultAsync(
@@ -72,6 +78,6 @@ internal sealed class EmailPasswordAuthenticationStrategy(
         if (entity is null)
             return UserErrors.InvalidCredentials;
 
-        return (entity.UserId, entity.Id, courtIdSelector(entity));
+        return (entity.UserId, entity.Id, usernameSelector(entity), courtIdSelector(entity));
     }
 }

@@ -24,7 +24,7 @@ public sealed class PaymentDue : Entity
     public bool IsNotified { get; private set; }
 
     public bool IsPaid => PaidAt != null && PaymentId != null && Status == PaymentStatus.Paid;
-    public bool IsDueDatePassed => DueDate <= EgyptTime.Today;
+    public bool IsDueDatePassed => DueDate < EgyptTime.Today;
 
     public Alimony Alimony { get; init; } = null!;
 

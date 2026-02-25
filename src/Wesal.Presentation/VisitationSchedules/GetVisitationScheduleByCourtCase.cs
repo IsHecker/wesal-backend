@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -22,7 +23,7 @@ internal sealed class GetVisitationScheduleByCourtCase : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new GetVisitationScheduleByCourtCaseQuery(
-                user.GetRoleId(),
+                user.GetCourtId(),
                 courtCaseId));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -32,6 +33,6 @@ internal sealed class GetVisitationScheduleByCourtCase : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(GetVisitationScheduleByCourtCase))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtAndParents);
     }
 }

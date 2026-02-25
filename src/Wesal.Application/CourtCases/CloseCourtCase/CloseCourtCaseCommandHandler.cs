@@ -33,11 +33,17 @@ internal sealed class CloseCourtCaseCommandHandler(
         var alimony = await alimonyRepository.GetByCourtCaseIdAsync(courtCase.Id, cancellationToken);
         var schedule = await scheduleRepository.GetByCourtCaseIdAsync(courtCase.Id, cancellationToken);
 
-        alimony.Stop();
-        schedule.Stop();
+        if (alimony is not null)
+        {
+            alimony.Stop();
+            alimonyRepository.Update(alimony);
+        }
 
-        alimonyRepository.Update(alimony);
-        scheduleRepository.Update(schedule);
+        if (schedule is not null)
+        {
+            schedule.Stop();
+            scheduleRepository.Update(schedule);
+        }
 
         await visitationRepository.DeleteScheduledByCourtCaseIdAsync(courtCase.Id, cancellationToken);
         await paymentDueRepository.DeleteUnpaidByCourtCaseIdAsync(courtCase.Id, cancellationToken);

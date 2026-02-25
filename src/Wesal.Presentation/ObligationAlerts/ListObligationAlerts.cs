@@ -26,7 +26,7 @@ internal sealed class ListObligationAlerts : IEndpoint
             var result = await sender.Send(new ListObligationAlertsQuery(
                 user.GetCourtId(),
                 query.Status,
-                query.Type,
+                query.ViolationType,
                 pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -35,8 +35,8 @@ internal sealed class ListObligationAlerts : IEndpoint
         .Produces<ObligationAlertsResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithOpenApiName(nameof(ListObligationAlerts))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
-    internal record struct QueryParams(string? Status = null, string? Type = null);
+    internal record struct QueryParams(string? Status = null, string? ViolationType = null);
 }

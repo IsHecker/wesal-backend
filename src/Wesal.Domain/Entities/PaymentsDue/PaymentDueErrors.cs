@@ -12,7 +12,7 @@ public static class PaymentDueErrors
         Error.Validation("PaymentDue.IsAlreadyPaid", $"Payment due is already paid");
 
     public static Error DueDatePassed =>
-        Error.NotFound("PaymentDue.DueDatePassed", $"Due date has passed for this payment");
+        Error.Validation("PaymentDue.DueDatePassed", $"Due date has passed for this payment");
 
     public static Error IsAlready(PaymentStatus status) =>
         Error.Validation(

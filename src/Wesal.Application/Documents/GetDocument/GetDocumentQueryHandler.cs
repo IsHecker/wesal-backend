@@ -21,8 +21,8 @@ internal sealed class GetDocumentQueryHandler(
         if (document is null)
             return DocumentErrors.NotFound(request.DocumentId);
 
-        if (document.UploadedBy != request.UserId)
-            return DocumentErrors.CannotSeeOrModifyDocument;
+        // if (document.UploadedBy != request.UserId)
+        //     return DocumentErrors.CannotSeeOrModifyDocument;
 
         return new DocumentResponse(
             document.Id,

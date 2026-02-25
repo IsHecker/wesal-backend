@@ -8,6 +8,7 @@ public sealed class ObligationAlert : Entity
 {
     public Guid ParentId { get; private set; }
     public Guid CourtId { get; private set; }
+    public string ParentName { get; private set; } = null!;
 
     // ID of the record that caused the alert (e.g., VisitId or PaymentId).
     public Guid RelatedEntityId { get; private set; }
@@ -28,6 +29,7 @@ public sealed class ObligationAlert : Entity
     public static ObligationAlert Create(
         Guid courtId,
         Guid parentId,
+        string parentName,
         Guid relatedEntityId,
         ViolationType violationType,
         AlertStatus status,
@@ -38,6 +40,7 @@ public sealed class ObligationAlert : Entity
             ParentId = parentId,
             RelatedEntityId = relatedEntityId,
             CourtId = courtId,
+            ParentName = parentName,
             ViolationType = violationType,
             Description = description,
             Status = status,

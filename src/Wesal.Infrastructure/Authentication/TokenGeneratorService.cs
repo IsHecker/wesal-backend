@@ -10,7 +10,12 @@ namespace Wesal.Infrastructure.Authentication;
 
 public class TokenGeneratorService(JwtOptions options)
 {
-    public JwtTokenResponse GenerateToken(User user, Guid roleId, Guid? courtId = null, bool? isFather = null)
+    public JwtTokenResponse GenerateToken(
+        User user,
+        string username,
+        Guid roleId,
+        Guid? courtId = null,
+        bool? isFather = null)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -20,6 +25,7 @@ public class TokenGeneratorService(JwtOptions options)
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Name, username),
             new(CustomClaims.RoleId, roleId.ToString()),
             new(CustomClaims.Role, user.Role.ToString()),
             new(CustomClaims.PasswordChangeRequired, user.PasswordChangeRequired.ToString()),
@@ -32,7 +38,7 @@ public class TokenGeneratorService(JwtOptions options)
             claims.Add(new(CustomClaims.CourtId, courtId.Value.ToString()));
 
         if (isFather.HasValue)
-            claims.Add(new(CustomClaims.ParentRole, isFather.Value.ToString()));
+            claims.Add(new(CustomClaims.ParentRole, isFather.Value ? "father" : "mother"));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

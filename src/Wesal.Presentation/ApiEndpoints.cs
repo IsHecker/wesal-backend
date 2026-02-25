@@ -7,7 +7,9 @@ internal static class ApiEndpoints
     private const string AuthenticationBase = $"{ApiBase}/auth";
     private const string UsersBase = $"{ApiBase}/users";
     private const string CourtsBase = $"{ApiBase}/courts";
+    private const string CourtStaffsBase = $"{ApiBase}/court-staffs";
     private const string ParentsBase = $"{ApiBase}/parents";
+    private const string VisitCenterStaffsBase = $"{ApiBase}/visit-center-staffs";
     private const string SchoolsBase = $"{ApiBase}/schools";
     private const string SchoolReportsBase = $"{ApiBase}/school-reports";
     private const string FamiliesBase = $"{ApiBase}/families";
@@ -31,10 +33,16 @@ internal static class ApiEndpoints
         public const string Me = $"{CourtsBase}/me";
     }
 
+    internal static class CourtStaffs
+    {
+        public const string GetById = $"{CourtStaffsBase}/me";
+    }
+
     internal static class Parents
     {
-        public const string Profile = $"{ParentsBase}/me";
-        public const string UpdateProfile = $"{ParentsBase}/{{parentId:guid}}";
+        public const string GetById = $"{ParentsBase}/{{parentId:guid}}";
+        public const string GetProfile = $"{ParentsBase}/me";
+        public const string UpdateProfile = GetById;
     }
 
     internal static class Families
@@ -55,9 +63,10 @@ internal static class ApiEndpoints
 
     internal static class Schools
     {
-        public const string GetById = $"{SchoolsBase}/{{schoolId:guid}}";
+        public const string GetProfile = $"{SchoolsBase}/me";
         public const string List = SchoolsBase;
         public const string Register = SchoolsBase;
+        public const string UpdateProfile = $"{SchoolsBase}/{{schoolId:guid}}";
     }
 
     internal static class SchoolReports
@@ -70,8 +79,8 @@ internal static class ApiEndpoints
     {
         public const string GetById = $"{CourtCasesBase}/{{courtCaseId:guid}}";
         public const string Create = CourtCasesBase;
-        public const string Close = $"{CourtCasesBase}/close";
-        public const string ListByFamily = $"{CourtCasesBase}/{{familyId:guid}}";
+        public const string Close = $"{GetById}/close";
+        public const string ListByFamily = $"{Families.GetById}/court-cases";
     }
 
     internal static class Custodies
@@ -111,9 +120,9 @@ internal static class ApiEndpoints
 
     internal static class VisitationLocations
     {
+        public const string GetById = $"{visitationLocationsBase}/{{locationId:guid}}";
         public const string List = visitationLocationsBase;
         public const string Create = visitationLocationsBase;
-        public const string GetById = $"{visitationLocationsBase}/{{locationId:guid}}";
         public const string Update = GetById;
         public const string Delete = GetById;
     }
@@ -130,7 +139,7 @@ internal static class ApiEndpoints
     internal static class PaymentsDue
     {
         public const string GetById = $"{PaymentsDueBase}/{{paymentDueId:guid}}";
-        public const string ListByFamily = $"{Families.GetById}/payments-due";
+        public const string ListByFamily = $"{Alimonies.GetById}/payments-due";
 
         public const string InitiateAlimonyPayment = $"{GetById}/payments";
         public const string Withdraw = $"{GetById}/withdraw";
@@ -167,6 +176,7 @@ internal static class ApiEndpoints
     internal static class Complaints
     {
         public const string ListByCourt = $"{Courts.Me}/complaints";
+        public const string ListByFamily = $"{Families.GetById}/complaints";
         public const string UpdateStatus = $"{ComplaintsBase}/{{complaintId:guid}}/status";
         public const string Create = ComplaintsBase;
     }
@@ -182,6 +192,11 @@ internal static class ApiEndpoints
         public const string Upload = DocumentsBase;
         public const string GetById = $"{DocumentsBase}/{{documentId:guid}}";
         public const string Delete = GetById;
+    }
+
+    internal static class VisitCenterStaffs
+    {
+        public const string GetProfile = $"{VisitCenterStaffsBase}/me";
     }
 
     public static class Auth

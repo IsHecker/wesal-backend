@@ -1,11 +1,11 @@
 using System.Security.Claims;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.CustodyRequests.ListCustodyRequests;
 using Wesal.Application.Data;
-using Wesal.Contracts.Common;
 using Wesal.Contracts.CustodyRequests;
 using Wesal.Domain.Entities.Users;
 using Wesal.Presentation.EndpointResults;
@@ -26,7 +26,8 @@ internal sealed class ListCustodyRequests : IEndpoint
         {
             var result = await sender.Send(new ListCustodyRequestsQuery(
                 user.GetRoleId(),
-                UserRole.CourtStaff,
+                user.GetCourtId(),
+                user.GetRole(),
                 query.FamilyId,
                 query.Status,
                 pagination));
@@ -34,8 +35,12 @@ internal sealed class ListCustodyRequests : IEndpoint
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
         .WithTags(Tags.CustodyRequests)
-        .Produces<PagedResponse<CustodyRequestResponse>>(StatusCodes.Status200OK)
-        .WithOpenApiName(nameof(ListCustodyRequests));
+        .Produces<CustodyRequestsResponse>(StatusCodes.Status200OK)
+        .WithOpenApiName(nameof(ListCustodyRequests))
+        .RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = $"{UserRole.FamilyCourt},{UserRole.CourtStaff},{UserRole.Parent}"
+        });
     }
 
     internal record struct QueryParams(Guid? FamilyId = null, string? Status = null);

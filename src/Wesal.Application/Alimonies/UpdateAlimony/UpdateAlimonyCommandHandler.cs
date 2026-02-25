@@ -9,6 +9,7 @@ using Wesal.Domain.Results;
 
 internal sealed class UpdateAlimonyCommandHandler(
     IAlimonyRepository alimonyRepository,
+    IPaymentDueRepository paymentDueRepository,
     ICourtCaseRepository courtCaseRepository)
     : ICommandHandler<UpdateAlimonyCommand>
 {
@@ -35,6 +36,8 @@ internal sealed class UpdateAlimonyCommandHandler(
             request.EndDate);
 
         alimonyRepository.Update(alimony);
+
+        await paymentDueRepository.DeleteUnpaidByCourtCaseIdAsync(courtCase.Id, cancellationToken);
 
         return Result.Success;
     }

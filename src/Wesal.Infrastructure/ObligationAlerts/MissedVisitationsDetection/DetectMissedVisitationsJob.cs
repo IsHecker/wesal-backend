@@ -73,28 +73,27 @@ internal sealed class DetectMissedVisitationsJob(
             return (
                 [custodialId],
                 ViolationType.MissedVisit,
-                $@"Neither party attended the scheduled visitation on {visitation.StartAt}.");
+                $"Neither party attended the scheduled visitation on {visitation.StartAt}.");
 
         // Only companion missed the visit
         if (!visitation.IsCompanionCheckedIn)
             return (
                 [custodialId],
                 ViolationType.MissedVisit,
-                $@"Children were not delivered for the visitation scheduled on {visitation.StartAt}.");
+                $"Children were not delivered for the visitation scheduled on {visitation.StartAt}.");
 
         // Only custodial parent missed the visit
         if (!visitation.IsNonCustodialCheckedIn)
             return (
                 [nonCustodialId],
                 ViolationType.MissedVisit,
-                $@"Did not attend the visitation scheduled on {visitation.StartAt}.");
+                $"Non-custodial parent did not attend the visitation scheduled on {visitation.StartAt}.");
 
         // Both checked in but overstayed
         return (
             [custodialId, nonCustodialId],
             ViolationType.OverstayedVisit,
-            $@"Failed to end the visitation on time. 
-            The visit scheduled to end at {visitation.EndAt} exceeded the allowed grace period.");
+            $"Failed to end the visitation on time. The visitation scheduled to end at {visitation.EndAt} was not properly concluded within the allowed grace period.");
     }
 
     private async Task RecordVisitationMissedAsync(Visitation visitation, CancellationToken cancellationToken)
@@ -109,5 +108,5 @@ internal sealed class DetectMissedVisitationsJob(
     }
 
     private Expression<Func<Visitation, bool>> IsMissed =>
-        visit => EgyptTime.Now >= visit.EndAt.AddMinutes(visitationOptions.CheckOutGracePeriodMinutes);
+        visit => EgyptTime.Now > visit.StartAt.AddMinutes(visitationOptions.CheckInGracePeriodMinutes);
 }

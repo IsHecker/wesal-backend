@@ -39,6 +39,8 @@ internal sealed class ListSchoolReportsByChildQueryHandler(
             .Select(report => new SchoolReportResponse(
                 report.Id,
                 report.ChildId,
+                report.SchoolId,
+                report.DocumentId,
                 report.ReportType.ToString(),
                 report.UploadedAt))
             .ToPagedResponseAsync(request.Pagination, totalCount);

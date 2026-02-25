@@ -4,6 +4,7 @@ public static class Tags
 {
     public const string Users = nameof(Users);
     public const string Authentication = nameof(Authentication);
+    public const string CourtStaffs = nameof(CourtStaffs);
     public const string Parents = nameof(Parents);
     public const string Children = nameof(Children);
     public const string Schools = nameof(Schools);

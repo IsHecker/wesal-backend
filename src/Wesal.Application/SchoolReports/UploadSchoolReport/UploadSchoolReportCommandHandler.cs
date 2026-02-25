@@ -4,6 +4,7 @@ using Wesal.Application.Data;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Children;
+using Wesal.Domain.Entities.Documents;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.SchoolReports;
@@ -13,6 +14,7 @@ namespace Wesal.Application.SchoolReports.UploadSchoolReport;
 
 internal sealed class UploadSchoolReportCommandHandler(
     IChildRepository childRepository,
+    IRepository<Document> documentRepository,
     IRepository<SchoolReport> schoolReportRepository,
     INotificationService notificationService,
     IFamilyRepository familyRepository)
@@ -28,6 +30,10 @@ internal sealed class UploadSchoolReportCommandHandler(
 
         if (child.SchoolId != request.SchooldId)
             return SchoolReportErrors.ChildNotInSchool();
+
+        var isDocumentExist = await documentRepository.ExistsAsync(request.DocumentId, cancellationToken);
+        if (!isDocumentExist)
+            return DocumentErrors.NotFound(request.DocumentId);
 
         var family = await familyRepository.GetByIdAsync(child.FamilyId, cancellationToken);
 

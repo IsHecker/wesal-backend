@@ -30,13 +30,7 @@ internal sealed class ListSchoolsQueryHandler(
 
         return await query
             .Paginate(request.Pagination)
-            .Select(school => new SchoolResponse(
-                school.Id,
-                school.Name,
-                school.Address,
-                school.Governorate,
-                school.Email,
-                school.ContactNumber))
+            .Select(school => school.ToResponse())
             .ToPagedResponseAsync(request.Pagination, totalCount);
     }
 

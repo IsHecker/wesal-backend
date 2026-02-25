@@ -23,7 +23,7 @@ internal sealed class EnrollFamily : IEndpoint
             ISender sender) =>
         {
             var result = await sender.Send(new EnrollFamilyCommand(
-                user.GetRoleId(),
+                user.GetCourtId(),
                 request.Father.ToDto(),
                 request.Mother.ToDto(),
                 request.Children?.Select(c => c.ToDto())));
@@ -35,7 +35,7 @@ internal sealed class EnrollFamily : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
         .WithOpenApiName(nameof(EnrollFamily))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
     internal readonly record struct Request(
@@ -57,7 +57,6 @@ internal sealed class EnrollFamily : IEndpoint
             NationalId,
             FullName,
             BirthDate,
-            Gender,
             Address,
             Phone,
             Job,

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Authentication;
 using Wesal.Application.Data;
-using Wesal.Application.VisitationLocations.ListVisitationLocations;
+using Wesal.Application.VisitationLocations.GetVisitationLocation;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.VisitationLocations;
 using Wesal.Presentation.EndpointResults;

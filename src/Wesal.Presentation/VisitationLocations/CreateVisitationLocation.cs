@@ -22,9 +22,9 @@ internal sealed class CreateVisitationLocation : IEndpoint
         {
             var result = await sender.Send(new CreateVisitationLocationCommand(
                 user.GetRoleId(),
+                user.GetCourtId(),
                 request.Name,
                 request.Address,
-                request.Governorate,
                 request.ContactNumber,
                 request.MaxConcurrentVisits,
                 request.OpeningTime,
@@ -43,7 +43,6 @@ internal sealed class CreateVisitationLocation : IEndpoint
     internal sealed record Request(
         string Name,
         string Address,
-        string Governorate,
         string? ContactNumber,
         int MaxConcurrentVisits,
         TimeOnly OpeningTime,

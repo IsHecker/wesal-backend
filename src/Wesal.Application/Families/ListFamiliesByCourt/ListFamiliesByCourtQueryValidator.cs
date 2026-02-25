@@ -14,6 +14,7 @@ public sealed class ListFamiliesByCourtQueryValidator : AbstractValidator<ListFa
             .Length(14)
             .WithMessage($"National ID must equal 14 characters")
             .Matches(@"^[0-9]+$")
-            .WithMessage($"National ID must contain only digits");
+            .WithMessage($"National ID must contain only digits")
+            .When(x => !string.IsNullOrWhiteSpace(x.NationalId));
     }
 }

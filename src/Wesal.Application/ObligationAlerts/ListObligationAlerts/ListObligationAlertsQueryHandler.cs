@@ -19,6 +19,10 @@ internal sealed class ListObligationAlertsQueryHandler(IWesalDbContext context)
         alerts = context.ObligationAlerts
             .Where(alert => alert.CourtId == request.CourtId && alert.Status != AlertStatus.Drafted);
 
+        var pendingCount = alerts.Count(a => a.Status == AlertStatus.Pending);
+        var underReviewCount = alerts.Count(a => a.Status == AlertStatus.UnderReview);
+        var resolvedCount = alerts.Count(a => a.Status == AlertStatus.Resolved);
+
         if (!string.IsNullOrWhiteSpace(request.Status))
             alerts = alerts.Where(a => a.Status == request.Status.ToEnum<AlertStatus>());
 
@@ -26,9 +30,6 @@ internal sealed class ListObligationAlertsQueryHandler(IWesalDbContext context)
             alerts = alerts.Where(a => a.ViolationType == request.ViolationType.ToEnum<ViolationType>());
 
         var totalCount = alerts.Count();
-        var pendingCount = alerts.Count(a => a.Status == AlertStatus.Pending);
-        var underReviewCount = alerts.Count(a => a.Status == AlertStatus.UnderReview);
-        var resolvedCount = alerts.Count(a => a.Status == AlertStatus.Resolved);
 
         var pagedAlerts = await alerts
             .OrderByDescending(a => a.TriggeredAt)
@@ -38,6 +39,7 @@ internal sealed class ListObligationAlertsQueryHandler(IWesalDbContext context)
                 alert.CourtId,
                 alert.ParentId,
                 alert.RelatedEntityId,
+                alert.ParentName,
                 alert.ViolationType.ToString(),
                 alert.Description,
                 alert.TriggeredAt,

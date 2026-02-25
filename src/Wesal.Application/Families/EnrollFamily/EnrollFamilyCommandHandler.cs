@@ -13,10 +13,8 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Families.EnrollFamily;
 
 internal sealed class EnrollFamilyCommandHandler(
-    ICourtStaffRepository staffRepository,
     IParentRepository parentRepository,
     IFamilyRepository familyRepository,
-    IChildRepository childRepository,
     IUserService userService,
     IStripeGateway stripeGateway) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
 {
@@ -24,10 +22,6 @@ internal sealed class EnrollFamilyCommandHandler(
         EnrollFamilyCommand request,
         CancellationToken cancellationToken)
     {
-        var staff = await staffRepository.GetByIdAsync(request.StaffId, cancellationToken);
-        if (staff is null)
-            return UserErrors.NotFound(request.StaffId);
-
         if (await parentRepository.ExistsByNationalIdAsync(request.Mother.NationalId, cancellationToken))
             return FamilyErrors.ParentAlreadyExists(request.Mother.NationalId);
 
@@ -36,12 +30,12 @@ internal sealed class EnrollFamilyCommandHandler(
 
         var father = Parent.Create(
             fatherUser.User.Id,
-            staff.CourtId,
+            request.CourtId,
             isFather: true,
             request.Father.NationalId,
             request.Father.FullName,
             request.Father.BirthDate,
-            request.Father.Gender,
+            "male",
             request.Father.Address,
             request.Father.Phone,
             request.Father.Job,
@@ -49,18 +43,18 @@ internal sealed class EnrollFamilyCommandHandler(
 
         var mother = Parent.Create(
             motherUser.User.Id,
-            staff.CourtId,
+            request.CourtId,
             isFather: false,
             request.Mother.NationalId,
             request.Mother.FullName,
             request.Mother.BirthDate,
-            request.Mother.Gender,
+            "female",
             request.Mother.Address,
             request.Mother.Phone,
             request.Mother.Job,
             request.Mother.Email);
 
-        var family = Family.Create(staff.CourtId, father.Id, mother.Id);
+        var family = Family.Create(request.CourtId, father.Id, mother.Id);
 
         var fatherCustomerId = await stripeGateway.CreateCustomerAsync(father, cancellationToken);
         var motherCustomerId = await stripeGateway.CreateCustomerAsync(mother, cancellationToken);
@@ -83,7 +77,7 @@ internal sealed class EnrollFamilyCommandHandler(
                 childDto.Gender,
                 childDto.SchoolId);
 
-            await childRepository.AddAsync(child, cancellationToken);
+            family.Children.Add(child);
         }
 
         return new EnrollFamilyResponse(

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.CourtCases.ListCourtCasesByFamily;
 using Wesal.Application.Data;
+using Wesal.Contracts.Common;
 using Wesal.Contracts.CourtCases;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -25,7 +26,7 @@ internal sealed class ListCourtCasesByFamily : IEndpoint
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
         .WithTags(Tags.CourtCases)
-        .Produces<CourtCaseResponse>(StatusCodes.Status200OK)
+        .Produces<PagedResponse<CourtCaseResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(ListCourtCasesByFamily))
         .RequireAuthorization();

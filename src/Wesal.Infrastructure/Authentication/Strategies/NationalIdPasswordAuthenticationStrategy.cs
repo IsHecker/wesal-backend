@@ -26,6 +26,7 @@ internal sealed class NationalIdPasswordAuthenticationStrategy(
         return await authenticationService.AuthenticateAsync(
             parent.UserId,
             credentials.Password,
+            parent.FullName,
             parent.Id,
             parent.CourtId,
             parent.IsFather,

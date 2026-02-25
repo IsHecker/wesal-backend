@@ -82,5 +82,5 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
             || due.Status != PaymentStatus.Paid;
 
     private static readonly Expression<Func<PaymentDue, bool>> IsDueDatePassed =
-        due => due.DueDate <= EgyptTime.Today;
+        due => EgyptTime.Today > due.DueDate;
 }

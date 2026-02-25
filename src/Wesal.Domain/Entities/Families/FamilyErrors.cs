@@ -11,7 +11,7 @@ public static class FamilyErrors
         Error.NotFound("Family.NotFound", $"Family with Parent ID '{parentId}' was not found");
 
     public static Error ParentNotInFamily =>
-        Error.Unauthorized("Family.ParentNotInFamily", $"This parent is not in the current family.");
+        Error.Forbidden("Family.ParentNotInFamily", $"This parent is not in the current family.");
 
     public static Error ParentAlreadyExists(string nationalId) =>
         Error.Conflict(

@@ -7,4 +7,6 @@ internal sealed class StripeOptions
     public string SecretKey { get; init; } = null!;
     public string WebhookSecret { get; init; } = null!;
     public string ConnectWebhookSecret { get; init; } = null!;
+    public bool AllowCustomerCreation { get; init; }
+    public bool AllowAccountCreation { get; init; }
 }

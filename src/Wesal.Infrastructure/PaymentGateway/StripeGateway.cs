@@ -6,7 +6,9 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Infrastructure.PaymentGateway;
 
-internal sealed class StripeGateway(CurrencyConverter currencyConverter) : IStripeGateway
+internal sealed class StripeGateway(
+    CurrencyConverter currencyConverter,
+    StripeOptions stripeOptions) : IStripeGateway
 {
     public async Task<string> CreateCheckoutSessionAsync(
         Parent payerParent,
@@ -54,6 +56,9 @@ internal sealed class StripeGateway(CurrencyConverter currencyConverter) : IStri
 
     public async Task<string> CreateCustomerAsync(Parent parent, CancellationToken cancellationToken = default)
     {
+        if (!stripeOptions.AllowCustomerCreation)
+            return string.Empty;
+
         var customer = await new Stripe.CustomerService().CreateAsync(new Stripe.CustomerCreateOptions
         {
             Name = parent.FullName,
@@ -67,6 +72,9 @@ internal sealed class StripeGateway(CurrencyConverter currencyConverter) : IStri
         Parent parent,
         CancellationToken cancellationToken = default)
     {
+        if (!stripeOptions.AllowAccountCreation)
+            return string.Empty;
+
         var accountOptions = new Stripe.AccountCreateOptions
         {
             Type = "express",

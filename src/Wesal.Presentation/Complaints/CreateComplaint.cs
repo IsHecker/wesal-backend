@@ -22,6 +22,7 @@ internal sealed class CreateComplaint : IEndpoint
         {
             var result = await sender.Send(new CreateComplaintCommand(
                 user.GetRoleId(),
+                request.FamilyId,
                 request.DocumentId,
                 request.Type,
                 request.Description));
@@ -35,5 +36,9 @@ internal sealed class CreateComplaint : IEndpoint
         .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 
-    internal readonly record struct Request(string Type, Guid? DocumentId, string Description);
+    internal readonly record struct Request(
+        Guid FamilyId,
+        string Type,
+        Guid? DocumentId,
+        string Description);
 }

@@ -5,7 +5,7 @@ namespace Wesal.Application.Parents;
 
 public static class ParentMapper
 {
-    public static ParentProfileResponse ToResponse(this Parent parent) =>
+    public static ParentResponse ToResponse(this Parent parent) =>
         new(
             parent.Id,
             parent.FullName,

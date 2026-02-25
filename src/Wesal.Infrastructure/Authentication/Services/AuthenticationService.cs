@@ -14,6 +14,7 @@ internal sealed class AuthenticationService(
     public async Task<Result<JwtTokenResponse>> AuthenticateAsync(
         Guid userId,
         string password,
+        string username,
         Guid roleId,
         Guid? courtId = null,
         bool? isFather = null,
@@ -27,6 +28,6 @@ internal sealed class AuthenticationService(
         if (result == PasswordVerificationResult.Failed)
             return UserErrors.InvalidCredentials;
 
-        return tokenGenerator.GenerateToken(user, roleId, courtId, isFather);
+        return tokenGenerator.GenerateToken(user, username, roleId, courtId, isFather);
     }
 }

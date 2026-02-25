@@ -34,7 +34,7 @@ internal sealed class UpdateObligationAlertStatus : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UpdateObligationAlertStatus))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
     internal readonly record struct Request(string Status, string ResolutionNotes);

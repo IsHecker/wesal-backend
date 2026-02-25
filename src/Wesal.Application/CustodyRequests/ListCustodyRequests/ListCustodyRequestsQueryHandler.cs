@@ -3,9 +3,7 @@ using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
-using Wesal.Contracts.Common;
 using Wesal.Contracts.CustodyRequests;
-using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.CustodyRequests;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Parents;
@@ -15,13 +13,12 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.CustodyRequests.ListCustodyRequests;
 
 internal sealed class ListCustodyRequestsQueryHandler(
-    ICourtStaffRepository courtStaffRepository,
     IFamilyRepository familyRepository,
     IParentRepository parentRepository,
     IWesalDbContext context)
-    : IQueryHandler<ListCustodyRequestsQuery, PagedResponse<CustodyRequestResponse>>
+    : IQueryHandler<ListCustodyRequestsQuery, CustodyRequestsResponse>
 {
-    public async Task<Result<PagedResponse<CustodyRequestResponse>>> Handle(
+    public async Task<Result<CustodyRequestsResponse>> Handle(
         ListCustodyRequestsQuery request,
         CancellationToken cancellationToken)
     {
@@ -29,15 +26,30 @@ internal sealed class ListCustodyRequestsQueryHandler(
         if (queryResult.IsFailure)
             return queryResult.Error;
 
+        var pendingCount = await queryResult.Value.CountAsync(
+            request => request.Status == CustodyRequestStatus.Pending,
+            cancellationToken);
+
+        var approvedCount = await queryResult.Value.CountAsync(
+            request => request.Status == CustodyRequestStatus.Approved,
+            cancellationToken);
+
+        var rejectedCount = await queryResult.Value.CountAsync(
+            request => request.Status == CustodyRequestStatus.Rejected,
+            cancellationToken);
+
         var query = ApplyStatusFilter(queryResult.Value, request.Status);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
-        return await query
+        var pagedRequests = await query
             .OrderByDescending(cr => cr.CreatedAt)
             .Paginate(request.Pagination)
             .Select(request => new CustodyRequestResponse(
                 request.Id,
+                request.FamilyId,
+                request.CourtCaseId,
+                request.CustodyId,
                 request.Family.Father.FullName,
                 request.Family.Mother.FullName,
                 request.StartDate,
@@ -48,32 +60,12 @@ internal sealed class ListCustodyRequestsQueryHandler(
                 request.DecisionNote,
                 request.ProcessedAt))
             .ToPagedResponseAsync(request.Pagination, totalCount);
-    }
 
-    private async Task<Result<IQueryable<CustodyRequest>>> BuildQuery(
-        ListCustodyRequestsQuery request,
-        CancellationToken cancellationToken)
-    {
-        var baseQuery = context.CustodyRequests
-            .Include(cr => cr.Family)
-                .ThenInclude(f => f.Father)
-            .Include(cr => cr.Family)
-                .ThenInclude(f => f.Mother);
-
-        if (request.UserRole == UserRole.CourtStaff)
-        {
-            var staff = await courtStaffRepository.GetByIdAsync(request.UserId, cancellationToken);
-            if (staff is null)
-                return CourtStaffErrors.NotFound(request.UserId);
-
-            return baseQuery.Where(x => x.Family.CourtId == staff.CourtId).ToResult();
-        }
-
-        var parent = await parentRepository.GetByIdAsync(request.UserId, cancellationToken);
-        if (parent is null)
-            return ParentErrors.NotFound(request.UserId);
-
-        return baseQuery.Where(cr => cr.FamilyId == request.UserId).ToResult();
+        return new CustodyRequestsResponse(
+            pagedRequests,
+            pendingCount,
+            approvedCount,
+            rejectedCount);
     }
 
     private static IQueryable<CustodyRequest> ApplyStatusFilter(
@@ -91,32 +83,15 @@ internal sealed class ListCustodyRequestsQueryHandler(
         ListCustodyRequestsQuery request,
         CancellationToken cancellationToken)
     {
-        var baseQuery = GetBaseQuery();
-
-        return request.UserRole == UserRole.CourtStaff
-            ? await BuildCourtStaffQuery(baseQuery, request.UserId, cancellationToken)
-            : await BuildParentQuery(baseQuery, request.UserId, request.FamilyId!.Value, cancellationToken);
-    }
-
-    private IQueryable<CustodyRequest> GetBaseQuery()
-    {
-        return context.CustodyRequests
+        var baseQuery = context.CustodyRequests
             .Include(cr => cr.Family)
                 .ThenInclude(f => f.Father)
             .Include(cr => cr.Family)
                 .ThenInclude(f => f.Mother);
-    }
 
-    private async Task<Result<IQueryable<CustodyRequest>>> BuildCourtStaffQuery(
-        IQueryable<CustodyRequest> baseQuery,
-        Guid userId,
-        CancellationToken cancellationToken)
-    {
-        var staff = await courtStaffRepository.GetByIdAsync(userId, cancellationToken);
-        if (staff is null)
-            return CourtStaffErrors.NotFound(userId);
-
-        return baseQuery.Where(cr => cr.Family.CourtId == staff.CourtId).ToResult();
+        return request.UserRole == UserRole.Parent
+            ? await BuildParentQuery(baseQuery, request.UserId, request.FamilyId!.Value, cancellationToken)
+            : baseQuery.Where(cr => cr.Family.CourtId == request.CourtId).ToResult();
     }
 
     private async Task<Result<IQueryable<CustodyRequest>>> BuildParentQuery(

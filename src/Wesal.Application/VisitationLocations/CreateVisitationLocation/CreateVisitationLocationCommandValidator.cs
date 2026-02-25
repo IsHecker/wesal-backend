@@ -24,12 +24,6 @@ public sealed class CreateVisitationLocationCommandValidator : AbstractValidator
             .MaximumLength(500)
             .WithMessage("Address cannot exceed 500 characters");
 
-        RuleFor(x => x.Governorate)
-            .NotEmpty()
-            .WithMessage("Governorate is required")
-            .MaximumLength(100)
-            .WithMessage("Governorate cannot exceed 100 characters");
-
         RuleFor(x => x.ContactNumber)
             .MaximumLength(20)
             .When(x => !string.IsNullOrWhiteSpace(x.ContactNumber))

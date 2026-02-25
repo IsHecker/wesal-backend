@@ -17,11 +17,11 @@ internal sealed class VisitationScheduleRepository(WesalDbContext context)
             .AnyAsync(schedule => schedule.CourtCaseId == courtCaseId, cancellationToken);
     }
 
-    public Task<VisitationSchedule> GetByCourtCaseIdAsync(
+    public Task<VisitationSchedule?> GetByCourtCaseIdAsync(
         Guid courtCaseId,
         CancellationToken cancellationToken = default)
     {
         return context.VisitationSchedules
-            .FirstAsync(schedule => schedule.CourtCaseId == courtCaseId, cancellationToken);
+            .FirstOrDefaultAsync(schedule => schedule.CourtCaseId == courtCaseId, cancellationToken);
     }
 }

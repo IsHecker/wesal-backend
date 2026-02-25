@@ -34,4 +34,10 @@ public sealed class School : Entity, IHasUserId
             ContactNumber = contactNumber,
         };
     }
+
+    public void UpdateProfile(string? email, string? contactNumber)
+    {
+        Email = email;
+        ContactNumber = contactNumber;
+    }
 }

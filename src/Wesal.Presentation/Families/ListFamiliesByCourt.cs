@@ -35,7 +35,7 @@ internal sealed class ListFamiliesByCourt : IEndpoint
         .Produces<PagedResponse<FamilyResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(ListFamiliesByCourt))
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtManagement);
     }
 
     internal record struct QueryParams(string? NationalId = null);

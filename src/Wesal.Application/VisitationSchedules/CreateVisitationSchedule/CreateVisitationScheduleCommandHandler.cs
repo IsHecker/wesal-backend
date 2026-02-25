@@ -29,6 +29,8 @@ internal sealed class CreateVisitationScheduleCommandHandler(
             return validationResult.Error;
 
         var custody = await custodyRepository.GetByFamilyIdAsync(courtCase.FamilyId, cancellationToken);
+        if (custody is null)
+            return VisitationScheduleErrors.CustodyNotFound;
 
         var custodialParent = await parentRepository.GetByIdAsync(custody!.CustodialParentId, cancellationToken);
         var nonCustodialParent = await parentRepository.GetByIdAsync(custody.NonCustodialParentId, cancellationToken);

@@ -30,7 +30,6 @@ internal sealed class ListPaymentsByPaymentDue : IEndpoint
         .Produces<PagedResponse<PaymentResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(ListPaymentsByPaymentDue))
-        .RequireAuthorization(CustomPolicies.ParentsOnly)
-        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
+        .RequireAuthorization(CustomPolicies.CourtAndParents);
     }
 }

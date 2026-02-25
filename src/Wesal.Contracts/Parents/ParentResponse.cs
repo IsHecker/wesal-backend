@@ -1,6 +1,6 @@
 namespace Wesal.Contracts.Parents;
 
-public record struct ParentProfileResponse(
+public record struct ParentResponse(
     Guid Id,
     string FullName,
     string NationalId,

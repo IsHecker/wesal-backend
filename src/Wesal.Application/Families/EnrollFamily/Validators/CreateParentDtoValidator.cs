@@ -32,12 +32,6 @@ internal sealed class CreateParentDtoValidator : AbstractValidator<CreateParentD
             .Must(BeAtLeast18YearsOld)
             .WithMessage($"must be at least 18 years old");
 
-        RuleFor(x => x.Gender)
-            .NotEmpty()
-            .WithMessage($"gender is required")
-            .Must(BeValidGender)
-            .WithMessage($"gender must be 'Male' or 'Female'");
-
         RuleFor(x => x.Phone)
             .MaximumLength(20)
             .WithMessage($"phone cannot exceed 20 characters")
@@ -73,6 +67,6 @@ internal sealed class CreateParentDtoValidator : AbstractValidator<CreateParentD
 
     private static bool BeValidGender(string gender)
     {
-        return gender is "Male" or "Female";
+        return gender.ToLower() is "male" or "female";
     }
 }

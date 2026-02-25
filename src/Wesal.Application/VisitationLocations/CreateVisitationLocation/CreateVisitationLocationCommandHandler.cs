@@ -1,13 +1,14 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.CourtStaffs;
+using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.VisitationLocations.CreateVisitationLocation;
 
 internal sealed class CreateVisitationLocationCommandHandler(
-    ICourtStaffRepository courtStaffRepository,
+    IFamilyCourtRepository courtRepository,
     IVisitationLocationRepository locationRepository)
     : ICommandHandler<CreateVisitationLocationCommand, Guid>
 {
@@ -15,23 +16,23 @@ internal sealed class CreateVisitationLocationCommandHandler(
         CreateVisitationLocationCommand request,
         CancellationToken cancellationToken)
     {
-        var staff = await courtStaffRepository.GetByIdAsync(request.StaffId, cancellationToken);
-        if (staff is null)
-            return CourtStaffErrors.NotFound(request.StaffId);
+        var court = await courtRepository.GetByIdAsync(request.CourtId, cancellationToken);
+        if (court is null)
+            return FamilyCourtErrors.NotFound(request.CourtId);
 
         var nameExists = await locationRepository.ExistsByNameAndGovernorateAsync(
             request.Name,
-            request.Governorate,
+            court.Governorate,
             cancellationToken);
 
         if (nameExists)
-            return VisitationLocationErrors.AlreadyExists(request.Name, request.Governorate);
+            return VisitationLocationErrors.AlreadyExists(request.Name, court.Governorate);
 
         var location = VisitationLocation.Create(
-            staff.CourtId,
+            court.Id,
             request.Name,
             request.Address,
-            request.Governorate,
+            court.Governorate,
             request.MaxConcurrentVisits,
             request.OpeningTime,
             request.ClosingTime,

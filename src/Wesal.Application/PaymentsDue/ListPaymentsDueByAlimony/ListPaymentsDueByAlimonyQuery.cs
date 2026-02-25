@@ -3,10 +3,10 @@ using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.PaymentsDue;
 
-namespace Wesal.Application.PaymentsDue.ListPaymentsDueByFamily;
+namespace Wesal.Application.PaymentsDue.ListPaymentsDueByAlimony;
 
-public record struct ListPaymentsDueByFamilyQuery(
+public record struct ListPaymentsDueByAlimonyQuery(
     Guid UserId,
     string UserRole,
-    Guid FamilyId,
+    Guid AlimonyId,
     Pagination Pagination) : IQuery<PagedResponse<PaymentDueResponse>>;

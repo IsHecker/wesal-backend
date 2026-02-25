@@ -5,6 +5,7 @@ using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Complaints;
 using Wesal.Domain.Entities.Documents;
+using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
 
@@ -12,6 +13,7 @@ namespace Wesal.Application.Complaints.CreateComplaint;
 
 internal sealed class CreateComplaintCommandHandler(
     IParentRepository parentRepository,
+    IFamilyRepository familyRepository,
     IComplaintRepository complaintRepository,
     IRepository<Document> documentRepository,
     IOptions<ComplaintOptions> complaintOptions)
@@ -27,6 +29,10 @@ internal sealed class CreateComplaintCommandHandler(
         if (parent is null)
             return ParentErrors.NotFound(request.ParentId);
 
+        var isInFamily = await familyRepository.IsParentInFamilyAsync(request.ParentId, request.FamilyId, cancellationToken);
+        if (!isInFamily)
+            return FamilyErrors.ParentNotInFamily;
+
         var count = await complaintRepository.GetMonthCountByParentIdAsync(request.ParentId, cancellationToken);
 
         if (count >= complaintOptions.MaxComplaintsInMonth)
@@ -41,6 +47,7 @@ internal sealed class CreateComplaintCommandHandler(
 
         var complaint = Complaint.Create(
             parent.CourtId,
+            request.FamilyId,
             request.ParentId,
             request.Type.ToEnum<ComplaintType>(),
             request.Description,

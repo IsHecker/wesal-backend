@@ -32,6 +32,7 @@ internal sealed class ListPaymentsByPaymentDueQueryHandler(
             .Paginate(request.Pagination)
             .Select(payment => new PaymentResponse(
                 payment.Id,
+                payment.Status.ToString(),
                 payment.Method.ToString(),
                 payment.ReceiptUrl,
                 payment.PaidAt))

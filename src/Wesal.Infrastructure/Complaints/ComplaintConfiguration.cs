@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wesal.Domain.Entities.Complaints;
 using Wesal.Domain.Entities.Documents;
-using Wesal.Domain.Entities.Parents;
 
 namespace Wesal.Infrastructure.Complaints;
 
@@ -10,7 +9,7 @@ internal sealed class ComplaintConfiguration : IEntityTypeConfiguration<Complain
 {
     public void Configure(EntityTypeBuilder<Complaint> builder)
     {
-        builder.HasOne<Parent>()
+        builder.HasOne(complaint => complaint.Reporter)
             .WithMany()
             .HasForeignKey(complaint => complaint.ReporterId);
 

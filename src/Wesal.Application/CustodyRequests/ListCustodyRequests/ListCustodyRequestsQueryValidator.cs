@@ -18,7 +18,7 @@ public sealed class ListCustodyRequestsQueryValidator : AbstractValidator<ListCu
 
         RuleFor(x => x.FamilyId)
             .NotEmpty()
-            .When(x => x.FamilyId.HasValue && x.UserRole == UserRole.Parent)
+            .When(x => x.UserRole == UserRole.Parent)
             .WithMessage("Family ID is required for parents to view custody requests.");
     }
 }

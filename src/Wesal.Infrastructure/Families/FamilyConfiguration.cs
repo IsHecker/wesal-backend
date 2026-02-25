@@ -20,16 +20,7 @@ internal sealed class FamilyConfiguration : IEntityTypeConfiguration<Family>
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasMany(family => family.Children)
-            .WithMany()
-            .UsingEntity<Dictionary<string, object>>(
-                "FamilyChild",
-                j => j.HasOne<Child>()
-                    .WithMany()
-                    .HasForeignKey("ChildId")
-                    .OnDelete(DeleteBehavior.NoAction),
-                j => j.HasOne<Family>()
-                    .WithMany()
-                    .HasForeignKey("FamilyId")
-                    .OnDelete(DeleteBehavior.NoAction));
+            .WithOne()
+            .HasForeignKey(child => child.FamilyId);
     }
 }

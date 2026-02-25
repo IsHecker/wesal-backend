@@ -28,6 +28,7 @@ internal sealed class UsernamePasswordAuthenticationStrategy(
         return await authenticationService.AuthenticateAsync(
             school.UserId,
             credentials.Password,
+            school.Name,
             school.Id,
             cancellationToken: cancellationToken);
     }

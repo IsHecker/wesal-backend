@@ -5,6 +5,7 @@ using Wesal.Application.Messaging;
 using Wesal.Contracts.Alimonies;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.CourtCases;
+using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Results;
 
@@ -12,6 +13,7 @@ namespace Wesal.Application.Alimonies.GetAlimonyByCourtCase;
 
 internal sealed class GetAlimonyByCourtCaseQueryHandler(
     ICourtCaseRepository courtCaseRepository,
+    IFamilyRepository familyRepository,
     IWesalDbContext dbContext)
     : IQueryHandler<GetAlimonyByCourtCaseQuery, AlimonyResponse>
 {
@@ -31,6 +33,17 @@ internal sealed class GetAlimonyByCourtCaseQueryHandler(
 
         if (alimony is null)
             return AlimonyErrors.NotFound;
+
+        if (request.IsParent)
+        {
+            var isInFamily = await familyRepository.IsParentInFamilyAsync(
+                request.UserId,
+                alimony.FamilyId,
+                cancellationToken);
+
+            if (!isInFamily)
+                return FamilyErrors.ParentNotInFamily;
+        }
 
         return new AlimonyResponse(
             alimony.Id,

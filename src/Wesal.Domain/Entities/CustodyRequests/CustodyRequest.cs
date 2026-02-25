@@ -7,7 +7,7 @@ namespace Wesal.Domain.Entities.CustodyRequests;
 
 public sealed class CustodyRequest : Entity
 {
-    public Guid ParentId { get; private set; }
+    public Guid NonCustodialParentId { get; private set; }
     public Guid FamilyId { get; private set; }
     public Guid CourtCaseId { get; private set; }
     public Guid CustodyId { get; private set; }
@@ -33,7 +33,7 @@ public sealed class CustodyRequest : Entity
     {
         return new CustodyRequest
         {
-            ParentId = parentId,
+            NonCustodialParentId = parentId,
             FamilyId = familyId,
             CourtCaseId = courtCaseId,
             CustodyId = custodyId,

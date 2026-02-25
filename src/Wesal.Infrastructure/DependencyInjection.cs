@@ -311,9 +311,12 @@ public static class DependencyInjection
         services.AddAuthorizationBuilder()
             .AddPolicy(CustomPolicies.SystemAdminOnly, policy => policy.RequireRole(UserRole.SystemAdmin))
             .AddPolicy(CustomPolicies.FamilyCourtAdminOnly, policy => policy.RequireRole(UserRole.FamilyCourt))
-            .AddPolicy(CustomPolicies.CourtStaffOnly, policy => policy.RequireRole(UserRole.CourtStaff))
             .AddPolicy(CustomPolicies.CourtManagement, policy => policy.RequireRole(UserRole.FamilyCourt, UserRole.CourtStaff))
             .AddPolicy(CustomPolicies.ParentsOnly, policy => policy.RequireRole(UserRole.Parent))
+            .AddPolicy(CustomPolicies.CourtAndParents, policy => policy.RequireRole(
+                UserRole.FamilyCourt,
+                UserRole.CourtStaff,
+                UserRole.Parent))
             .AddPolicy(CustomPolicies.SchoolsOnly, policy => policy.RequireRole(UserRole.School))
             .AddPolicy(CustomPolicies.VisitCenterStaffOnly, policy => policy.RequireRole(UserRole.VisitCenterStaff));
 

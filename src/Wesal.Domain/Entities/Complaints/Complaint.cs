@@ -1,5 +1,6 @@
 using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
+using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
 
 namespace Wesal.Domain.Entities.Complaints;
@@ -7,6 +8,7 @@ namespace Wesal.Domain.Entities.Complaints;
 public sealed class Complaint : Entity
 {
     public Guid CourtId { get; private set; }
+    public Guid FamilyId { get; private set; }
     public Guid ReporterId { get; private set; }
     public Guid? DocumentId { get; private set; }
 
@@ -20,10 +22,13 @@ public sealed class Complaint : Entity
 
     public string? ResolutionNotes { get; private set; }
 
+    public Parent Reporter { get; init; } = null!;
+
     private Complaint() { }
 
     public static Complaint Create(
         Guid courtId,
+        Guid familyId,
         Guid reporterId,
         ComplaintType type,
         string description,
@@ -32,6 +37,7 @@ public sealed class Complaint : Entity
         return new Complaint
         {
             CourtId = courtId,
+            FamilyId = familyId,
             ReporterId = reporterId,
             DocumentId = documentId,
             Type = type,

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -8,6 +9,7 @@ using Wesal.Application.Data;
 using Wesal.Application.SchoolReports.ListSchoolReportsByChild;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.SchoolReports;
+using Wesal.Domain.Entities.Users;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -35,6 +37,6 @@ internal sealed class ListSchoolReportsByChild : IEndpoint
         .Produces<PagedResponse<SchoolReportResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(ListSchoolReportsByChild))
-        .RequireAuthorization(CustomPolicies.SchoolsOnly);
+        .RequireAuthorization();
     }
 }
