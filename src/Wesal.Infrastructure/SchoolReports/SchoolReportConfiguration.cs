@@ -12,12 +12,12 @@ internal sealed class SchoolReportConfiguration : IEntityTypeConfiguration<Schoo
     public void Configure(EntityTypeBuilder<SchoolReport> builder)
     {
         builder.HasOne<Child>()
-            .WithOne()
-            .HasForeignKey<SchoolReport>(report => report.ChildId);
+            .WithMany()
+            .HasForeignKey(report => report.ChildId);
 
         builder.HasOne<School>()
-            .WithOne()
-            .HasForeignKey<SchoolReport>(report => report.SchoolId);
+            .WithMany()
+            .HasForeignKey(report => report.SchoolId);
 
         builder.HasOne<Document>()
             .WithOne()

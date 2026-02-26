@@ -77,6 +77,6 @@ internal sealed class ListVisitationsQueryHandler(
             query = query.Where(v => v.StartAt.Date == startAt);
         }
 
-        return query.OrderByDescending(v => v.StartAt);
+        return query.OrderBy(v => v.StartAt);
     }
 }

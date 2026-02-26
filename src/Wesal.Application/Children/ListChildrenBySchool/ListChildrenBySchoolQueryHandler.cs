@@ -25,12 +25,15 @@ internal sealed class ListChildrenBySchoolQueryHandler(
             return SchoolErrors.NotFound(request.SchoolId);
 
         var query = context.Children
-            .Where(c => c.SchoolId == request.SchoolId)
-            .OrderBy(c => c.FullName);
+            .Where(c => c.SchoolId == request.SchoolId);
+
+        if (!string.IsNullOrWhiteSpace(request.Name))
+            query = query.Where(child => child.FullName.Contains(request.Name));
 
         var totalCount = await query.CountAsync(cancellationToken);
 
         return await query
+            .OrderBy(c => c.FullName)
             .Paginate(request.Pagination)
             .Select(child => new ChildResponse(
                 child.Id,

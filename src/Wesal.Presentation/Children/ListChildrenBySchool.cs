@@ -19,11 +19,15 @@ internal sealed class ListChildrenBySchool : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Children.ListBySchool, async (
+            [AsParameters] QueryParams query,
             [AsParameters] Pagination pagination,
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new ListChildrenBySchoolQuery(user.GetRoleId(), pagination));
+            var result = await sender.Send(new ListChildrenBySchoolQuery(
+                user.GetRoleId(),
+                query.Name,
+                pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
@@ -34,4 +38,6 @@ internal sealed class ListChildrenBySchool : IEndpoint
         .WithOpenApiName(nameof(ListChildrenBySchool))
         .RequireAuthorization(CustomPolicies.SchoolsOnly);
     }
+
+    internal record struct QueryParams(string? Name = null);
 }
