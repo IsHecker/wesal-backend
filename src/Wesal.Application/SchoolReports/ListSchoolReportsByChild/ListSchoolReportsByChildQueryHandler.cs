@@ -24,8 +24,8 @@ internal sealed class ListSchoolReportsByChildQueryHandler(
         if (child is null)
             return ChildErrors.NotFound(request.ChildId);
 
-        if (child.SchoolId != request.SchoolId)
-            return SchoolReportErrors.ChildNotInSchool();
+        // if (child.SchoolId != request.SchoolId)
+        //     return SchoolReportErrors.ChildNotInSchool();
 
         var query = context.SchoolReports
             .OrderByDescending(report => report.UploadedAt)
