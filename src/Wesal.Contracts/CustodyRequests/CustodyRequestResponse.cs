@@ -12,5 +12,5 @@ public record struct CustodyRequestResponse(
     string Reason,
     string Status,
     DateTime RequestedAt,
-    string? DecisionNote,
-    DateTime? ProcessedAt);
+    string? ReasonNote,
+    DateTime? RespondedAt);

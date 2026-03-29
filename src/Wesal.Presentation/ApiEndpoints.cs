@@ -95,7 +95,7 @@ internal static class ApiEndpoints
     internal static class CustodyRequests
     {
         public const string ListByCourt = CustodyRequestsBase;
-        public const string Process = $"{CustodyRequestsBase}/{{requestId:guid}}/process";
+        public const string Respond = $"{CustodyRequestsBase}/{{requestId:guid}}/respond";
         public const string Create = CustodyRequestsBase;
     }
 

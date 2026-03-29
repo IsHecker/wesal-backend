@@ -12,4 +12,7 @@ public static class CustodyRequestErrors
 
     public static Error NotFound(Guid requestId) =>
         Error.NotFound("CustodyRequest.NotFound", $"Custody request with ID '{requestId}' not found");
+
+    public static Error NotTheCustodialParent =>
+        Error.Forbidden("CustodyRequest.NotTheCustodialParent", "You are not authorized to respond to this request");
 }

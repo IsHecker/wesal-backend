@@ -4,27 +4,28 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Authentication;
-using Wesal.Application.CustodyRequests.ProcessCustodyRequest;
+using Wesal.Application.CustodyRequests.RespondToCustodyRequest;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
 
 namespace Wesal.Presentation.CustodyRequests;
 
-internal sealed class ProcessCustodyRequest : IEndpoint
+internal sealed class RespondToCustodyRequest : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPatch(ApiEndpoints.CustodyRequests.Process, async (
+        app.MapPatch(ApiEndpoints.CustodyRequests.Respond, async (
             Guid requestId,
             Request request,
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new ProcessCustodyRequestCommand(
+            var result = await sender.Send(new RespondToCustodyRequestCommand(
                 requestId,
-                request.IsApproved,
-                request.DecisionNote));
+                user.GetRoleId(),
+                request.IsAccepted,
+                request.ReasonNote));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })
@@ -32,11 +33,11 @@ internal sealed class ProcessCustodyRequest : IEndpoint
         .Produces(StatusCodes.Status204NoContent)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(ProcessCustodyRequest))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .WithOpenApiName(nameof(RespondToCustodyRequest))
+        .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
 
     internal record struct Request(
-        bool IsApproved,
-        string DecisionNote);
+        bool IsAccepted,
+        string? ReasonNote);
 }

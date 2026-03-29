@@ -5,12 +5,16 @@ using Wesal.Domain.Entities.CustodyRequests;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Results;
 
+using Wesal.Application.Abstractions.Services;
+using Wesal.Domain.Entities.Notifications;
+
 namespace Wesal.Application.CustodyRequests.CreateCustodyRequest;
 
 internal sealed class CreateCustodyRequestCommandHandler(
     IFamilyRepository familyRepository,
     ICustodyRepository custodyRepository,
-    IRepository<CustodyRequest> custodyRequestRepository)
+    IRepository<CustodyRequest> custodyRequestRepository,
+    INotificationService notificationService)
     : ICommandHandler<CreateCustodyRequestCommand, Guid>
 {
     public async Task<Result<Guid>> Handle(
@@ -36,8 +40,14 @@ internal sealed class CreateCustodyRequestCommandHandler(
             request.StartDate,
             request.EndDate,
             request.Reason);
+            
+        custodyRequest.ForwardTo(custody.CustodialParentId);
 
         await custodyRequestRepository.AddAsync(custodyRequest, cancellationToken);
+        
+        await notificationService.SendNotificationsAsync(
+            [NotificationTemplate.CustodyRequestReceived(custodialParentId: custody.CustodialParentId)],
+            cancellationToken: cancellationToken);
 
         return custodyRequest.Id;
     }

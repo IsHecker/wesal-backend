@@ -14,6 +14,7 @@ using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Caching;
 using Wesal.Application.Complaints;
 using Wesal.Application.Data;
+using Wesal.Application.CustodyRequests;
 using Wesal.Application.ObligationAlerts;
 using Wesal.Application.Visitations;
 using Wesal.Infrastructure.Alimonies;
@@ -131,6 +132,9 @@ public static class DependencyInjection
 
         services.Configure<DocumentOptions>(
             configuration.GetSection(DocumentOptions.SectionName));
+
+        services.Configure<CustodyRequestOptions>(
+            configuration.GetSection(CustodyRequestOptions.SectionName));
     }
 
     private static void AddRepositories(this IServiceCollection services)
@@ -160,7 +164,7 @@ public static class DependencyInjection
 
     private static void AddServices(this IServiceCollection services)
     {
-        services.AddScoped<ObligationAlertService>();
+        services.AddScoped<IObligationAlertService, ObligationAlertService>();
         services.AddScoped<ComplianceMetricsService>();
     }
 

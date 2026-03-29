@@ -11,12 +11,13 @@ public sealed class CustodyRequest : Entity
     public Guid FamilyId { get; private set; }
     public Guid CourtCaseId { get; private set; }
     public Guid CustodyId { get; private set; }
+    public Guid CustodialParentId { get; private set; }
     public DateOnly StartDate { get; private set; }
     public DateOnly EndDate { get; private set; }
     public string Reason { get; private set; } = null!;
     public CustodyRequestStatus Status { get; private set; }
-    public string? DecisionNote { get; private set; }
-    public DateTime? ProcessedAt { get; private set; }
+    public string? ReasonNote { get; private set; }
+    public DateTime? RespondedAt { get; private set; }
 
     public Family Family { get; private set; } = null!;
 
@@ -44,7 +45,12 @@ public sealed class CustodyRequest : Entity
         };
     }
 
-    public Result Approve(string decisionNote)
+    public void ForwardTo(Guid custodialParentId)
+    {
+        CustodialParentId = custodialParentId;
+    }
+
+    public Result Accept()
     {
         var result = StatusTransition
             .Validate(Status, CustodyRequestStatus.Pending, CustodyRequestStatus.Approved);
@@ -53,13 +59,12 @@ public sealed class CustodyRequest : Entity
             return result.Error;
 
         Status = CustodyRequestStatus.Approved;
-        DecisionNote = decisionNote;
-        ProcessedAt = EgyptTime.Now;
+        RespondedAt = EgyptTime.Now;
 
         return Result.Success;
     }
 
-    public Result Reject(string decisionNote)
+    public Result Reject(string reasonNote)
     {
         var result = StatusTransition
             .Validate(Status, CustodyRequestStatus.Pending, CustodyRequestStatus.Rejected);
@@ -68,8 +73,8 @@ public sealed class CustodyRequest : Entity
             return result.Error;
 
         Status = CustodyRequestStatus.Rejected;
-        DecisionNote = decisionNote;
-        ProcessedAt = EgyptTime.Now;
+        ReasonNote = reasonNote;
+        RespondedAt = EgyptTime.Now;
 
         return Result.Success;
     }

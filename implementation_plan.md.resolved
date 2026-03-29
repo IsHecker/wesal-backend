@@ -1,0 +1,229 @@
+# Custody Request (مكوث) Workflow Redesign – Point 7
+
+Point 7 requires an **automated, system-mediated** workflow between the two parents. The system ("court" in the requirement refers to the system acting as the mediator) handles forwarding and tracking.
+
+```
+Non-Custodial Parent → System → Custodial Parent → System → Non-Custodial Parent
+```
+
+**Court Role:**
+1. **Visibility**: Court staff can view all requests and their current state (Approved/Rejected/Waiting).
+2. **Automated Escalation**: If the custodial parent rejects multiple subsequent requests (e.g., 3 in a row), the system will automatically trigger a violation/obligation alert to the parent, and suggest actions for the court staff (e.g., "Review custody arrangement due to repeated denial of visitation/stay").
+
+---
+
+## Current vs. Target Flow
+
+| Step | Current | Target |
+|------|---------|--------|
+| 1 | Father creates request | Non-custodial parent creates request |
+| 2 | Court approves/rejects ❌ | **System automatically notifies** custodial parent |
+| 3 | — | **Custodial parent** accepts or rejects (with reason) |
+| 4 | — | **System** records the reaction and notifies the non-custodial parent |
+| 5 | — | If custodial parent rejects **multiple times**, system auto-sends an **Obligation Alert** and notifies the Court |
+| 6 | — | Court staff views **full history** of all requests and reactions |
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Threshold Question**: How many consecutive rejections should trigger the automated violation alert? The plan currently assumes **3 consecutive rejections**.
+
+> [!IMPORTANT]
+> **Breaking Change**: The [ProcessCustodyRequest](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Presentation/CustodyRequests/ProcessCustodyRequest.cs#14-43) endpoint (currently used by court to approve/reject) will be **deleted**. The court no longer directly decides on requests.
+
+---
+
+## Proposed Changes
+
+### Domain Layer
+
+#### [MODIFY] [CustodyRequestStatus.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequestStatus.cs)
+
+```diff
+ public enum CustodyRequestStatus
+ {
+     Pending,
++    WaitingForResponse,
+     Approved,
+     Rejected
+ }
+```
+
+#### [MODIFY] [CustodyRequest.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequest.cs)
+
+**New properties:**
+- `CustodialParentId` (Guid) — calculated on creation
+- `ResponseNote` (string?) — custodial parent's response/reason
+- `RespondedAt` (DateTime?) — when they responded
+
+**Replace** existing [Approve](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequest.cs#47-61)/[Reject](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequest.cs#62-76) methods with:
+- `ForwardToParent()` — `Pending → WaitingForResponse` (called automatically on creation)
+- `Accept(string note)` — `WaitingForResponse → Approved`
+- [Reject(string note)](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequest.cs#62-76) — `WaitingForResponse → Rejected`
+
+**Remove** `DecisionNote` and `ProcessedAt` (these were for court decisions).
+
+---
+
+#### [MODIFY] [CustodyRequestErrors.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequestErrors.cs)
+
+Add:
+- `NotWaitingForResponse` — trying to respond when not in the right state
+- `NotTheCustodialParent` — authorization: only the custodial parent can respond
+
+---
+
+### Application Layer
+
+#### [MODIFY] [CreateCustodyRequestCommandHandler.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Application/CustodyRequests/CreateCustodyRequest/CreateCustodyRequestCommandHandler.cs)
+
+After creating the request:
+1. Automatically transition to `WaitingForResponse`
+2. **Send notification** to the custodial parent via [INotificationService](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Application/Abstractions/Services/INotificationService.cs#6-13)
+
+---
+
+#### [DELETE] ProcessCustodyRequest (3 files)
+
+The court no longer processes requests. Remove:
+- [ProcessCustodyRequestCommand.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Application/CustodyRequests/ProcessCustodyRequest/ProcessCustodyRequestCommand.cs)
+- [ProcessCustodyRequestCommandHandler.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Application/CustodyRequests/ProcessCustodyRequest/ProcessCustodyRequestCommandHandler.cs)
+- [ProcessCustodyRequestCommandValidator.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Application/CustodyRequests/ProcessCustodyRequest/ProcessCustodyRequestCommandValidator.cs)
+
+---
+
+#### [NEW] RespondToCustodyRequest (3 files)
+
+New command for the **custodial parent** to accept/reject:
+
+| File | Path |
+|------|------|
+| `RespondToCustodyRequestCommand.cs` | `Application/CustodyRequests/RespondToCustodyRequest/` |
+| `RespondToCustodyRequestCommandHandler.cs` | Same |
+| `RespondToCustodyRequestCommandValidator.cs` | Same |
+
+**Command**: [(Guid RequestId, Guid ParentId, bool IsAccepted, string? ResponseNote)](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/DomainEvents/Entity.cs#18-19)
+
+**Handler Logic (includes Automated Violation Check):**
+1. Load request, verify status is `WaitingForResponse` and caller is `CustodialParentId`
+2. Call `Accept()` or [Reject()](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequest.cs#62-76) on the entity
+3. **Send notification** to non-custodial parent with the result
+4. **Violation Logic**: If `IsAccepted` is `false`:
+   - Query the database to check the last N requests for this family where the caller was the custodial parent.
+   - If the last 3 requests (including this one) were all [Rejected](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationTemplate.cs#23-29), trigger:
+     - A strict [ObligationAlert](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationTemplate.cs#105-111) to the custodial parent.
+     - A specialized Court Alert notification to the assigned court staff suggesting action (e.g., "Review custody arrangement due to repeated denial of stay requests").
+
+---
+
+#### [MODIFY] [ListCustodyRequestsQueryHandler.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Application/CustodyRequests/ListCustodyRequests/ListCustodyRequestsQueryHandler.cs)
+
+- The existing endpoint is already restricted to Court Staff based on `UserRole.CourtStaff`.
+- Update status counts to include `WaitingForResponse`. 
+- Update the `Select` projection to include the new `ResponseNote` and `RespondedAt` fields instead of the old court decision fields.
+
+---
+
+### Contracts Layer
+
+#### [MODIFY] [CustodyRequestResponse.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Contracts/CustodyRequests/CustodyRequestResponse.cs)
+
+```diff
+ public record struct CustodyRequestResponse(
+     ...
+     string Status,
+     DateTime RequestedAt,
+-    string? DecisionNote,
+-    DateTime? ProcessedAt);
++    string? ResponseNote,
++    DateTime? RespondedAt);
+```
+
+#### [MODIFY] [CustodyRequestsResponse.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Contracts/CustodyRequests/CustodyRequestsResponse.cs)
+
+```diff
+ public record struct CustodyRequestsResponse(
+     ...
+     int PendingCount,
++    int WaitingForResponseCount,
+     int ApprovedCount,
+     int RejectedCount);
+```
+
+---
+
+### Presentation Layer
+
+#### [DELETE] [ProcessCustodyRequest.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Presentation/CustodyRequests/ProcessCustodyRequest.cs)
+
+Remove the court processing endpoint.
+
+#### [NEW] [RespondToCustodyRequest.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Presentation/CustodyRequests/RespondToCustodyRequest.cs)
+
+- **Route**: `PATCH /api/custody-requests/{requestId}/respond`
+- **Auth**: `ParentsOnly` (handler validates it's the custodial parent)
+- **Body**: `{ isAccepted: bool, responseNote?: string }`
+
+#### [MODIFY] [ApiEndpoints.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Presentation/ApiEndpoints.cs)
+
+Update the API routes constants to match the deletion and addition.
+
+---
+
+### Notification Layer
+
+#### [MODIFY] [NotificationType.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationType.cs)
+
+Add [CustodyRequest](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/CustodyRequests/CustodyRequest.cs#23-24) type if not covered by [Update](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Custodies/Custody.cs#37-43). (Existing [ObligationAlert](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationTemplate.cs#105-111) type is already in place).
+
+#### [MODIFY] [NotificationTemplate.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationTemplate.cs)
+
+Add/update templates:
+- `CustodyRequestReceived(Guid custodialParentId)` — "You have a new مكوث request to review"
+- `CustodyRequestAccepted(Guid nonCustodialParentId)` — "Your مكوث request has been accepted"
+- [CustodyRequestRejected(Guid nonCustodialParentId, string reason)](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationTemplate.cs#23-29) — Modify to reflect parent response instead of court
+- `RepeatedRejectionCourtAlert(Guid courtId, string familyName)` — "Family X has repeatedly rejected stay requests. Suggested action: Review custody arrangement." (using `NotificationType.Case`)
+
+---
+
+### Infrastructure Layer
+
+#### [MODIFY] [CustodyRequestConfiguration.cs](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Infrastructure/CustodyRequests/CustodyRequestConfiguration.cs)
+
+Add column configuration for `CustodialParentId`, `ResponseNote`, `RespondedAt`.
+
+#### New EF Core migration required.
+
+---
+
+## Workflow Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> WaitingForResponse : Non-custodial parent creates request\n(system auto-notifies custodial parent)
+    WaitingForResponse --> Approved : Custodial parent accepts
+    WaitingForResponse --> Rejected : Custodial parent rejects\n(with reason)
+    Approved --> [*] : Non-custodial parent notified ✅
+    Rejected --> [*] : Non-custodial parent notified ❌
+    
+    note right of Rejected
+        If N consecutive rejections:
+        1. ObligationAlert sent to parent
+        2. Case alert sent to Court Staff
+    end note
+```
+
+---
+
+## Verification Plan
+
+### Manual Verification (via Swagger/Postman)
+1. Create custody request as non-custodial parent → verify `WaitingForResponse` + custodial parent gets notification
+2. Respond as custodial parent (accept) → verify [Approved](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationTemplate.cs#16-22) + non-custodial parent gets notification
+3. Respond as custodial parent (reject) 3 times sequentially:
+   - Request 1: Rejected
+   - Request 2: Rejected
+   - Request 3: Rejected → Verify the handler correctly identifies the streak, and issues the [ObligationAlert](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Domain/Entities/Notifications/NotificationTemplate.cs#105-111) to the parent and the suggestion alert to the court.
+4. Verify court staff can call [ListCustodyRequests](file:///c:/Users/Mhamed/source/repos/wesal-backend/src/Wesal.Application/CustodyRequests/ListCustodyRequests/ListCustodyRequestsQueryHandler.cs#15-126) and see the new `ResponseNote` and history perfectly format.

@@ -30,5 +30,10 @@ internal sealed class CustodyRequestConfiguration : IEntityTypeConfiguration<Cus
             .WithMany()
             .HasForeignKey(request => request.CustodyId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne<Parent>()
+            .WithMany()
+            .HasForeignKey(request => request.CustodialParentId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

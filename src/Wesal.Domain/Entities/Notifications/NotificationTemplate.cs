@@ -13,18 +13,25 @@ public static class NotificationTemplate
             NotificationType.Update);
 
 
-    public static Notification CustodyRequestApproved(Guid recipientId) =>
+    public static Notification CustodyRequestReceived(Guid custodialParentId) =>
+        Notification.Create(
+            custodialParentId,
+            "Custody Request Received",
+            "You have a new custody stay request to review.",
+            NotificationType.Update);
+
+    public static Notification CustodyRequestAccepted(Guid recipientId) =>
         Notification.Create(
             recipientId,
-            "Custody Request Approved",
-            "Your custody request has been approved by the court",
+            "Custody Request Accepted",
+            "Your custody stay request has been accepted by the custodial parent.",
             NotificationType.Update);
 
     public static Notification CustodyRequestRejected(Guid recipientId, string reason) =>
         Notification.Create(
             recipientId,
             "Custody Request Rejected",
-            $"Your custody request has been rejected. Reason: {reason}",
+            $"Your custody stay request has been rejected. Reason: {reason}",
             NotificationType.Update);
 
     public static Notification PaymentDue(PaymentDue paymentDue) =>

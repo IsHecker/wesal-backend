@@ -57,8 +57,8 @@ internal sealed class ListCustodyRequestsQueryHandler(
                 request.Reason,
                 request.Status.ToString(),
                 request.CreatedAt,
-                request.DecisionNote,
-                request.ProcessedAt))
+                request.ReasonNote,
+                request.RespondedAt))
             .ToPagedResponseAsync(request.Pagination, totalCount);
 
         return new CustodyRequestsResponse(

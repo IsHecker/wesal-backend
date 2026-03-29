@@ -7,12 +7,14 @@ using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Infrastructure.Database;
 
+using Wesal.Application.Data;
+
 namespace Wesal.Infrastructure.ObligationAlerts;
 
 internal sealed class ObligationAlertService(
     IOptions<ObligationAlertOptions> alertOptions,
     INotificationService notificationService,
-    WesalDbContext dbContext)
+    WesalDbContext dbContext) : IObligationAlertService
 {
     private readonly ObligationAlertOptions alertOptions = alertOptions.Value;
 
