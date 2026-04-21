@@ -7,8 +7,6 @@ using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Infrastructure.Database;
 
-using Wesal.Application.Data;
-
 namespace Wesal.Infrastructure.ObligationAlerts;
 
 internal sealed class ObligationAlertService(
@@ -30,7 +28,8 @@ internal sealed class ObligationAlertService(
 
         parent.RecordViolation();
 
-        var hasReachedMaxViolations = parent.ViolationCount >= alertOptions.MaxViolationsCount;
+        var hasReachedMaxViolations = !alertOptions.EnforceMaxViolationsThreshold || 
+                                      parent.ViolationCount >= alertOptions.MaxViolationsCount;
 
         var obligationAlert = ObligationAlert.Create(
             parent.CourtId,
@@ -101,7 +100,13 @@ internal sealed class ObligationAlertService(
         if (!hasReachedMaxViolations)
             return violationDescription;
 
-        return $@"{violationDescription} You have reached the maximum number of violations ({alertOptions.MaxViolationsCount}). 
-        The court has been notified and may take legal action.";
+        var message = violationDescription;
+
+        if (alertOptions.EnforceMaxViolationsThreshold)
+        {
+            message += $" You have reached the maximum number of violations ({alertOptions.MaxViolationsCount}).";
+        }
+
+        return $@"{message} The court has been notified and may take legal action.";
     }
 }

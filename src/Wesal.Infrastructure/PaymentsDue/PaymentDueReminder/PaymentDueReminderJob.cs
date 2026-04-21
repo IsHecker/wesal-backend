@@ -35,6 +35,8 @@ internal sealed class PaymentDueReminderJob(
                 },
                 context.CancellationToken);
         }
+
+        await dbContext.SaveChangesAsync(context.CancellationToken);
     }
 
     private async Task<List<PaymentDue>> GenerateUpcomingPaymentsDueAsync(CancellationToken cancellationToken)

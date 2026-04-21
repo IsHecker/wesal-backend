@@ -25,7 +25,11 @@ internal sealed class CheckInVisitationCommandHandler(
         if (centerStaff is null)
             return UserErrors.NotFound(request.CenterStaffId);
 
-        var checkInResult = visitation.CheckIn(centerStaff.LocationId, request.NationalId, options.Value.CheckInGracePeriodMinutes);
+        var checkInResult = visitation.CheckIn(
+            centerStaff.LocationId,
+            request.NationalId,
+            options.Value.CheckInGracePeriodMinutes,
+            request.AttendingChildrenIds);
         if (checkInResult.IsFailure)
             return checkInResult.Error;
 

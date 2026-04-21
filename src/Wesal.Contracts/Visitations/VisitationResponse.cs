@@ -11,6 +11,20 @@ public record struct VisitationResponse(
     DateTime StartAt,
     DateTime EndAt,
     string Status,
+    AttendanceResponse Attendance);
+
+public record struct AttendanceResponse(
     DateTime? NonCustodialCheckedInAt,
     DateTime? CompanionCheckedInAt,
-    DateTime? CompletedAt);
+    DateTime? NonCustodialCheckedOutAt,
+    DateTime? CompanionCheckedOutAt,
+    DateTime? CompletedAt,
+    bool NonCustodialOverstayed,
+    bool CompanionOverstayed,
+    bool IsNonCustodialCheckedIn,
+    bool IsCompanionCheckedIn,
+    bool IsNonCustodialCheckedOut,
+    bool IsCompanionCheckedOut,
+    bool AreBothCheckedIn,
+    bool AreBothCheckedOut,
+    IEnumerable<Guid> AttendedChildrenIds);

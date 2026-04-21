@@ -3,6 +3,7 @@ using Wesal.Application.Data;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Application.VisitationSchedules.UpdateVisitationSchedule;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.VisitationLocations;
@@ -44,7 +45,7 @@ internal sealed class UpdateVisitationScheduleCommandHandler(
 
         schedule.Update(
             request.LocationId,
-            request.Frequency.ToEnum<VisitationFrequency>(),
+            request.Frequency.ToEnum<ScheduleFrequency>(),
             request.StartTime,
             request.EndTime,
             request.StartDate,

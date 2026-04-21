@@ -12,7 +12,7 @@ namespace Wesal.Infrastructure.PaymentGateway.StripeEvents.EventHandlers;
 [StripeEvent(EventTypes.PaymentIntentPaymentFailed)]
 internal sealed class PaymentIntentPaymentFailedHandler(
     IPaymentDueRepository paymentDueRepository,
-    IRepository<Payment> paymentRepository,
+    IPaymentRepository paymentRepository,
     IUnitOfWork unitOfWork,
     INotificationService notificationService) : StripeEventHandler<PaymentIntent>
 {

@@ -1,7 +1,7 @@
 using System.Collections.Frozen;
 using System.Reflection;
+using System.Transactions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Stripe;
 using Wesal.Application.Abstractions.PaymentGateway;
 using Wesal.Domain.Results;
@@ -9,27 +9,12 @@ using Wesal.Infrastructure.PaymentGateway.ProcessedStripeEvents;
 
 namespace Wesal.Infrastructure.PaymentGateway.StripeEvents;
 
-internal sealed class StripeEventDispatcher
-    : IStripeEventDispatcher
+internal sealed class StripeEventDispatcher(
+    StripeOptions stripeOptions,
+    IServiceProvider serviceProvider,
+    ProcessedStripeEventRepository eventRepository) : IStripeEventDispatcher
 {
-    private static FrozenDictionary<string, Type> _handlersType = null!;
-    private static StripeOptions _stripeOptions = null!;
-
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ProcessedStripeEventRepository _eventRepository;
-
-    public StripeEventDispatcher(
-        StripeOptions stripeOptions,
-        IServiceProvider serviceProvider,
-        ProcessedStripeEventRepository eventRepository)
-    {
-        if (_handlersType is null)
-            RegisterHandlersFromAssembly(AssemblyReference.Assembly);
-
-        _stripeOptions = stripeOptions;
-        _serviceProvider = serviceProvider;
-        _eventRepository = eventRepository;
-    }
+    private static readonly FrozenDictionary<string, Type> _handlersType = RegisterHandlersFromAssembly(AssemblyReference.Assembly);
 
     public async Task<Result> DispatchAsync(
         string eventJson,
@@ -43,8 +28,8 @@ internal sealed class StripeEventDispatcher
             stripeEvent = EventUtility.ConstructEvent(
                 eventJson,
                 stripeSignature,
-                isConnectWebhook ? _stripeOptions.ConnectWebhookSecret
-                    : _stripeOptions.WebhookSecret,
+                isConnectWebhook ? stripeOptions.ConnectWebhookSecret
+                    : stripeOptions.WebhookSecret,
                 throwOnApiVersionMismatch: false);
         }
         catch (StripeException)
@@ -52,27 +37,38 @@ internal sealed class StripeEventDispatcher
             return Error.Validation();
         }
 
-        if (await _eventRepository.IsEventProcessedAsync(stripeEvent.Id))
+        if (await eventRepository.IsEventProcessedAsync(stripeEvent.Id))
             return Result.Success;
 
         if (!_handlersType.TryGetValue(stripeEvent.Type, out var handlerType))
             return Result.Success;
 
-        var handler = (IStripeEventHandler)ActivatorUtilities.CreateInstance(_serviceProvider, handlerType);
+        var handler = (IStripeEventHandler)ActivatorUtilities.CreateInstance(serviceProvider, handlerType);
 
-        var result = await handler.HandleAsync(stripeEvent);
+        using var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
 
-        if (result.IsSuccess)
+        try
         {
-            await _eventRepository.MarkEventAsProcessedAsync(stripeEvent.Id);
-        }
+            Result result = await handler.HandleAsync(stripeEvent);
 
-        return result;
+            if (result.IsSuccess)
+            {
+                await eventRepository.MarkEventAsProcessedAsync(stripeEvent.Id);
+                scope.Complete();
+            }
+
+            return result;
+        }
+        catch (Exception)
+        {
+            // If another webhook is processing this concurrently, the unique key constraint will fail it here
+            return Result.Success;
+        }
     }
 
-    private static void RegisterHandlersFromAssembly(Assembly assembly)
+    private static FrozenDictionary<string, Type> RegisterHandlersFromAssembly(Assembly assembly)
     {
-        _handlersType = assembly.GetTypes()
+        return assembly.GetTypes()
             .Where(type => type.IsClass
                         && !type.IsAbstract
                         && type.IsAssignableTo(typeof(IStripeEventHandler)))

@@ -50,4 +50,6 @@ public interface IWesalDbContext
     DbSet<ComplianceMetric> ComplianceMetrics { get; init; }
     DbSet<Notification> Notifications { get; init; }
     DbSet<Document> Documents { get; init; }
+
+    Task<int> ExecuteSqlAsync(string sql, CancellationToken cancellationToken = default);
 }

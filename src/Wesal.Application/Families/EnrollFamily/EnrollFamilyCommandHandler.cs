@@ -1,6 +1,7 @@
 using Wesal.Application.Abstractions.PaymentGateway;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
+using Wesal.Application.Data;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
 using Wesal.Contracts.Users;
@@ -16,7 +17,8 @@ internal sealed class EnrollFamilyCommandHandler(
     IParentRepository parentRepository,
     IFamilyRepository familyRepository,
     IUserService userService,
-    IStripeGateway stripeGateway) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
+    IStripeGateway stripeGateway,
+    IUnitOfWork unitOfWork) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
 {
     public async Task<Result<EnrollFamilyResponse>> Handle(
         EnrollFamilyCommand request,
@@ -56,18 +58,6 @@ internal sealed class EnrollFamilyCommandHandler(
 
         var family = Family.Create(request.CourtId, father.Id, mother.Id);
 
-        var fatherCustomerId = await stripeGateway.CreateCustomerAsync(father, cancellationToken);
-        var motherCustomerId = await stripeGateway.CreateCustomerAsync(mother, cancellationToken);
-
-        var fatherAccountId = await stripeGateway.CreateConnectAccountAsync(father, cancellationToken);
-        var motherAccountId = await stripeGateway.CreateConnectAccountAsync(mother, cancellationToken);
-
-        father.SetupStripe(fatherCustomerId, fatherAccountId);
-        mother.SetupStripe(motherCustomerId, motherAccountId);
-
-        await parentRepository.AddRangeAsync([father, mother], cancellationToken);
-        await familyRepository.AddAsync(family, cancellationToken);
-
         foreach (var childDto in request.Children ?? [])
         {
             var child = Child.Create(
@@ -80,6 +70,54 @@ internal sealed class EnrollFamilyCommandHandler(
             family.Children.Add(child);
         }
 
+        var fatherCustomerResult = await stripeGateway.CreateCustomerAsync(father, cancellationToken);
+        if (fatherCustomerResult.IsFailure)
+            return fatherCustomerResult.Error;
+
+        var motherCustomerResult = await stripeGateway.CreateCustomerAsync(mother, cancellationToken);
+        if (motherCustomerResult.IsFailure)
+        {
+            await stripeGateway.DeleteCustomer(fatherCustomerResult.Value);
+            return motherCustomerResult.Error;
+        }
+
+        var fatherAccountResult = await stripeGateway.CreateConnectAccountAsync(father, cancellationToken);
+        if (fatherAccountResult.IsFailure)
+        {
+            await stripeGateway.DeleteCustomer(fatherCustomerResult.Value);
+            await stripeGateway.DeleteCustomer(motherCustomerResult.Value);
+            return fatherAccountResult.Error;
+        }
+
+        var motherAccountResult = await stripeGateway.CreateConnectAccountAsync(mother, cancellationToken);
+        if (motherAccountResult.IsFailure)
+        {
+            await stripeGateway.DeleteCustomer(fatherCustomerResult.Value);
+            await stripeGateway.DeleteCustomer(motherCustomerResult.Value);
+            await stripeGateway.DeleteAccount(fatherAccountResult.Value);
+            return motherAccountResult.Error;
+        }
+
+        father.SetupStripe(fatherCustomerResult.Value, fatherAccountResult.Value);
+        mother.SetupStripe(motherCustomerResult.Value, motherAccountResult.Value);
+
+        await parentRepository.AddRangeAsync([father, mother], cancellationToken);
+        await familyRepository.AddAsync(family, cancellationToken);
+
+        try
+        {
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception) // Catching generic exception (like DbUpdateException) to rollback Stripe
+        {
+            await stripeGateway.DeleteCustomer(fatherCustomerResult.Value);
+            await stripeGateway.DeleteCustomer(motherCustomerResult.Value);
+            await stripeGateway.DeleteAccount(fatherAccountResult.Value);
+            await stripeGateway.DeleteAccount(motherAccountResult.Value);
+
+            return Error.Validation("Family.EnrollmentFailed", "Failed to enroll family due to a database constraint violation.");
+        }
+        
         return new EnrollFamilyResponse(
             family.Id,
             new UserCredentialResponse(father.Id, father.NationalId, fatherUser.TemporaryPassword),

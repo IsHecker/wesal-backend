@@ -1,5 +1,7 @@
 using FluentValidation;
+using Wesal.Application.Extensions;
 using Wesal.Application.VisitationSchedules.UpdateVisitationSchedule;
+using Wesal.Domain.Common;
 
 internal sealed class UpdateVisitationScheduleCommandValidator
     : AbstractValidator<UpdateVisitationScheduleCommand>
@@ -23,5 +25,9 @@ internal sealed class UpdateVisitationScheduleCommandValidator
             .WithMessage("End time is required.")
             .Must((cmd, endTime) => endTime > cmd.StartTime)
             .WithMessage("End time must be after start time.");
+
+        RuleFor(x => x.Frequency)
+            .NotEmpty()
+            .MustBeEnumValue<UpdateVisitationScheduleCommand, ScheduleFrequency>();
     }
 }

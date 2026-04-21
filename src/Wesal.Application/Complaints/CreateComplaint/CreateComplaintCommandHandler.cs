@@ -33,10 +33,10 @@ internal sealed class CreateComplaintCommandHandler(
         if (!isInFamily)
             return FamilyErrors.ParentNotInFamily;
 
-        var count = await complaintRepository.GetMonthCountByParentIdAsync(request.ParentId, cancellationToken);
+        // var count = await complaintRepository.GetMonthCountByParentIdAsync(request.ParentId, cancellationToken);
 
-        if (count >= complaintOptions.MaxComplaintsInMonth)
-            return ComplaintErrors.MaxCountExceeded(complaintOptions.MaxComplaintsInMonth);
+        // if (count >= complaintOptions.MaxComplaintsInMonth)
+        //     return ComplaintErrors.MaxCountExceeded(complaintOptions.MaxComplaintsInMonth);
 
         if (request.DocumentId is not null)
         {

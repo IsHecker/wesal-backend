@@ -8,7 +8,8 @@ using Wesal.Domain.Results;
 
 internal sealed class DeleteAlimonyCommandHandler(
     IAlimonyRepository alimonyRepository,
-    ICourtCaseRepository courtCaseRepository)
+    ICourtCaseRepository courtCaseRepository,
+    IPaymentDueRepository paymentDueRepository)
     : ICommandHandler<DeleteAlimonyCommand>
 {
     public async Task<Result> Handle(
@@ -26,6 +27,12 @@ internal sealed class DeleteAlimonyCommandHandler(
 
         if (courtCase.Status == CourtCaseStatus.Closed)
             return AlimonyErrors.CannotModifyClosedCase;
+
+        var hasPayments = await paymentDueRepository.HasPaymentsByAlimonyIdAsync(request.AlimonyId, cancellationToken);
+        if (hasPayments)
+            return AlimonyErrors.HasPayments;
+
+        await paymentDueRepository.DeletePendingByAlimonyIdAsync(request.AlimonyId, cancellationToken);
 
         alimonyRepository.Delete(alimony);
 

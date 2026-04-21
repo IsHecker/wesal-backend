@@ -44,9 +44,21 @@ internal sealed class ListVisitationsQueryHandler(
                 visitation.StartAt,
                 visitation.EndAt,
                 visitation.Status.ToString(),
-                visitation.NonCustodialCheckedInAt,
-                visitation.CompanionCheckedInAt,
-                visitation.CompletedAt))
+                new AttendanceResponse(
+                    visitation.Attendance.NonCustodialCheckedInAt,
+                    visitation.Attendance.CompanionCheckedInAt,
+                    visitation.Attendance.NonCustodialCheckedOutAt,
+                    visitation.Attendance.CompanionCheckedOutAt,
+                    visitation.Attendance.CompletedAt,
+                    visitation.Attendance.NonCustodialOverstayed,
+                    visitation.Attendance.CompanionOverstayed,
+                    visitation.Attendance.IsNonCustodialCheckedIn,
+                    visitation.Attendance.IsCompanionCheckedIn,
+                    visitation.Attendance.IsNonCustodialCheckedOut,
+                    visitation.Attendance.IsCompanionCheckedOut,
+                    visitation.Attendance.AreBothCheckedIn,
+                    visitation.Attendance.AreBothCheckedOut,
+                    visitation.Attendance.AttendedChildrenIds)))
             .ToPagedResponseAsync(request.Pagination, totalCount);
     }
 

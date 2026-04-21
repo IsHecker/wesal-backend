@@ -18,26 +18,21 @@ internal sealed class InitiateAlimonyPayment : IEndpoint
     {
         app.MapPost(ApiEndpoints.PaymentsDue.InitiateAlimonyPayment, async (
             Guid paymentDueId,
-            Request request,
             ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new InitiateAlimonyPaymentCommand(
                user.GetRoleId(),
-               paymentDueId,
-               request.SuccessUrl,
-               request.CancelUrl));
+               paymentDueId));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })
         .WithTags(Tags.PaymentsDue)
-        .Produces<SessionResponse>(StatusCodes.Status200OK)
+        .Produces<PaymentIntentResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(InitiateAlimonyPayment))
         .RequireAuthorization(CustomPolicies.ParentsOnly);
     }
-
-    internal readonly record struct Request(string SuccessUrl, string CancelUrl);
 }

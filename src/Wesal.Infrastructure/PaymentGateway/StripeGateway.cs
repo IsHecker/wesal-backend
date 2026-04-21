@@ -1,4 +1,3 @@
-using Stripe.Checkout;
 using Wesal.Application.Abstractions.PaymentGateway;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.PaymentsDue;
@@ -6,98 +5,91 @@ using Wesal.Domain.Results;
 
 namespace Wesal.Infrastructure.PaymentGateway;
 
-internal sealed class StripeGateway(
-    CurrencyConverter currencyConverter,
-    StripeOptions stripeOptions) : IStripeGateway
+internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGateway
 {
-    public async Task<string> CreateCheckoutSessionAsync(
+    public async Task<string> CreatePaymentIntentAsync(
         Parent payerParent,
         PaymentDue paymentDue,
-        string successUrl,
-        string cancelUrl,
         CancellationToken cancellationToken = default)
     {
-        var options = new SessionCreateOptions
+        var options = new Stripe.PaymentIntentCreateOptions
         {
-            Mode = "payment",
+            Amount = paymentDue.Amount,
+            Currency = "egp",
             Customer = payerParent.StripeCustomerId,
-            PaymentMethodTypes = ["card"],
-            SavedPaymentMethodOptions = new SessionSavedPaymentMethodOptionsOptions
+            AutomaticPaymentMethods = new Stripe.PaymentIntentAutomaticPaymentMethodsOptions
             {
-                PaymentMethodSave = "enabled"
-            },
-            LineItems = [new SessionLineItemOptions
-            {
-                PriceData = new SessionLineItemPriceDataOptions
-                {
-                    Currency = "egp",
-                    UnitAmount = paymentDue.Amount,
-                    ProductData = new SessionLineItemPriceDataProductDataOptions
-                    {
-                        Name = "Payment Due",
-                        Description = $"Payment due on {paymentDue.DueDate:MMMM dd, yyyy}"
-                    }
-                },
-                Quantity = 1
-            }],
-            SuccessUrl = successUrl,
-            CancelUrl = cancelUrl,
-            PaymentIntentData = new SessionPaymentIntentDataOptions()
-            .WithKey(MetadataKeys.PayerId, payerParent.Id)
-            .WithKey(MetadataKeys.AlimonyId, paymentDue.AlimonyId)
-            .WithKey(MetadataKeys.PaymentDueId, paymentDue.Id)
-        };
+                Enabled = true,
+            }
+        }
+        .WithKey(MetadataKeys.PayerId, payerParent.Id)
+        .WithKey(MetadataKeys.AlimonyId, paymentDue.AlimonyId)
+        .WithKey(MetadataKeys.PaymentDueId, paymentDue.Id);
 
-        var session = await new SessionService()
-            .CreateAsync(options, cancellationToken: cancellationToken);
+        var service = new Stripe.PaymentIntentService();
+        var intent = await service.CreateAsync(options, cancellationToken: cancellationToken);
 
-        return session.Url;
+        return intent.ClientSecret;
     }
 
-    public async Task<string> CreateCustomerAsync(Parent parent, CancellationToken cancellationToken = default)
+    public async Task<Result<string>> CreateCustomerAsync(Parent parent, CancellationToken cancellationToken = default)
     {
         if (!stripeOptions.AllowCustomerCreation)
             return string.Empty;
 
-        var customer = await new Stripe.CustomerService().CreateAsync(new Stripe.CustomerCreateOptions
+        try
         {
-            Name = parent.FullName,
-            Email = parent.Email
-        }, cancellationToken: cancellationToken);
+            var customer = await new Stripe.CustomerService().CreateAsync(new Stripe.CustomerCreateOptions
+            {
+                Name = parent.FullName,
+                Email = parent.Email
+            }, cancellationToken: cancellationToken);
 
-        return customer.Id;
+            return customer.Id;
+        }
+        catch (Stripe.StripeException ex)
+        {
+            return Error.Failure("Stripe.CustomerCreationFailed", ex.Message);
+        }
     }
 
-    public async Task<string> CreateConnectAccountAsync(
+    public async Task<Result<string>> CreateConnectAccountAsync(
         Parent parent,
         CancellationToken cancellationToken = default)
     {
         if (!stripeOptions.AllowAccountCreation)
             return string.Empty;
 
-        var accountOptions = new Stripe.AccountCreateOptions
+        try
         {
-            Type = "express",
-            Country = "EG",
-            Email = parent.Email,
-            Capabilities = new Stripe.AccountCapabilitiesOptions
+            var accountOptions = new Stripe.AccountCreateOptions
             {
-                Transfers = new Stripe.AccountCapabilitiesTransfersOptions { Requested = true }
-            },
-            TosAcceptance = new Stripe.AccountTosAcceptanceOptions
-            {
-                ServiceAgreement = "recipient"
-            },
-            Metadata = new Dictionary<string, string>
-            {
-                [MetadataKeys.ParentId.Key] = parent.Id.ToString()
-            }
-        };
+                Type = "express",
+                Country = "EG",
+                Email = parent.Email,
+                Capabilities = new Stripe.AccountCapabilitiesOptions
+                {
+                    Transfers = new Stripe.AccountCapabilitiesTransfersOptions { Requested = true }
+                },
+                TosAcceptance = new Stripe.AccountTosAcceptanceOptions
+                {
+                    ServiceAgreement = "recipient"
+                },
+                Metadata = new Dictionary<string, string>
+                {
+                    [MetadataKeys.ParentId.Key] = parent.Id.ToString()
+                }
+            };
 
-        var account = await new Stripe.AccountService()
-            .CreateAsync(accountOptions, cancellationToken: cancellationToken);
+            var account = await new Stripe.AccountService()
+                .CreateAsync(accountOptions, cancellationToken: cancellationToken);
 
-        return account.Id;
+            return account.Id;
+        }
+        catch (Stripe.StripeException ex)
+        {
+            return Error.Failure("Stripe.AccountCreationFailed", ex.Message);
+        }
     }
 
     public async Task<Result<string>> CreateOnboardingSessionAsync(
@@ -130,9 +122,9 @@ internal sealed class StripeGateway(
     public async Task<Result> SendPayoutAsync(
         Parent parent,
         PaymentDue paymentDue,
+        string paymentIntentId,
         CancellationToken cancellationToken = default)
     {
-        var convertedAmountInUsd = await currencyConverter.EgpToUsdAsync(paymentDue.Amount);
         try
         {
             if (!parent.IsPayoutMethodConfigured)
@@ -140,10 +132,20 @@ internal sealed class StripeGateway(
                     "Payout.NotConfigured",
                     "Payout is not configured. Please complete your payout setup to receive withdrawals.");
 
+            // Fetch the actual settled amount from Stripe to ensure 100% accuracy and zero loss
+            var service = new Stripe.PaymentIntentService();
+            var paymentIntent = await service.GetAsync(
+                paymentIntentId,
+                new Stripe.PaymentIntentGetOptions { Expand = ["latest_charge.balance_transaction"] },
+                cancellationToken: cancellationToken);
+
+            var settledAmount = paymentIntent.LatestCharge.BalanceTransaction.Amount;
+            var settlementCurrency = paymentIntent.LatestCharge.BalanceTransaction.Currency;
+
             var options = new Stripe.TransferCreateOptions
             {
-                Amount = convertedAmountInUsd,
-                Currency = "usd",
+                Amount = settledAmount,
+                Currency = settlementCurrency,
                 Destination = parent.StripeConnectAccountId,
                 Metadata = new Dictionary<string, string>
                 {
@@ -157,8 +159,8 @@ internal sealed class StripeGateway(
 
             var payoutOptions = new Stripe.PayoutCreateOptions
             {
-                Amount = paymentDue.Amount,
-                Currency = "egp",
+                Amount = settledAmount,
+                Currency = settlementCurrency,
                 Metadata = new Dictionary<string, string>
                 {
                     [MetadataKeys.PaymentDueId.Key] = paymentDue.Id.ToString(),
@@ -188,5 +190,11 @@ internal sealed class StripeGateway(
     {
         var service = new Stripe.AccountService();
         var deleted = await service.DeleteAsync(accountId);
+    }
+
+    public async Task DeleteCustomer(string customerId)
+    {
+        var service = new Stripe.CustomerService();
+        await service.DeleteAsync(customerId);
     }
 }

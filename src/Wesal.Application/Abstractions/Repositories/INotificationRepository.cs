@@ -5,5 +5,5 @@ namespace Wesal.Application.Abstractions.Repositories;
 
 public interface INotificationRepository : IRepository<Notification>
 {
-    Task<IEnumerable<Notification>> GetByRecipientIdAsync(Guid recipientId, CancellationToken cancellationToken = default);
+    Task<IQueryable<Notification>> GetByRecipientIdAsync(Guid recipientId, CancellationToken cancellationToken = default);
 }

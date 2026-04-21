@@ -59,8 +59,7 @@ public static class NotificationTemplate
         Notification.Create(
             payerId,
             "Payment Failed",
-            $@"We couldn’t process your payment of {amount:C} for alimony. 
-            Please try again later or update your payment method.",
+            $"We couldn’t process your payment of {amount:C} for alimony. Please try again later or update your payment method.",
             NotificationType.Payment);
 
     public static Notification AlimonyReadyToWithdraw(Alimony alimony) =>
@@ -74,24 +73,21 @@ public static class NotificationTemplate
         Notification.Create(
             recipientId,
             "Withdrawal Initiated",
-            $@"Your withdrawal of {amount:C} has been initiated. 
-        The funds should arrive in your bank shortly.",
+            $"Your withdrawal of {amount:C} has been initiated. The funds should arrive in your bank shortly.",
             NotificationType.Payment);
 
     public static Notification AlimonyWithdrawalSuccess(Guid recipientId, long amount) =>
         Notification.Create(
             recipientId,
             "Withdrawal Successful",
-            $@"You have successfully withdrawn {amount:C} from your alimony balance. 
-            The funds should arrive in your bank shortly.",
+            $"You have successfully withdrawn {amount:C} from your alimony balance. The funds should arrive in your bank shortly.",
             NotificationType.Payment);
 
     public static Notification AlimonyWithdrawalFailed(Guid recipientId, long amount) =>
         Notification.Create(
             recipientId,
             "Withdrawal Failed",
-            $@"Your withdrawal of {amount:C} could not be completed. 
-            Please check your bank details or try again later.",
+            $"Your withdrawal of {amount:C} could not be completed. Please check your bank details or try again later.",
             NotificationType.Payment);
 
     public static Notification VisitationScheduled(Guid parentId) =>
@@ -115,4 +111,18 @@ public static class NotificationTemplate
             "Obligation Alert",
             message,
             NotificationType.ObligationAlert);
+
+    public static Notification AlimonyOverdue(Guid recipientId, DateTime dueDate) =>
+        Notification.Create(
+            recipientId,
+            "Alimony Overdue",
+            $"The alimony payment due on {dueDate:MMMM dd, yyyy} is now overdue.",
+            NotificationType.Payment);
+
+    public static Notification VisitationMissed(Guid recipientId, DateTime startAt) =>
+        Notification.Create(
+            recipientId,
+            "Visitation Missed",
+            $"The scheduled visitation for {startAt:MMMM dd, yyyy 'at' hh:mm tt} was missed.",
+            NotificationType.Update);
 }

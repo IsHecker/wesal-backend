@@ -1,4 +1,4 @@
-﻿using FirebaseAdmin;
+using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +69,7 @@ using Wesal.Infrastructure.PaymentGateway;
 using Wesal.Application.Abstractions.PaymentGateway;
 using Wesal.Infrastructure.PaymentGateway.StripeEvents;
 using Wesal.Infrastructure.PaymentGateway.ProcessedStripeEvents;
+using Wesal.Infrastructure.CustodyRequests;
 
 namespace Wesal.Infrastructure;
 
@@ -105,7 +106,7 @@ public static class DependencyInjection
         services.AddDbContext<WesalDbContext>((sp, opts) =>
             opts.UseSqlServer(configuration.GetConnectionString("Database"))
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-                .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
+                // .AddInterceptors(sp.GetRequiredService<PublishDomainEventsInterceptor>())
                 .LogTo(_ => { }, LogLevel.None));
 
 
@@ -160,6 +161,8 @@ public static class DependencyInjection
         services.AddScoped<IUserDeviceRepository, UserDeviceRepository>();
         services.AddScoped<IFamilyCourtRepository, FamilyCourtRepository>();
         services.AddScoped<IVisitationScheduleRepository, VisitationScheduleRepository>();
+        services.AddScoped<ICustodyRequestRepository, CustodyRequestRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
     }
 
     private static void AddServices(this IServiceCollection services)

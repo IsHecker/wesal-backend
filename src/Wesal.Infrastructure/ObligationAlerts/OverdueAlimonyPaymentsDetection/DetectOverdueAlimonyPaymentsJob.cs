@@ -1,8 +1,9 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Abstractions.Services;
 using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.ObligationAlerts;
@@ -16,8 +17,7 @@ namespace Wesal.Infrastructure.ObligationAlerts.OverdueAlimonyPaymentsDetection;
 internal sealed class DetectOverdueAlimonyPaymentsJob(
     IOptions<DetectOverdueAlimonyPaymentsOptions> options,
     IAlimonyRepository alimonyRepository,
-    IComplianceMetricsRepository metricsRepository,
-    ObligationAlertService alertService,
+    IObligationAlertService alertService,
     WesalDbContext dbContext) : IJob
 {
     private readonly DetectOverdueAlimonyPaymentsOptions options = options.Value;
@@ -61,19 +61,6 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
             $@"Failed to pay the alimony amount due on 
             {paymentDue.DueDate}. The payment is now marked as overdue.",
             cancellationToken);
-
-        await RecordAlimonyOverdueAsync(alimony, cancellationToken);
-    }
-
-    private async Task RecordAlimonyOverdueAsync(Alimony alimony, CancellationToken cancellationToken)
-    {
-        var metrics = await metricsRepository.GetAsync(
-            alimony.FamilyId,
-            alimony.PayerId,
-            EgyptTime.Today,
-            cancellationToken) ?? throw new InvalidOperationException();
-
-        metrics.RecordAlimonyOverdue();
     }
 
     private static readonly Expression<Func<PaymentDue, bool>> IsNotPaid =

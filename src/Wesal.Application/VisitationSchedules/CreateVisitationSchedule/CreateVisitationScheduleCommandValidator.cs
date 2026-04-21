@@ -1,6 +1,6 @@
 using FluentValidation;
 using Wesal.Application.Extensions;
-using Wesal.Domain.Entities.VisitationSchedules;
+using Wesal.Domain.Common;
 
 namespace Wesal.Application.VisitationSchedules.CreateVisitationSchedule;
 
@@ -10,18 +10,22 @@ public sealed class CreateVisitationScheduleCommandValidator : AbstractValidator
     {
         RuleFor(x => x.CourtCaseId).NotEmpty();
         RuleFor(x => x.LocationId).NotEmpty();
-        RuleFor(x => x.StartDate).NotEmpty();
+        RuleFor(x => x.StartDate)
+            .NotEmpty()
+            .GreaterThanOrEqualTo(EgyptTime.Today)
+            .WithMessage("Start date cannot be in the past");
+
         RuleFor(x => x.EndDate).NotEmpty();
         RuleFor(x => x.StartTime).NotEmpty();
         RuleFor(x => x.EndTime).NotEmpty();
-
+ 
         RuleFor(x => x.Frequency)
-            .MustBeEnumValue<CreateVisitationScheduleCommand, VisitationFrequency>();
-
+            .MustBeEnumValue<CreateVisitationScheduleCommand, ScheduleFrequency>();
+ 
         RuleFor(x => x)
             .Must(HaveValidDateRange)
             .WithMessage("Start date must be before end date");
-
+ 
         RuleFor(x => x)
             .Must(HaveValidTimeRange)
             .WithMessage("Start time must be before end time");

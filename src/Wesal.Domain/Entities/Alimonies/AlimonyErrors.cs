@@ -16,4 +16,7 @@ public static class AlimonyErrors
     public static readonly Error CannotModifyClosedCase = Error.Validation(
         code: "Alimony.CannotModifyClosedCase",
         description: "Cannot modify alimony belonging to a closed court case.");
+
+    public static Error HasPayments =>
+        Error.Validation("Alimony.HasPayments", "Cannot delete alimony with non-pending payments.");
 }

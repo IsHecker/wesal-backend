@@ -1,9 +1,10 @@
-﻿namespace Wesal.Presentation;
+namespace Wesal.Presentation;
 
 public static class Tags
 {
     public const string Users = nameof(Users);
     public const string Authentication = nameof(Authentication);
+    public const string Courts = nameof(Courts);
     public const string CourtStaffs = nameof(CourtStaffs);
     public const string Parents = nameof(Parents);
     public const string Children = nameof(Children);
@@ -25,4 +26,5 @@ public static class Tags
     public const string Notifications = nameof(Notifications);
     public const string UserDevices = nameof(UserDevices);
     public const string Documents = nameof(Documents);
+    public const string Development = nameof(Development);
 }

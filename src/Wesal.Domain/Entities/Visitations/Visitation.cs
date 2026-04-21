@@ -21,15 +21,9 @@ public sealed class Visitation : Entity
 
     public VisitationStatus Status { get; private set; }
 
-    public DateTime? NonCustodialCheckedInAt { get; private set; }
-    public DateTime? CompanionCheckedInAt { get; private set; }
-    public DateTime? CompletedAt { get; private set; } = null!;
+    public VisitationAttendance Attendance { get; private set; } = new();
 
     public bool IsNotified { get; private set; }
-
-    public bool IsNonCustodialCheckedIn => NonCustodialCheckedInAt.HasValue;
-    public bool IsCompanionCheckedIn => CompanionCheckedInAt.HasValue;
-    public bool AreBothCheckedIn => IsNonCustodialCheckedIn && IsCompanionCheckedIn;
 
     public VisitationSchedule VisitationSchedule { get; private set; } = null!;
 
@@ -53,63 +47,104 @@ public sealed class Visitation : Entity
         };
     }
 
-    public Result CheckIn(Guid staffLocationId, string nationalId, int gracePeriodMinutes)
+    public Result CheckIn(
+        Guid staffLocationId,
+        string nationalId,
+        int gracePeriodMinutes,
+        IEnumerable<Guid>? attendingChildrenIds = null)
     {
-        var validation = ValidateTransition(
-            staffLocationId,
-            VisitationStatus.Scheduled,
-            VisitationStatus.CheckedIn);
+        attendingChildrenIds ??= [];
+        if (LocationId != staffLocationId)
+            return VisitationErrors.LocationMismatch;
 
-        if (validation.IsFailure)
-            return validation;
+        if (EgyptTime.Now.Date != StartAt.Date)
+            return VisitationErrors.NotScheduledForToday;
 
         if (!IsWithinTimeWindow(StartAt, gracePeriodMinutes))
             return VisitationErrors.CheckInTooLate(StartAt, gracePeriodMinutes);
 
         if (nationalId == CompanionNationalId)
         {
-            if (IsCompanionCheckedIn)
+            if (Attendance.IsCompanionCheckedIn && attendingChildrenIds.All(c => Attendance.AttendedChildrenIds.Contains(c)))
                 return VisitationErrors.AlreadyCheckedIn;
 
-            CompanionCheckedInAt = EgyptTime.Now;
+            if (!Attendance.IsCompanionCheckedIn)
+                Attendance.CompanionCheckedInAt = EgyptTime.Now;
+
+            Attendance.AttendedChildrenIds = attendingChildrenIds.ToList();
         }
         else if (nationalId == NonCustodialNationalId)
         {
-            if (IsNonCustodialCheckedIn)
+            if (Attendance.IsNonCustodialCheckedIn)
                 return VisitationErrors.AlreadyCheckedIn;
 
-            NonCustodialCheckedInAt = EgyptTime.Now;
+            Attendance.NonCustodialCheckedInAt = EgyptTime.Now;
         }
         else
             return VisitationErrors.NationalIdMismatch;
 
-        if (AreBothCheckedIn)
-            Status = VisitationStatus.CheckedIn;
+        if (Attendance.AreBothCheckedIn)
+        {
+            Status = VisitationStatus.InProgress;
+            return Result.Success;
+        }
 
+        Status = VisitationStatus.PartiallyCheckedIn;
         return Result.Success;
     }
 
-    public Result Complete(VisitCenterStaff staff, Visitation visitation, int gracePeriodMinutes)
+    public Result CheckOut(VisitCenterStaff staff, string nationalId, int checkOutGraceMinutes, int checkInGraceMinutes)
     {
-        var validation = ValidateTransition(
-            staff.LocationId,
-            VisitationStatus.CheckedIn,
+        if (EgyptTime.Now < StartAt.AddMinutes(checkInGraceMinutes))
+        {
+            return VisitationErrors.CannotCheckOutEarlyBeforeStartTimeFinish(StartAt.AddMinutes(checkInGraceMinutes));
+        }
+
+        if (LocationId != staff.LocationId)
+            return VisitationErrors.LocationMismatch;
+
+        if (EgyptTime.Now.Date != StartAt.Date)
+            return VisitationErrors.NotScheduledForToday;
+
+        if (Attendance.AreBothCheckedIn)
+        {
+            var transitionResult = StatusTransition.Validate(Status,
+            VisitationStatus.InProgress,
             VisitationStatus.Completed);
 
-        if (validation.IsFailure)
-            return validation;
+            if (transitionResult.IsFailure)
+                return transitionResult.Error;
 
-        if (!visitation.AreBothCheckedIn)
-            return VisitationErrors.CannotCompleteWithoutBothPartiesCheckedIn;
+            if (EgyptTime.Now < EndAt)
+                return VisitationErrors.CannotCompleteBeforeEndTime(EndAt);
 
-        if (EgyptTime.Now <= EndAt)
-            return VisitationErrors.CannotCompleteBeforeEndTime(EndAt);
+            if (!IsWithinTimeWindow(EndAt, checkOutGraceMinutes))
+                return VisitationErrors.CompleteWindowExpired(EndAt, checkOutGraceMinutes);
+        }
 
-        if (!IsWithinTimeWindow(EndAt, gracePeriodMinutes))
-            return VisitationErrors.CompleteWindowExpired(EndAt, gracePeriodMinutes);
+        if (nationalId == CompanionNationalId)
+        {
+            if (Attendance.IsCompanionCheckedOut)
+                return VisitationErrors.AlreadyCheckedOut;
 
-        CompletedAt = EgyptTime.Now;
+            Attendance.CompanionCheckedOutAt = EgyptTime.Now;
+        }
+        else if (nationalId == NonCustodialNationalId)
+        {
+            if (Attendance.IsNonCustodialCheckedOut)
+                return VisitationErrors.AlreadyCheckedOut;
+
+            Attendance.NonCustodialCheckedOutAt = EgyptTime.Now;
+        }
+        else
+            return VisitationErrors.NationalIdMismatch;
+
+        if (!Attendance.AreBothCheckedOut)
+            return Result.Success;
+
         Status = VisitationStatus.Completed;
+
+        Attendance.CompletedAt = EgyptTime.Now;
         VerifiedById = staff.Id;
 
         return Result.Success;
@@ -118,6 +153,25 @@ public sealed class Visitation : Entity
     public void SetCompanion(string nationalId) => CompanionNationalId = nationalId;
 
     public void MarkAsMissed() => Status = VisitationStatus.Missed;
+    public void MarkAsPartiallyCompleted() => Status = VisitationStatus.PartiallyCompleted;
+
+    public void MarkAsOverstayedVisit()
+    {
+        if (!Attendance.IsNonCustodialCheckedOut && Attendance.IsNonCustodialCheckedIn)
+            Attendance.NonCustodialOverstayed = true;
+
+        if (!Attendance.IsCompanionCheckedOut && Attendance.IsCompanionCheckedIn)
+            Attendance.CompanionOverstayed = true;
+
+        if (Attendance.NonCustodialOverstayed && Attendance.CompanionOverstayed)
+        {
+            Status = VisitationStatus.OverstayedVisit;
+            return;
+        }
+        Status = VisitationStatus.PartiallyCompleted;
+    }
+
+    public void MarkAsCompleted() => Status = VisitationStatus.Completed;
     public void MarkAsNotified() => IsNotified = true;
 
     private Result ValidateTransition(

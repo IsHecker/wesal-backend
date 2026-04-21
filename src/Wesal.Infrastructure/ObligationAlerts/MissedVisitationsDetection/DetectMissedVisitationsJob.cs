@@ -1,8 +1,8 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
-using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Visitations;
 using Wesal.Domain.Common;
 using Wesal.Domain.Entities.ObligationAlerts;
@@ -15,8 +15,7 @@ namespace Wesal.Infrastructure.ObligationAlerts.MissedVisitationsDetection;
 internal sealed class DetectMissedVisitationsJob(
     IOptions<DetectMissedVisitationsOptions> options,
     IOptions<VisitationOptions> visitationOptions,
-    IComplianceMetricsRepository metricsRepository,
-    ObligationAlertService alertService,
+    IObligationAlertService alertService,
     WesalDbContext dbContext) : IJob
 {
     private readonly DetectMissedVisitationsOptions options = options.Value;
@@ -37,76 +36,77 @@ internal sealed class DetectMissedVisitationsJob(
     {
         return dbContext.Visitations
             .Include(visit => visit.VisitationSchedule)
-            .Where(IsMissed)
+            .AsTracking()
             .Where(visit => visit.Status != VisitationStatus.Completed
                 && visit.Status != VisitationStatus.Missed)
+            .Where(IsViolatingSchedule)
             .Take(batchSize)
             .ToListAsync(cancellationToken);
     }
 
     private async Task ProcessVisitationAsync(Visitation visitation, CancellationToken cancellationToken)
     {
-        visitation.MarkAsMissed();
-        dbContext.Visitations.Update(visitation);
+        if (visitation.Status == VisitationStatus.InProgress)
+        {
+            visitation.MarkAsOverstayedVisit();
+        }
+        else if (visitation.Status == VisitationStatus.PartiallyCheckedIn)
+        {
+            visitation.MarkAsPartiallyCompleted();
+        }
+        else
+        {
+            visitation.MarkAsMissed();
+        }
 
-        var (parentIds, type, message) = ResolveViolation(visitation);
+        var violations = ResolveViolations(visitation);
 
-        foreach (var parentId in parentIds)
+        foreach (var (parentId, type, message) in violations)
         {
             await alertService.RecordViolationAsync(parentId, type, visitation.Id, message, cancellationToken);
         }
-
-        await RecordVisitationMissedAsync(visitation, cancellationToken);
     }
 
-    private static (Guid[] parentIds, ViolationType type, string message) ResolveViolation(Visitation visitation)
+    private static List<(Guid ParentId, ViolationType Type, string Message)> ResolveViolations(Visitation visitation)
     {
-        //$@"Missed the scheduled visitation on {visitation.StartAt} at {visitation.StartAt.TimeOfDay}."
-        //$@"Failed to end the visitation on time. 
-        // The visit scheduled to end at {visitation.EndAt} exceeded the allowed grace period."
-
         var custodialId = visitation.VisitationSchedule.CustodialParentId;
         var nonCustodialId = visitation.NonCustodialParentId;
+        var violations = new List<(Guid ParentId, ViolationType Type, string Message)>();
 
-        // No one showed up
-        if (!visitation.IsNonCustodialCheckedIn && !visitation.IsCompanionCheckedIn)
-            return (
-                [custodialId],
-                ViolationType.MissedVisit,
-                $"Neither party attended the scheduled visitation on {visitation.StartAt}.");
+        if (visitation.Status == VisitationStatus.OverstayedVisit)
+        {
+            // Check who actually overstayed or failed to check out
+            if (!visitation.Attendance.IsNonCustodialCheckedOut)
+            {
+                violations.Add((nonCustodialId, ViolationType.OverstayedVisit,
+                    "Failed to check-out and conclude the visitation session on time."));
+            }
 
-        // Only companion missed the visit
-        if (!visitation.IsCompanionCheckedIn)
-            return (
-                [custodialId],
-                ViolationType.MissedVisit,
-                $"Children were not delivered for the visitation scheduled on {visitation.StartAt}.");
+            if (!visitation.Attendance.IsCompanionCheckedOut)
+            {
+                violations.Add((custodialId, ViolationType.OverstayedVisit,
+                    "Failed to check-out and conclude the visitation session on time."));
+            }
 
-        // Only custodial parent missed the visit
-        if (!visitation.IsNonCustodialCheckedIn)
-            return (
-                [nonCustodialId],
-                ViolationType.MissedVisit,
-                $"Non-custodial parent did not attend the visitation scheduled on {visitation.StartAt}.");
+            return violations;
+        }
 
-        // Both checked in but overstayed
-        return (
-            [custodialId, nonCustodialId],
-            ViolationType.OverstayedVisit,
-            $"Failed to end the visitation on time. The visitation scheduled to end at {visitation.EndAt} was not properly concluded within the allowed grace period.");
+        if (!visitation.Attendance.IsCompanionCheckedIn)
+        {
+            violations.Add((custodialId, ViolationType.MissedVisit, "The children were not delivered for the scheduled visitation session."));
+        }
+
+        if (!visitation.Attendance.IsNonCustodialCheckedIn)
+        {
+            violations.Add((nonCustodialId, ViolationType.MissedVisit, "The non-custodial parent failed to attend the scheduled visitation session."));
+        }
+
+        return violations;
     }
 
-    private async Task RecordVisitationMissedAsync(Visitation visitation, CancellationToken cancellationToken)
-    {
-        var metrics = await metricsRepository.GetAsync(
-            visitation.FamilyId,
-            visitation.NonCustodialParentId,
-            EgyptTime.Today,
-            cancellationToken) ?? throw new InvalidOperationException();
-
-        metrics.RecordVisitationMissed();
-    }
-
-    private Expression<Func<Visitation, bool>> IsMissed =>
-        visit => EgyptTime.Now > visit.StartAt.AddMinutes(visitationOptions.CheckInGracePeriodMinutes);
+    private Expression<Func<Visitation, bool>> IsViolatingSchedule =>
+        visit => ((visit.Status == VisitationStatus.Scheduled || visit.Status == VisitationStatus.PartiallyCheckedIn)
+            && EgyptTime.Now > visit.StartAt.AddMinutes(visitationOptions.CheckInGracePeriodMinutes))
+            || ((visit.Status == VisitationStatus.InProgress)
+                && EgyptTime.Now > visit.EndAt.AddMinutes(visitationOptions.CheckOutGracePeriodMinutes));
 }

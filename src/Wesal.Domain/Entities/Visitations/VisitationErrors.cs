@@ -27,6 +27,11 @@ public static class VisitationErrors
             "Visitation.CheckInTooLate",
             $"Check-in is no longer allowed. Check-in is from {startAt.TimeOfDay} until {startAt.AddMinutes(gracePeriodMinutes).TimeOfDay}.");
 
+    public static Error CannotCheckOutEarlyBeforeStartTimeFinish(DateTime gracePeriodEndTime) =>
+        Error.Validation(
+            "Visitation.CannotCheckOutEarlyBeforeStartTimeFinish",
+            $"You cannot check out early until the start time finishes.");
+
     public static Error NationalIdMismatch =>
         Error.Validation(
             "Visitation.NationalIdMismatch",
@@ -46,4 +51,9 @@ public static class VisitationErrors
         Error.Validation(
             "Visitation.AlreadyCheckedIn",
             "Already checked-in.");
+
+    public static Error AlreadyCheckedOut =>
+        Error.Validation(
+            "Visitation.AlreadyCheckedOut",
+            "Already checked-out.");
 }

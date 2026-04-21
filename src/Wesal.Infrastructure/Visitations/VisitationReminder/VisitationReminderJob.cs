@@ -38,6 +38,8 @@ internal sealed class VisitationReminderJob(
                 },
                 context.CancellationToken);
         }
+
+        await dbContext.SaveChangesAsync(context.CancellationToken);
     }
 
     private async Task<List<Visitation>> GetUpcomingVisitationsAsync(CancellationToken cancellationToken)

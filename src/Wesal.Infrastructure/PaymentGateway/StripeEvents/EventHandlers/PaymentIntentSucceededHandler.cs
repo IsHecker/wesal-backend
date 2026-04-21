@@ -14,8 +14,7 @@ namespace Wesal.Infrastructure.PaymentGateway.StripeEvents.EventHandlers;
 internal sealed class PaymentIntentSucceededHandler(
     IAlimonyRepository alimonyRepository,
     IPaymentDueRepository paymentDueRepository,
-    IRepository<Payment> paymentRepository,
-    IComplianceMetricsRepository metricsRepository,
+    IPaymentRepository paymentRepository,
     IUnitOfWork unitOfWork,
     INotificationService notificationService) : StripeEventHandler<PaymentIntent>
 {
@@ -51,24 +50,11 @@ internal sealed class PaymentIntentSucceededHandler(
         await paymentRepository.AddAsync(payment);
         paymentDueRepository.Update(paymentDue);
 
-        await RecordAlimonyPaidOnTimeAsync(alimony);
-
         await unitOfWork.SaveChangesAsync();
 
         await SendNotificationsAsync(alimony);
 
         return Result.Success;
-    }
-
-    private async Task RecordAlimonyPaidOnTimeAsync(Alimony alimony)
-    {
-        var metrics = await metricsRepository.GetAsync(
-            alimony.FamilyId,
-            alimony.PayerId,
-            EgyptTime.Today) ?? throw new InvalidOperationException();
-
-        metrics.RecordAlimonyPaidOnTime();
-        metricsRepository.Update(metrics);
     }
 
     private async Task SendNotificationsAsync(Alimony alimony)

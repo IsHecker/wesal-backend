@@ -65,4 +65,9 @@ internal sealed class WesalDbContext(DbContextOptions<WesalDbContext> options)
 
       modelBuilder.ApplyConfigurationsFromAssembly(AssemblyReference.Assembly);
    }
+
+   public async Task<int> ExecuteSqlAsync(string sql, CancellationToken cancellationToken = default)
+   {
+      return await Database.ExecuteSqlRawAsync(sql, cancellationToken);
+   }
 }

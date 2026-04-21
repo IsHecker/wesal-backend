@@ -5,6 +5,4 @@ namespace Wesal.Application.PaymentsDue.InitiateAlimonyPayment;
 
 public record struct InitiateAlimonyPaymentCommand(
     Guid ParentId,
-    Guid PaymentDueId,
-    string SuccessUrl,
-    string CancelUrl) : ICommand<SessionResponse>;
+    Guid PaymentDueId) : ICommand<PaymentIntentResponse>;

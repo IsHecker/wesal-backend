@@ -2,6 +2,7 @@ using System.Transactions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Data;
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Results;
 
@@ -52,7 +53,7 @@ public class UnitOfWorkBehaviour<TRequest, TResponse>(IUnitOfWork unitOfWork)
 
         foreach (var entity in entities)
         {
-            entity.UpdatedAt = DateTime.UtcNow;
+            entity.UpdatedAt = EgyptTime.UtcNow;
         }
     }
 }

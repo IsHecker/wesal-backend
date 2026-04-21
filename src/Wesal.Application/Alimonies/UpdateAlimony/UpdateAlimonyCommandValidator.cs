@@ -1,7 +1,7 @@
 using FluentValidation;
 using Wesal.Application.Alimonies.UpdateAlimony;
 using Wesal.Application.Extensions;
-using Wesal.Domain.Entities.Alimonies;
+using Wesal.Domain.Common;
 
 internal sealed class UpdateAlimonyCommandValidator : AbstractValidator<UpdateAlimonyCommand>
 {
@@ -15,7 +15,7 @@ internal sealed class UpdateAlimonyCommandValidator : AbstractValidator<UpdateAl
             .GreaterThan(0)
             .WithMessage("Amount must be greater than zero.");
 
-        RuleFor(x => x.Frequency).MustBeEnumValue<UpdateAlimonyCommand, AlimonyFrequency>();
+        RuleFor(x => x.Frequency).MustBeEnumValue<UpdateAlimonyCommand, ScheduleFrequency>();
 
         RuleFor(x => x.StartDate)
             .NotEmpty()

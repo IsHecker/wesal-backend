@@ -8,11 +8,11 @@ namespace Wesal.Infrastructure.Notifications;
 internal sealed class NotificationRepository(WesalDbContext context)
     : Repository<Notification>(context), INotificationRepository
 {
-    public Task<IEnumerable<Notification>> GetByRecipientIdAsync(
+    public Task<IQueryable<Notification>> GetByRecipientIdAsync(
         Guid recipientId,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult<IEnumerable<Notification>>(context.Notifications
+        return Task.FromResult(context.Notifications
             .Where(n => n.RecipientId == recipientId));
     }
 }

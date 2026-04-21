@@ -1,4 +1,5 @@
 using FluentValidation;
+using Wesal.Domain.Common;
 
 namespace Wesal.Application.Custodies.CreateCustody;
 
@@ -10,9 +11,10 @@ internal sealed class CreateCustodyCommandValidator : AbstractValidator<CreateCu
         RuleFor(x => x.CourtCaseId).NotEmpty();
         RuleFor(x => x.CustodialParentId).NotEmpty();
 
-        RuleFor(x => x.StartAt)
+        RuleFor(x => x.StartAt.Date)
             .NotEmpty()
-            .WithMessage("Start date is required");
+            .GreaterThanOrEqualTo(EgyptTime.Now.Date)
+            .WithMessage("Start date cannot be in the past");
 
         RuleFor(x => x)
             .Must(HaveValidDateRange)

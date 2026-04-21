@@ -2,6 +2,7 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Alimonies.UpdateAlimony;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.FamilyCourts;
@@ -31,7 +32,7 @@ internal sealed class UpdateAlimonyCommandHandler(
 
         alimony.Update(
             request.Amount,
-            request.Frequency.ToEnum<AlimonyFrequency>(),
+            request.Frequency.ToEnum<ScheduleFrequency>(),
             request.StartDate,
             request.EndDate);
 

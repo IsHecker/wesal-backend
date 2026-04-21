@@ -31,6 +31,7 @@ internal static class ApiEndpoints
     internal static class Courts
     {
         public const string Me = $"{CourtsBase}/me";
+        public const string GetById = $"{CourtsBase}/{{courtId:guid}}";
     }
 
     internal static class CourtStaffs
@@ -115,7 +116,7 @@ internal static class ApiEndpoints
 
         public const string List = visitationsBase;
         public const string CheckIn = $"{GetById}/check-in";
-        public const string Complete = $"{GetById}/complete";
+        public const string CheckOut = $"{GetById}/check-out";
     }
 
     internal static class VisitationLocations
@@ -216,5 +217,11 @@ internal static class ApiEndpoints
         public const string CreateCourtStaff = $"{UsersBase}/court-staff";
         public const string CreateVisitCenterStaff = $"{UsersBase}/visit-center-staff";
         public const string ChangePassword = $"{UsersBase}/change-password";
+    }
+
+    internal static class Development
+    {
+        private const string DevBase = $"{ApiBase}/dev";
+        public const string ClearTable = $"{DevBase}/clear/{{tableName}}";
     }
 }

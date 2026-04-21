@@ -15,4 +15,7 @@ public static class CustodyRequestErrors
 
     public static Error NotTheCustodialParent =>
         Error.Forbidden("CustodyRequest.NotTheCustodialParent", "You are not authorized to respond to this request");
+
+    public static Error AlreadyPending =>
+        Error.Conflict("CustodyRequest.AlreadyPending", "You already have a pending custody request for this family.");
 }

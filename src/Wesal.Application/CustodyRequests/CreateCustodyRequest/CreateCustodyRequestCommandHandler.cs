@@ -13,7 +13,7 @@ namespace Wesal.Application.CustodyRequests.CreateCustodyRequest;
 internal sealed class CreateCustodyRequestCommandHandler(
     IFamilyRepository familyRepository,
     ICustodyRepository custodyRepository,
-    IRepository<CustodyRequest> custodyRequestRepository,
+    ICustodyRequestRepository custodyRequestRepository,
     INotificationService notificationService)
     : ICommandHandler<CreateCustodyRequestCommand, Guid>
 {
@@ -31,6 +31,12 @@ internal sealed class CreateCustodyRequestCommandHandler(
 
         if (custody.CustodialParentId == request.ParentId)
             return CustodyRequestErrors.AlreadyCustodian;
+
+        var alreadyPending = await custodyRequestRepository
+            .HasPendingByParentAndFamilyAsync(request.ParentId, family.Id, cancellationToken);
+                
+        if (alreadyPending)
+            return CustodyRequestErrors.AlreadyPending;
 
         var custodyRequest = CustodyRequest.Create(
             request.ParentId,

@@ -21,7 +21,11 @@ internal sealed class CheckInVisitation : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new CheckInVisitationCommand(user.GetRoleId(), requst.NationalId, visitationId));
+            var result = await sender.Send(new CheckInVisitationCommand(
+                user.GetRoleId(),
+                requst.NationalId,
+                visitationId,
+                requst.AttendingChildrenIds));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })
@@ -34,5 +38,5 @@ internal sealed class CheckInVisitation : IEndpoint
         .RequireAuthorization(CustomPolicies.VisitCenterStaffOnly);
     }
 
-    internal record struct Request(string NationalId);
+    internal record struct Request(string NationalId, IEnumerable<Guid>? AttendingChildrenIds);
 }

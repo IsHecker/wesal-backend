@@ -5,6 +5,7 @@ using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.VisitationLocations;
 using Wesal.Domain.Entities.Visitations;
 using Wesal.Domain.Entities.VisitCenterStaffs;
+using Wesal.Infrastructure.Extensions;
 
 namespace Wesal.Infrastructure.Visitations;
 
@@ -36,5 +37,10 @@ internal sealed class VisitationConfiguration : IEntityTypeConfiguration<Visitat
             .WithMany()
             .HasForeignKey(visit => visit.VerifiedById)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.OwnsOne(visit => visit.Attendance, attendance =>
+        {
+            attendance.ToJson();
+        });
     }
 }

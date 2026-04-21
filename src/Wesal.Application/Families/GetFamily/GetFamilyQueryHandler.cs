@@ -3,7 +3,6 @@ using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
 using Wesal.Domain.Entities.Families;
-using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Families.GetFamily;
@@ -24,9 +23,6 @@ internal sealed class GetFamilyQueryHandler(
 
         if (family is null)
             return FamilyErrors.NotFound(request.FamilyId);
-
-        if (family.CourtId != request.CourtId)
-            return FamilyCourtErrors.NotBelongToCourt(nameof(Family));
 
         return family.ToResponse();
     }

@@ -8,4 +8,12 @@ public interface IPaymentDueRepository : IRepository<PaymentDue>
     Task DeleteUnpaidByCourtCaseIdAsync(
         Guid courtCaseId,
         CancellationToken cancellationToken = default);
+
+    Task DeletePendingByAlimonyIdAsync(
+        Guid alimonyId,
+        CancellationToken cancellationToken = default);
+
+    Task<bool> HasPaymentsByAlimonyIdAsync(
+        Guid alimonyId,
+        CancellationToken cancellationToken = default);
 }

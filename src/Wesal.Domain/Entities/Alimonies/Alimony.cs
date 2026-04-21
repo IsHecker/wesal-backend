@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.CourtCases;
 
@@ -13,7 +14,7 @@ public sealed class Alimony : Entity
 
     public long Amount { get; private set; }
 
-    public AlimonyFrequency Frequency { get; private set; }
+    public ScheduleFrequency Frequency { get; private set; }
 
     public DateOnly StartDate { get; private set; }
 
@@ -31,7 +32,7 @@ public sealed class Alimony : Entity
         Guid payerId,
         Guid recipientId,
         long amount,
-        AlimonyFrequency frequency,
+        ScheduleFrequency frequency,
         DateOnly startDate,
         DateOnly endDate)
     {
@@ -51,7 +52,7 @@ public sealed class Alimony : Entity
 
     public void Update(
         long amount,
-        AlimonyFrequency frequency,
+        ScheduleFrequency frequency,
         DateOnly startDate,
         DateOnly? endDate)
     {
@@ -71,16 +72,4 @@ public sealed class Alimony : Entity
     }
 
     public void Stop() => IsStopped = true;
-
-    public int GetFrequencyInDays(DateOnly targetDate)
-    {
-        return Frequency switch
-        {
-            AlimonyFrequency.Daily => 1,
-            AlimonyFrequency.Weekly => 7,
-            AlimonyFrequency.Monthly => DateTime.DaysInMonth(targetDate.Year, targetDate.Month),
-            AlimonyFrequency.Yearly => targetDate.AddYears(1).DayNumber - targetDate.DayNumber,
-            _ => throw new NotImplementedException()
-        };
-    }
 }

@@ -1214,15 +1214,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("CompanionCheckedInAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("CompanionNationalId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -1238,9 +1232,6 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("NonCustodialCheckedInAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("NonCustodialNationalId")
                         .IsRequired()
@@ -1716,6 +1707,49 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .WithMany()
                         .HasForeignKey("VisitationScheduleId")
                         .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.OwnsOne("Wesal.Domain.Entities.Visitations.VisitationAttendance", "Attendance", b1 =>
+                        {
+                            b1.Property<Guid>("VisitationId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("AttendedChildrenIds")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<DateTime?>("CompanionCheckedInAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime?>("CompanionCheckedOutAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<bool>("CompanionOverstayed")
+                                .HasColumnType("bit");
+
+                            b1.Property<DateTime?>("CompletedAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime?>("NonCustodialCheckedInAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<DateTime?>("NonCustodialCheckedOutAt")
+                                .HasColumnType("datetime2");
+
+                            b1.Property<bool>("NonCustodialOverstayed")
+                                .HasColumnType("bit");
+
+                            b1.HasKey("VisitationId");
+
+                            b1.ToTable("Visitations");
+
+                            b1.ToJson("Attendance");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VisitationId");
+                        });
+
+                    b.Navigation("Attendance")
                         .IsRequired();
 
                     b.Navigation("VisitationSchedule");

@@ -39,6 +39,6 @@ internal sealed class VisitationRepository(WesalDbContext context)
     {
         return context.Visitations
             .AnyAsync(visitation => visitation.VisitationScheduleId == scheduleId
-                && visitation.Status == VisitationStatus.Scheduled, cancellationToken);
+                && visitation.Status != VisitationStatus.Scheduled, cancellationToken);
     }
 }

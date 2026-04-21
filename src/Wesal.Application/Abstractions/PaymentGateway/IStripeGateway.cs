@@ -6,18 +6,16 @@ namespace Wesal.Application.Abstractions.PaymentGateway;
 
 public interface IStripeGateway
 {
-    Task<string> CreateCheckoutSessionAsync(
+    Task<string> CreatePaymentIntentAsync(
         Parent payerParent,
         PaymentDue paymentDue,
-        string successUrl,
-        string cancelUrl,
         CancellationToken cancellationToken = default);
 
-    Task<string> CreateCustomerAsync(
+    Task<Result<string>> CreateCustomerAsync(
         Parent parent,
         CancellationToken cancellationToken = default);
 
-    Task<string> CreateConnectAccountAsync(
+    Task<Result<string>> CreateConnectAccountAsync(
         Parent parent,
         CancellationToken cancellationToken = default);
 
@@ -30,7 +28,10 @@ public interface IStripeGateway
     Task<Result> SendPayoutAsync(
         Parent parent,
         PaymentDue paymentDue,
+        string paymentIntentId,
         CancellationToken cancellationToken = default);
 
     Task DeleteAccount(string accountId);
-}
+    
+    Task DeleteCustomer(string customerId);
+}

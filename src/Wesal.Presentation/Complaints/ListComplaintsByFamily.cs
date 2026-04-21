@@ -19,12 +19,13 @@ internal sealed class ListComplaintsByFamily : IEndpoint
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
         app.MapGet(ApiEndpoints.Complaints.ListByFamily, async (
+            Guid familyId,
             [AsParameters] Pagination pagination,
             ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ListComplaintsByFamilyQuery(
-                user.GetRoleId(),
+                familyId,
                 pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);

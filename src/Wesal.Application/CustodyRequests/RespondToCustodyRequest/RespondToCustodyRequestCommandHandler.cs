@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Wesal.Application.Abstractions.Data;
+using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Data;
 using Wesal.Application.Messaging;
@@ -12,7 +13,7 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.CustodyRequests.RespondToCustodyRequest;
 
 internal sealed class RespondToCustodyRequestCommandHandler(
-    IRepository<CustodyRequest> custodyRequestRepository,
+    ICustodyRequestRepository custodyRequestRepository,
     INotificationService notificationService,
     IObligationAlertService obligationAlertService,
     IOptions<CustodyRequestOptions> options,
@@ -35,7 +36,7 @@ internal sealed class RespondToCustodyRequestCommandHandler(
         var result = request.IsAccepted
             ? custodyRequest.Accept()
             : custodyRequest.Reject(request.ReasonNote!);
-            
+
         if (result.IsFailure)
             return result.Error;
 
@@ -50,7 +51,7 @@ internal sealed class RespondToCustodyRequestCommandHandler(
             await notificationService.SendNotificationsAsync(
                 [NotificationTemplate.CustodyRequestRejected(custodyRequest.NonCustodialParentId, request.ReasonNote!)],
                 cancellationToken: cancellationToken);
-                
+
             await CheckForRepeatedRejectionsAsync(custodyRequest, cancellationToken);
         }
 
@@ -62,13 +63,13 @@ internal sealed class RespondToCustodyRequestCommandHandler(
         var maxRejections = options.MaxConsecutiveRejections;
 
         var lastApprovedAt = await dbContext.CustodyRequests
-            .Where(cr => cr.FamilyId == currentRequest.FamilyId 
+            .Where(cr => cr.FamilyId == currentRequest.FamilyId
                       && cr.CustodialParentId == currentRequest.CustodialParentId
                       && cr.Status == CustodyRequestStatus.Approved)
             .MaxAsync(cr => cr.RespondedAt, cancellationToken);
-        
+
         var query = dbContext.CustodyRequests
-            .Where(cr => cr.FamilyId == currentRequest.FamilyId 
+            .Where(cr => cr.FamilyId == currentRequest.FamilyId
                       && cr.CustodialParentId == currentRequest.CustodialParentId
                       && cr.Status == CustodyRequestStatus.Rejected
                       && cr.Id != currentRequest.Id);

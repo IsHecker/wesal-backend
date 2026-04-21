@@ -1,6 +1,7 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.FamilyCourts;
@@ -38,7 +39,7 @@ internal sealed class CreateAlimonyCommandHandler(
             custody!.NonCustodialParentId,
             custody.CustodialParentId,
             request.Amount,
-            request.Frequency.ToEnum<AlimonyFrequency>(),
+            request.Frequency.ToEnum<ScheduleFrequency>(),
             request.StartDate,
             request.EndDate);
 

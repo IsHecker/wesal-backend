@@ -9,6 +9,7 @@ namespace Wesal.Application.PaymentsDue.WithdrawPayment;
 
 internal sealed class WithdrawPaymentCommandHandler(
     IPaymentDueRepository paymentDueRepository,
+    IPaymentRepository paymentRepository,
     IAlimonyRepository alimonyRepository,
     IParentRepository parentRepository,
     IStripeGateway stripeGateway)
@@ -31,11 +32,26 @@ internal sealed class WithdrawPaymentCommandHandler(
         if (alimony.RecipientId != request.ParentId)
             return WithdrawalErrors.Unauthorized;
 
-        if (paymentDue.WithdrawalStatus == WithdrawalStatus.Completed)
+        if (paymentDue.WithdrawalStatus is WithdrawalStatus.Completed or WithdrawalStatus.Processing)
             return WithdrawalErrors.AlreadyWithdrawn;
 
         var parent = await parentRepository.GetByIdAsync(request.ParentId, cancellationToken);
+        
+        var payment = await paymentRepository.GetByPaymentDueIdAsync(paymentDue.Id, cancellationToken)
+            ?? throw new InvalidOperationException("Payment record is missing for a paid item.");
 
-        return await stripeGateway.SendPayoutAsync(parent!, paymentDue, cancellationToken);
+        var result = await stripeGateway.SendPayoutAsync(
+            parent!, 
+            paymentDue, 
+            payment.PaymentIntentId!, 
+            cancellationToken);
+        
+        if (result.IsFailure)
+            return result.Error;
+
+        paymentDue.MarkWithdrawalStatusAs(WithdrawalStatus.Processing);
+        paymentDueRepository.Update(paymentDue);
+
+        return Result.Success;
     }
 }

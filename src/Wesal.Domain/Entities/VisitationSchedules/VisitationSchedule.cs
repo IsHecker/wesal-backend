@@ -1,3 +1,4 @@
+using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.Parents;
 
@@ -14,7 +15,7 @@ public sealed class VisitationSchedule : Entity
     public string NonCustodialNationalId { get; private set; } = null!;
     public Guid LocationId { get; private set; }
 
-    public VisitationFrequency Frequency { get; private set; }
+    public ScheduleFrequency Frequency { get; private set; }
 
     public TimeOnly StartTime { get; private set; }
     public TimeOnly EndTime { get; private set; }
@@ -37,7 +38,7 @@ public sealed class VisitationSchedule : Entity
         Parent custodialParent,
         Parent nonCustodialParent,
         Guid locationId,
-        VisitationFrequency frequency,
+        ScheduleFrequency frequency,
         DateOnly startDate,
         DateOnly? endDate,
         TimeOnly startTime,
@@ -62,30 +63,9 @@ public sealed class VisitationSchedule : Entity
         };
     }
 
-    public void UpdateLastGeneratedDate(DateOnly lastDate)
-    {
-        if (LastGeneratedDate.HasValue && lastDate < LastGeneratedDate.Value)
-            throw new InvalidOperationException();
-
-        LastGeneratedDate = lastDate;
-    }
-
-    public void Stop() => IsStopped = true;
-
-    public int GetFrequencyInDays(DateOnly targetDate)
-    {
-        return Frequency switch
-        {
-            VisitationFrequency.Daily => 1,
-            VisitationFrequency.Weekly => 7,
-            VisitationFrequency.Monthly => DateTime.DaysInMonth(targetDate.Year, targetDate.Month),
-            _ => throw new NotImplementedException()
-        };
-    }
-
     public void Update(
         Guid locationId,
-        VisitationFrequency frequency,
+        ScheduleFrequency frequency,
         TimeOnly startTime,
         TimeOnly endTime,
         DateOnly startDate,
@@ -99,4 +79,14 @@ public sealed class VisitationSchedule : Entity
         EndDate = endDate;
         LastGeneratedDate = null;
     }
+
+    public void UpdateLastGeneratedDate(DateOnly lastDate)
+    {
+        if (LastGeneratedDate.HasValue && lastDate < LastGeneratedDate.Value)
+            throw new InvalidOperationException();
+
+        LastGeneratedDate = lastDate;
+    }
+
+    public void Stop() => IsStopped = true;
 }

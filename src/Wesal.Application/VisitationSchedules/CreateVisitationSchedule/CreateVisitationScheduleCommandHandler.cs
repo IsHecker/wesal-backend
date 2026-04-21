@@ -1,5 +1,7 @@
 using Wesal.Application.Abstractions.Repositories;
+using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
+using Wesal.Domain.Common;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.VisitationLocations;
@@ -35,9 +37,6 @@ internal sealed class CreateVisitationScheduleCommandHandler(
         var custodialParent = await parentRepository.GetByIdAsync(custody!.CustodialParentId, cancellationToken);
         var nonCustodialParent = await parentRepository.GetByIdAsync(custody.NonCustodialParentId, cancellationToken);
 
-        if (!Enum.TryParse<VisitationFrequency>(request.Frequency, out var frequency))
-            return VisitationScheduleErrors.InvalidFrequency(request.Frequency);
-
         var schedule = VisitationSchedule.Create(
             courtCase.CourtId,
             request.CourtCaseId,
@@ -45,7 +44,7 @@ internal sealed class CreateVisitationScheduleCommandHandler(
             custodialParent!,
             nonCustodialParent!,
             request.LocationId,
-            frequency,
+            request.Frequency.ToEnum<ScheduleFrequency>(),
             request.StartDate,
             request.EndDate,
             request.StartTime,

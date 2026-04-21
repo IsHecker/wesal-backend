@@ -1,11 +1,13 @@
-﻿namespace Wesal.Domain.DomainEvents;
+using Wesal.Domain.Common;
+
+namespace Wesal.Domain.DomainEvents;
 
 public abstract record DomainEvent : IDomainEvent
 {
     protected DomainEvent()
     {
         Id = Guid.NewGuid();
-        OccurredOnUtc = DateTime.UtcNow;
+        OccurredOnUtc = EgyptTime.UtcNow;
     }
 
     protected DomainEvent(Guid id, DateTime occurredOnUtc)

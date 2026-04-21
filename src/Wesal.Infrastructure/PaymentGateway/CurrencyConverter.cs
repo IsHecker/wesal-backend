@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
+using Wesal.Domain.Results;
 
 namespace Wesal.Infrastructure.PaymentGateway;
 
@@ -10,34 +11,39 @@ internal sealed class CurrencyConverter(
     private const int CacheMinutes = 60;
     private const string BaseUrl = "https://open.exchangerate-api.com/v6/latest";
 
-    public async Task<long> EgpToUsdAsync(long egpPiasters)
+    public async Task<Result<long>> EgpToUsdAsync(long egpPiasters)
     {
-        var rate = await GetExchangeRateAsync("EGP", "USD");
-        return (long)Math.Round(egpPiasters * rate);
+        var rateResult = await GetExchangeRateAsync("EGP", "USD");
+
+        if (rateResult.IsFailure)
+            return rateResult.Error;
+
+        return (long)Math.Round(egpPiasters * rateResult.Value);
     }
 
-    public async Task<long> UsdToEgpAsync(long usdCents)
-    {
-        var rate = await GetExchangeRateAsync("USD", "EGP");
-        return (long)Math.Round(usdCents * rate);
-    }
-
-    private async Task<decimal> GetExchangeRateAsync(string from, string to)
+    private async Task<Result<decimal>> GetExchangeRateAsync(string from, string to)
     {
         var cacheKey = $"exchange_rate_{from}_{to}";
 
         if (cache.TryGetValue<decimal>(cacheKey, out var cachedRate))
             return cachedRate;
 
-        var url = $"{BaseUrl}/{from}";
-        var response = await httpClient.GetFromJsonAsync<ExchangeRateResponse>(url);
+        try
+        {
+            var url = $"{BaseUrl}/{from}";
+            var response = await httpClient.GetFromJsonAsync<ExchangeRateResponse>(url);
 
-        if (response?.Rates == null || !response.Rates.TryGetValue(to, out var rate))
-            throw new InvalidOperationException($"Exchange rate for {from} to {to} not available");
+            if (response?.Rates == null || !response.Rates.TryGetValue(to, out var rate))
+                return Error.Failure("CurrencyConverter.RateNotAvailable", $"Exchange rate for {from} to {to} not available");
 
-        cache.Set(cacheKey, rate, TimeSpan.FromMinutes(CacheMinutes));
+            cache.Set(cacheKey, rate, TimeSpan.FromMinutes(CacheMinutes));
 
-        return rate;
+            return rate;
+        }
+        catch (Exception)
+        {
+            return Error.Failure("CurrencyConverter.ApiError", "Failed to fetch exchange rates from external API");
+        }
     }
 
     private sealed class ExchangeRateResponse

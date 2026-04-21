@@ -1,10 +1,12 @@
-﻿namespace Wesal.Domain.DomainEvents;
+using Wesal.Domain.Common;
+
+namespace Wesal.Domain.DomainEvents;
 
 public abstract class Entity
 {
     public Guid Id { get; init; } = Guid.NewGuid();
 
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; init; } = EgyptTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
     private readonly List<IDomainEvent> _domainEvents = [];
