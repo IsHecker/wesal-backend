@@ -26,5 +26,6 @@ public static class Tags
     public const string Notifications = nameof(Notifications);
     public const string UserDevices = nameof(UserDevices);
     public const string Documents = nameof(Documents);
+    public const string VisitCenterStaffs = nameof(VisitCenterStaffs);
     public const string Development = nameof(Development);
 }

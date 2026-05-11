@@ -7,4 +7,5 @@ public record struct ComplaintsResponse(
     PagedResponse<ComplaintResponse> Complaints,
     int PendingCount,
     int UnderReviewCount,
-    int ResolvedCount);
+    int ResolvedCount,
+    int RejectedCount);

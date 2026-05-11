@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
-using Wesal.Application.Authentication;
 using Wesal.Application.Schools.UpdateSchoolProfile;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
@@ -33,7 +32,7 @@ internal sealed class UpdateSchoolProfile : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UpdateSchoolProfile))
-        .RequireAuthorization(CustomPolicies.SchoolsOnly);
+        .RequireAuthorization();
     }
 
     internal record struct Request(string? Email, string? ContactNumber);

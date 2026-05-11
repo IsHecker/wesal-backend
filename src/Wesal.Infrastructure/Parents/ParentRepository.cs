@@ -11,23 +11,23 @@ internal sealed class ParentRepository(WesalDbContext context)
 {
     public Task<bool> ExistsByNationalIdAsync(string nationalId, CancellationToken cancellationToken = default)
     {
-        return context.Parents.AnyAsync(parent => parent.NationalId == nationalId, cancellationToken);
+        return _context.Parents.AnyAsync(parent => parent.NationalId == nationalId, cancellationToken);
     }
 
     public Task<Parent?> GetByNationalIdAsync(string nationalId, CancellationToken cancellationToken = default)
     {
-        return context.Parents.FirstOrDefaultAsync(parent => parent.NationalId == nationalId, cancellationToken);
+        return _context.Parents.FirstOrDefaultAsync(parent => parent.NationalId == nationalId, cancellationToken);
     }
 
     public Task<Parent?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return context.Parents
+        return _context.Parents
             .FirstOrDefaultAsync(school => school.UserId == userId, cancellationToken);
     }
 
     public Task<Parent> GetByStripeAccountIdAsync(string accountId, CancellationToken cancellationToken = default)
     {
-        return context.Parents
+        return _context.Parents
             .AsTracking()
             .FirstAsync(w => w.StripeConnectAccountId == accountId, cancellationToken);
     }

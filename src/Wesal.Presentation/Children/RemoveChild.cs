@@ -21,7 +21,7 @@ internal sealed class RemoveChild : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new RemoveChildCommand(user.GetCourtId(), familyId, childId));
+            var result = await sender.Send(new RemoveChildCommand(user.GetCourtId(), user.GetRoleId(), familyId, childId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })
@@ -30,6 +30,6 @@ internal sealed class RemoveChild : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(RemoveChild))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 }

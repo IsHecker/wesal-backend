@@ -22,6 +22,7 @@ internal sealed class DeleteVisitationSchedule : IEndpoint
         {
             var result = await sender.Send(new DeleteVisitationScheduleCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 scheduleId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
@@ -31,6 +32,6 @@ internal sealed class DeleteVisitationSchedule : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(DeleteVisitationSchedule))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CaseClerkOnly);
     }
 }

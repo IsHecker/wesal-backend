@@ -22,6 +22,7 @@ internal sealed class CreateVisitationSchedule : IEndpoint
         {
             var result = await sender.Send(new CreateVisitationScheduleCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 request.CourtCaseId,
                 request.LocationId,
                 request.Frequency,
@@ -37,7 +38,7 @@ internal sealed class CreateVisitationSchedule : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(CreateVisitationSchedule))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CaseClerkOnly);
     }
 
     internal sealed record Request(

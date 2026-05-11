@@ -6,18 +6,18 @@ using Wesal.Contracts.Complaints;
 using Wesal.Domain.Entities.Complaints;
 using Wesal.Domain.Results;
 
-namespace Wesal.Application.Complaints.ListComplaintsByCourt;
+namespace Wesal.Application.Complaints.ListComplaints;
 
-internal sealed class ListComplaintsByCourtQueryHandler(
+internal sealed class ListComplaintsQueryHandler(
     IWesalDbContext context)
-    : IQueryHandler<ListComplaintsByCourtQuery, ComplaintsResponse>
+    : IQueryHandler<ListComplaintsQuery, ComplaintsResponse>
 {
     public async Task<Result<ComplaintsResponse>> Handle(
-        ListComplaintsByCourtQuery request,
+        ListComplaintsQuery request,
         CancellationToken cancellationToken)
     {
         var query = context.Complaints
-            .Where(complaint => complaint.CourtId == request.CourtId);
+            .Where(complaint => complaint.AssignedStaffId == request.StaffId);
 
         var pendingCount = await query.CountAsync(
             complaint => complaint.Status == ComplaintStatus.Pending,
@@ -29,6 +29,10 @@ internal sealed class ListComplaintsByCourtQueryHandler(
 
         var resolvedCount = await query.CountAsync(
             complaint => complaint.Status == ComplaintStatus.Resolved,
+            cancellationToken);
+
+        var rejectedCount = await query.CountAsync(
+            complaint => complaint.Status == ComplaintStatus.Rejected,
             cancellationToken);
 
         query = ApplyStatusFilter(query, request.Status);
@@ -51,14 +55,16 @@ internal sealed class ListComplaintsByCourtQueryHandler(
                 complaint.Description,
                 complaint.FiledAt,
                 complaint.ResolvedAt,
-                complaint.ResolutionNotes))
+                complaint.RejectedAt,
+                complaint.Notes))
             .ToPagedResponseAsync(request.Pagination, totalCount);
 
         return new ComplaintsResponse(
             pagedComplaints,
             pendingCount,
             underReviewCount,
-            resolvedCount);
+            resolvedCount,
+            rejectedCount);
     }
 
     private static IQueryable<Complaint> ApplyStatusFilter(

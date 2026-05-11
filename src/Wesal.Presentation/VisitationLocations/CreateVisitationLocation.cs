@@ -37,7 +37,7 @@ internal sealed class CreateVisitationLocation : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
         .WithOpenApiName(nameof(CreateVisitationLocation))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CourtAdminOnly);
     }
 
     internal sealed record Request(

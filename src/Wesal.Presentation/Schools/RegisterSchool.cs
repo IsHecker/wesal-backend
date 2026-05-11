@@ -34,7 +34,7 @@ internal sealed class RegisterSchool : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
         .WithOpenApiName(nameof(RegisterSchool))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 
     internal record struct Request(

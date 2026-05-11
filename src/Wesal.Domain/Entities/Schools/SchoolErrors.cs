@@ -12,4 +12,7 @@ public static class SchoolErrors
 
     public static Error SchoolAlreadyExists(string name, string governorate) =>
         Error.Conflict("School.AlreadyExists", $"School '{name}' in '{governorate}' already exists");
+
+    public static readonly Error HasReferences =
+        Error.Validation("School.HasReferences", "Cannot delete school because it is referenced by children or school reports.");
 }

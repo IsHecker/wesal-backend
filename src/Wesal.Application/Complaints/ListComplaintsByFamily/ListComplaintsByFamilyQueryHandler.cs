@@ -37,7 +37,8 @@ internal sealed class ListComplaintsByFamilyQueryHandler(
                 complaint.Description,
                 complaint.FiledAt,
                 complaint.ResolvedAt,
-                complaint.ResolutionNotes))
+                complaint.RejectedAt,
+                complaint.Notes))
             .ToPagedResponseAsync(request.Pagination, totalCount);
     }
 }

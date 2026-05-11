@@ -4,6 +4,7 @@ namespace Wesal.Application.Parents.UpdateParentProfile;
 
 public record struct UpdateParentProfileCommand(
     Guid CourtId,
+    Guid StaffId,
     Guid ParentId,
     string? Email,
     string Phone,

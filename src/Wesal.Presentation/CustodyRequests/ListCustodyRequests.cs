@@ -8,6 +8,7 @@ using Wesal.Application.CustodyRequests.ListCustodyRequests;
 using Wesal.Application.Data;
 using Wesal.Contracts.CustodyRequests;
 using Wesal.Domain.Entities.Users;
+using Wesal.Application.Authentication;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -37,10 +38,7 @@ internal sealed class ListCustodyRequests : IEndpoint
         .WithTags(Tags.CustodyRequests)
         .Produces<CustodyRequestsResponse>(StatusCodes.Status200OK)
         .WithOpenApiName(nameof(ListCustodyRequests))
-        .RequireAuthorization(new AuthorizeAttribute
-        {
-            Roles = $"{UserRole.FamilyCourt},{UserRole.CourtStaff},{UserRole.Parent}"
-        });
+        .RequireAuthorization(CustomPolicies.CourtAndParents);
     }
 
     internal record struct QueryParams(Guid? FamilyId = null, string? Status = null);

@@ -23,6 +23,7 @@ internal sealed class UpdateCustody : IEndpoint
         {
             var result = await sender.Send(new UpdateCustodyCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 custodyId,
                 request.NewCustodialParentId,
                 request.StartAt,
@@ -35,7 +36,7 @@ internal sealed class UpdateCustody : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UpdateCustody))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CaseClerkOnly);
     }
 
     internal record struct Request(

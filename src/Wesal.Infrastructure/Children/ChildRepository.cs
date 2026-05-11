@@ -13,7 +13,7 @@ internal sealed class ChildRepository(WesalDbContext context)
         Guid familyId,
         CancellationToken cancellationToken = default)
     {
-        return context.Children
+        return _context.Children
             .Where(child => child.FamilyId == familyId)
             .ToListAsync(cancellationToken);
     }

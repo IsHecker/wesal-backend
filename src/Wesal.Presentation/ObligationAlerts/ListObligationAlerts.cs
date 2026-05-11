@@ -17,14 +17,14 @@ internal sealed class ListObligationAlerts : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.ObligationAlerts.List, async (
+        app.MapGet(ApiEndpoints.ObligationAlerts.ListByStaff, async (
             [AsParameters] QueryParams query,
-            ClaimsPrincipal user,
             [AsParameters] Pagination pagination,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
             var result = await sender.Send(new ListObligationAlertsQuery(
-                user.GetCourtId(),
+                user.GetRoleId(),
                 query.Status,
                 query.ViolationType,
                 pagination));
@@ -35,7 +35,7 @@ internal sealed class ListObligationAlerts : IEndpoint
         .Produces<ObligationAlertsResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .WithOpenApiName(nameof(ListObligationAlerts))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.ComplianceMonitorOnly);
     }
 
     internal record struct QueryParams(string? Status = null, string? ViolationType = null);

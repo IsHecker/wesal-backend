@@ -23,6 +23,7 @@ internal sealed class UpdateObligationAlertStatus : IEndpoint
         {
             var result = await sender.Send(new UpdateObligationAlertStatusCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 alertId,
                 request.Status,
                 request.ResolutionNotes));
@@ -34,7 +35,7 @@ internal sealed class UpdateObligationAlertStatus : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UpdateObligationAlertStatus))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.ComplianceMonitorOnly);
     }
 
     internal readonly record struct Request(string Status, string ResolutionNotes);

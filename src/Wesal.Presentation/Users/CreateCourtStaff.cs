@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Authentication;
 using Wesal.Application.CourtStaffs.CreateCourtStaff;
 using Wesal.Contracts.Users;
+using Wesal.Domain.Entities.CourtStaffs;
+using Wesal.Domain.Entities.Users;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
@@ -21,10 +23,20 @@ internal sealed class CreateCourtStaff : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
+            if (user.GetRole() == nameof(StaffRole.Manager) &&
+                request.Role.Equals(nameof(StaffRole.Manager), StringComparison.OrdinalIgnoreCase))
+            {
+                return Results.Problem(
+                    statusCode: StatusCodes.Status403Forbidden,
+                    title: "Forbidden",
+                    detail: "Only Family Court Administrators can create Manager staff accounts.");
+            }
+
             var result = await sender.Send(new CreateCourtStaffCommand(
                 user.GetCourtId(),
                 request.Email,
                 request.FullName,
+                request.Role,
                 request.Phone));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
@@ -34,11 +46,12 @@ internal sealed class CreateCourtStaff : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .WithOpenApiName(nameof(CreateCourtStaff))
-        .RequireAuthorization(CustomPolicies.FamilyCourtAdminOnly);
+        .RequireAuthorization(CustomPolicies.CourtAdminOnly);
     }
 
     internal record struct Request(
         string Email,
         string FullName,
+        string Role,
         string? Phone);
 }

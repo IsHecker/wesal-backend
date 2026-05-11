@@ -15,10 +15,15 @@ internal sealed class CourtStaffConfiguration : IEntityTypeConfiguration<CourtSt
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(staff => staff.Court)
-            .WithOne()
-            .HasForeignKey<CourtStaff>(staff => staff.CourtId)
+            .WithMany()
+            .HasForeignKey(staff => staff.CourtId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasIndex(staff => staff.Email).IsUnique();
+
+        builder.HasMany(staff => staff.Workloads)
+            .WithOne()
+            .HasForeignKey(w => w.CourtStaffId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

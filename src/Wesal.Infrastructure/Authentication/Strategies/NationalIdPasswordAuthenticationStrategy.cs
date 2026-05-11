@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Authentication;
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Authentication.Credentials;
@@ -5,11 +6,13 @@ using Wesal.Contracts.Authentication;
 using Wesal.Domain.Entities.Users;
 using Wesal.Domain.Results;
 using Wesal.Infrastructure.Authentication.Services;
+using Wesal.Infrastructure.Database;
 
 namespace Wesal.Infrastructure.Authentication.Strategies;
 
 internal sealed class NationalIdPasswordAuthenticationStrategy(
     IParentRepository parentRepository,
+    WesalDbContext dbContext,
     AuthenticationService authenticationService)
     : IAuthenticationStrategy<NationalIdPasswordCredentials>
 {
@@ -23,6 +26,11 @@ internal sealed class NationalIdPasswordAuthenticationStrategy(
         if (parent is null)
             return UserErrors.InvalidCredentials;
 
+        var custody = await dbContext.Custodies
+            .Where(c => c.CustodialParentId == parent.Id || c.NonCustodialParentId == parent.Id)
+            .OrderByDescending(c => c.StartAt)
+            .FirstOrDefaultAsync(cancellationToken);
+
         return await authenticationService.AuthenticateAsync(
             parent.UserId,
             credentials.Password,
@@ -30,6 +38,7 @@ internal sealed class NationalIdPasswordAuthenticationStrategy(
             parent.Id,
             parent.CourtId,
             parent.IsFather,
-            cancellationToken);
+            isCustodialParent: custody?.CustodialParentId == parent.Id,
+            cancellationToken: cancellationToken);
     }
 }

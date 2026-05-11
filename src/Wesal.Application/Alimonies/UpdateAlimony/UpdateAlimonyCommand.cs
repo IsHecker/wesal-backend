@@ -4,6 +4,7 @@ namespace Wesal.Application.Alimonies.UpdateAlimony;
 
 public record struct UpdateAlimonyCommand(
     Guid CourtId,
+    Guid StaffId,
     Guid AlimonyId,
     long Amount,
     string Frequency,

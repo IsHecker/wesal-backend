@@ -28,6 +28,9 @@ internal sealed class DeleteVisitationScheduleCommandHandler(
         if (courtCase!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
 
+        if (courtCase.AssignedStaffId != request.StaffId)
+            return Error.Forbidden("CourtCase.Ownership", "You are not assigned to this case.");
+
         if (courtCase!.Status == CourtCaseStatus.Closed)
             return VisitationScheduleErrors.CannotModifyClosedCase;
 

@@ -21,13 +21,13 @@ internal sealed class TransferCreatedHandler(
 
         var paymentDue = await paymentDueRepository.GetByIdAsync(paymentDueId);
 
-        paymentDue!.MarkWithdrawalStatusAs(WithdrawalStatus.Pending);
+        paymentDue!.MarkAsWithdrawn();
         paymentDueRepository.Update(paymentDue);
 
         await unitOfWork.SaveChangesAsync();
 
         await notificationService.SendNotificationsAsync([
-            NotificationTemplate.AlimonyWithdrawalPending(recipientId, paymentDue.Amount)]);
+            NotificationTemplate.AlimonyWithdrawalSuccess(recipientId, paymentDue.Amount)]);
 
         return Result.Success;
     }

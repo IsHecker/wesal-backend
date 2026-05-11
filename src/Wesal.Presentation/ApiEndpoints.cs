@@ -31,12 +31,21 @@ internal static class ApiEndpoints
     internal static class Courts
     {
         public const string Me = $"{CourtsBase}/me";
+        public const string List = CourtsBase;
         public const string GetById = $"{CourtsBase}/{{courtId:guid}}";
+        public const string Update = GetById;
+        public const string Delete = GetById;
     }
 
     internal static class CourtStaffs
     {
-        public const string GetById = $"{CourtStaffsBase}/me";
+        public const string Me = $"{CourtStaffsBase}/me";
+        public const string GetById = $"{CourtStaffsBase}/{{staffId:guid}}";
+        public const string ListByCourt = $"{Courts.Me}/staffs";
+        public const string Update = GetById;
+        public const string GetReport = $"{GetById}/report";
+        public const string GetMyReport = $"{Me}/report";
+        public const string ListReports = $"{Courts.Me}/staff-reports";
     }
 
     internal static class Parents
@@ -52,6 +61,8 @@ internal static class ApiEndpoints
         public const string ListByCourt = $"{Courts.Me}/families";
 
         public const string Enroll = FamiliesBase;
+        public const string Settle = $"{GetById}/settle";
+        public const string ReturnToDispute = $"{GetById}/return-to-dispute";
         public const string Children = $"{GetById}/children";
         public const string GetByParent = FamiliesBase;
         public const string Delete = GetById;
@@ -64,10 +75,12 @@ internal static class ApiEndpoints
 
     internal static class Schools
     {
+        public const string GetById = $"{SchoolsBase}/{{schoolId:guid}}";
         public const string GetProfile = $"{SchoolsBase}/me";
         public const string List = SchoolsBase;
         public const string Register = SchoolsBase;
-        public const string UpdateProfile = $"{SchoolsBase}/{{schoolId:guid}}";
+        public const string UpdateProfile = GetById;
+        public const string Delete = GetById;
     }
 
     internal static class SchoolReports
@@ -82,6 +95,7 @@ internal static class ApiEndpoints
         public const string Create = CourtCasesBase;
         public const string Close = $"{GetById}/close";
         public const string ListByFamily = $"{Families.GetById}/court-cases";
+        public const string ListByStaff = $"{CourtStaffs.Me}/court-cases";
     }
 
     internal static class Custodies
@@ -176,7 +190,7 @@ internal static class ApiEndpoints
 
     internal static class Complaints
     {
-        public const string ListByCourt = $"{Courts.Me}/complaints";
+        public const string ListByStaff = $"{CourtStaffs.Me}/complaints";
         public const string ListByFamily = $"{Families.GetById}/complaints";
         public const string UpdateStatus = $"{ComplaintsBase}/{{complaintId:guid}}/status";
         public const string Create = ComplaintsBase;
@@ -184,7 +198,7 @@ internal static class ApiEndpoints
 
     internal static class ObligationAlerts
     {
-        public const string List = ObligationAlertsBase;
+        public const string ListByStaff = $"{CourtStaffs.Me}/obligation-alerts";
         public const string UpdateStatus = $"{ObligationAlertsBase}/{{alertId:guid}}/status";
     }
 
@@ -198,6 +212,8 @@ internal static class ApiEndpoints
     internal static class VisitCenterStaffs
     {
         public const string GetProfile = $"{VisitCenterStaffsBase}/me";
+        public const string ListByCourt = $"{Courts.Me}/center-staffs";
+        public const string Update = $"{VisitCenterStaffsBase}/{{staffId:guid}}";
     }
 
     public static class Auth

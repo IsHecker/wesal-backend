@@ -11,13 +11,13 @@ internal sealed class FamilyRepository(WesalDbContext context)
 {
     public Task<Family?> GetByParentIdAsync(Guid parentId, CancellationToken cancellationToken = default)
     {
-        return context.Families
+        return _context.Families
             .FirstOrDefaultAsync(family => family.FatherId == parentId || family.MotherId == parentId, cancellationToken);
     }
 
     public Task<bool> IsParentInFamilyAsync(Guid parentId, Guid familyId, CancellationToken cancellationToken = default)
     {
-        return context.Families
+        return _context.Families
             .AnyAsync(family => family.Id == familyId && (family.FatherId == parentId || family.MotherId == parentId),
                 cancellationToken);
     }

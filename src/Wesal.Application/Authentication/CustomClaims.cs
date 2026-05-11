@@ -1,4 +1,4 @@
-﻿namespace Wesal.Application.Authentication;
+namespace Wesal.Application.Authentication;
 
 public static class CustomClaims
 {
@@ -7,4 +7,5 @@ public static class CustomClaims
     public const string CourtId = "courtId";
     public const string PasswordChangeRequired = "tmp_pwd";
     public const string ParentRole = "parentRole";
+    public const string IsCustodialParent = "isCustodialParent";
 }

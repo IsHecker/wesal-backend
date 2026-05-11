@@ -11,7 +11,7 @@ internal sealed class FamilyCourtRepository(WesalDbContext context)
 {
     public Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
-        return context.FamilyCourts
+        return _context.FamilyCourts
             .AnyAsync(court => court.Email == email, cancellationToken);
     }
 }

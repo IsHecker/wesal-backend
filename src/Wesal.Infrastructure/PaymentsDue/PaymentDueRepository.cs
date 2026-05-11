@@ -14,7 +14,7 @@ internal sealed class PaymentDueRepository(WesalDbContext context)
         Guid courtCaseId,
         CancellationToken cancellationToken = default)
     {
-        await context.PaymentsDue
+        await _context.PaymentsDue
             .Where(due => due.Alimony.CourtCaseId == courtCaseId
                 && due.Status == PaymentStatus.Pending).ExecuteDeleteAsync(cancellationToken);
     }
@@ -23,7 +23,7 @@ internal sealed class PaymentDueRepository(WesalDbContext context)
         Guid alimonyId,
         CancellationToken cancellationToken = default)
     {
-        await context.PaymentsDue
+        await _context.PaymentsDue
             .Where(due => due.AlimonyId == alimonyId
                 && due.Status == PaymentStatus.Pending).ExecuteDeleteAsync(cancellationToken);
     }
@@ -32,7 +32,7 @@ internal sealed class PaymentDueRepository(WesalDbContext context)
         Guid alimonyId,
         CancellationToken cancellationToken = default)
     {
-        return context.PaymentsDue
+        return _context.PaymentsDue
             .AnyAsync(due => due.AlimonyId == alimonyId
                 && due.Status != PaymentStatus.Pending, cancellationToken);
     }

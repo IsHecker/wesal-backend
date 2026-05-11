@@ -26,7 +26,7 @@ public sealed class Parent : Entity, IHasUserId
     public bool IsOnboardingComplete { get; private set; }
 
     public bool IsPayoutMethodConfigured =>
-        StripeConnectAccountId is not null && IsOnboardingComplete;
+        !string.IsNullOrWhiteSpace(StripeConnectAccountId) && IsOnboardingComplete;
 
     private Parent() { }
 

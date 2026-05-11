@@ -22,6 +22,9 @@ internal sealed class RemoveChildCommandHandler(
         if (family!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(Family));
 
+        if (family.AssignedStaffId != request.StaffId)
+            return Error.Forbidden("Family.Ownership", "You are not assigned to this family.");
+
         var child = await childRepository.GetByIdAsync(request.ChildId, cancellationToken);
         if (child is null)
             return ChildErrors.NotFound(request.ChildId);

@@ -12,6 +12,7 @@ public static class FamilyMapper
     public static FamilyResponse ToResponse(this Family family) =>
         new(
             family.Id,
+            family.Status.ToString(),
             family.Father.ToResponse(),
             family.Mother.ToResponse(),
             family.Children.Select(child => child.ToResponse()));

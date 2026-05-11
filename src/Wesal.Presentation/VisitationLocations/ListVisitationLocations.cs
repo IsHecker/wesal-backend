@@ -34,7 +34,7 @@ internal sealed class ListVisitationLocations : IEndpoint
         .WithTags(Tags.VisitationLocations)
         .Produces<PagedResponse<VisitationLocationResponse>>(StatusCodes.Status200OK)
         .WithOpenApiName(nameof(ListVisitationLocations))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization();
     }
 
     internal sealed record QueryParams(string? Name = null);

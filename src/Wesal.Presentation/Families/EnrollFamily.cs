@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +24,7 @@ internal sealed class EnrollFamily : IEndpoint
         {
             var result = await sender.Send(new EnrollFamilyCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 request.Father.ToDto(),
                 request.Mother.ToDto(),
                 request.Children?.Select(c => c.ToDto())));
@@ -35,7 +36,7 @@ internal sealed class EnrollFamily : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status409Conflict)
         .WithOpenApiName(nameof(EnrollFamily))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 
     internal readonly record struct Request(

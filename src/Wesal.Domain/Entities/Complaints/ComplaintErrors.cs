@@ -20,5 +20,5 @@ public static class ComplaintErrors
     public static Error CannotUpdateStatus(ComplaintStatus status) =>
         Error.Validation(
             "Complaint.CannotUpdateStatus",
-            $"Cannot update complaint status to '{status}'. Only 'UnderReview' or 'Resolved' transitions are supported.");
+            $"Cannot update complaint status to '{status}'. Only 'UnderReview', 'Resolved' or 'Rejected' transitions are supported.");
 }

@@ -14,7 +14,7 @@ internal sealed class CustodyRequestRepository(WesalDbContext context)
         Guid familyId,
         CancellationToken cancellationToken = default)
     {
-        return context.Set<CustodyRequest>()
+        return _context.Set<CustodyRequest>()
             .AnyAsync(r => r.FamilyId == familyId 
                 && r.NonCustodialParentId == parentId 
                 && r.Status == CustodyRequestStatus.Pending, cancellationToken);

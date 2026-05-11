@@ -8,7 +8,8 @@ using Wesal.Domain.Results;
 namespace Wesal.Application.Parents.UpdateParentProfile;
 
 internal sealed class UpdateParentProfileCommandHandler(
-    IParentRepository parentRepository)
+    IParentRepository parentRepository,
+    IFamilyRepository familyRepository)
     : ICommandHandler<UpdateParentProfileCommand>
 {
     public async Task<Result> Handle(
@@ -21,6 +22,10 @@ internal sealed class UpdateParentProfileCommandHandler(
 
         if (parent!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(Family));
+
+        var family = await familyRepository.GetByParentIdAsync(parent.Id, cancellationToken);
+        if (family is null || family.AssignedStaffId != request.StaffId)
+            return Error.Forbidden("Family.Ownership", "You are not assigned to this family.");
 
         parent.UpdateProfile(request.Email, request.Job, request.Address, request.Phone);
 

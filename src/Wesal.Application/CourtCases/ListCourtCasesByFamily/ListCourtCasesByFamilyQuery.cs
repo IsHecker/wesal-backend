@@ -5,5 +5,5 @@ using Wesal.Contracts.CourtCases;
 
 namespace Wesal.Application.CourtCases.ListCourtCasesByFamily;
 
-public record struct ListCourtCasesByFamilyQuery(Guid FamilyId, Pagination Pagination)
+public record struct ListCourtCasesByFamilyQuery(Guid FamilyId, Guid? ClerkId, Pagination Pagination)
     : IQuery<PagedResponse<CourtCaseResponse>>;

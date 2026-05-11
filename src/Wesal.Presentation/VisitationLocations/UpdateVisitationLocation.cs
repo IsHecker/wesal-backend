@@ -39,7 +39,7 @@ internal sealed class UpdateVisitationLocation : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UpdateVisitationLocation))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CourtAdminOnly);
     }
 
     internal record struct Request(

@@ -7,5 +7,6 @@ public interface ICourtStaffRepository : IRepository<CourtStaff>
 {
     Task<CourtStaff?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<CourtStaff?> GetByUserIdWithCourtAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<CourtStaff?> GetByIdWithWorkloadAsync(Guid id, CancellationToken cancellationToken = default);
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
 }

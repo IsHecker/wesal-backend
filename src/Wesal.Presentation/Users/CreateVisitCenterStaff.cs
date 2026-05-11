@@ -35,7 +35,7 @@ internal sealed class CreateVisitCenterStaff : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .WithOpenApiName(nameof(CreateVisitCenterStaff))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CourtAdminOnly);
     }
 
     internal record struct Request(

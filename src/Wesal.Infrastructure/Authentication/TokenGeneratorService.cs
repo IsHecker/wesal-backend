@@ -15,7 +15,9 @@ public class TokenGeneratorService(JwtOptions options)
         string username,
         Guid roleId,
         Guid? courtId = null,
-        bool? isFather = null)
+        bool? isFather = null,
+        string? staffRole = null,
+        bool? isCustodialParent = null)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -27,7 +29,7 @@ public class TokenGeneratorService(JwtOptions options)
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Name, username),
             new(CustomClaims.RoleId, roleId.ToString()),
-            new(CustomClaims.Role, user.Role.ToString()),
+            new(CustomClaims.Role, staffRole ?? user.Role.ToString()),
             new(CustomClaims.PasswordChangeRequired, user.PasswordChangeRequired.ToString()),
             new(JwtRegisteredClaimNames.Iat,
                 DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(),
@@ -39,6 +41,9 @@ public class TokenGeneratorService(JwtOptions options)
 
         if (isFather.HasValue)
             claims.Add(new(CustomClaims.ParentRole, isFather.Value ? "father" : "mother"));
+
+        if (isCustodialParent.HasValue)
+            claims.Add(new(CustomClaims.IsCustodialParent, isCustodialParent.Value.ToString().ToLower()));
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

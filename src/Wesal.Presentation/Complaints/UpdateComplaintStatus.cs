@@ -23,6 +23,7 @@ internal sealed class UpdateComplaintStatus : IEndpoint
         {
             var result = await sender.Send(new UpdateComplaintStatusCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 complaintId,
                 request.Status,
                 request.ResolutionNotes));
@@ -34,7 +35,7 @@ internal sealed class UpdateComplaintStatus : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UpdateComplaintStatus))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.ComplianceMonitorOnly);
     }
 
     internal readonly record struct Request(string Status, string ResolutionNotes);

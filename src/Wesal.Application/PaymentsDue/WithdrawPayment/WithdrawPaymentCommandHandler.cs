@@ -3,6 +3,7 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Messaging;
 using Wesal.Domain.Entities.Payments;
 using Wesal.Domain.Entities.PaymentsDue;
+using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.PaymentsDue.WithdrawPayment;
@@ -36,9 +37,14 @@ internal sealed class WithdrawPaymentCommandHandler(
             return WithdrawalErrors.AlreadyWithdrawn;
 
         var parent = await parentRepository.GetByIdAsync(request.ParentId, cancellationToken);
+        if (parent is null)
+            return ParentErrors.NotFound(request.ParentId);
         
         var payment = await paymentRepository.GetByPaymentDueIdAsync(paymentDue.Id, cancellationToken)
             ?? throw new InvalidOperationException("Payment record is missing for a paid item.");
+
+        if (string.IsNullOrWhiteSpace(payment.PaymentIntentId))
+            return WithdrawalErrors.MissingPaymentReference;
 
         var result = await stripeGateway.SendPayoutAsync(
             parent!, 

@@ -17,5 +17,10 @@ internal sealed class ObligationAlertConfiguration : IEntityTypeConfiguration<Ob
         builder.HasOne<FamilyCourt>()
             .WithMany()
             .HasForeignKey(alert => alert.CourtId);
+
+        builder.HasOne(alert => alert.AssignedStaff)
+            .WithMany()
+            .HasForeignKey(alert => alert.AssignedStaffId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

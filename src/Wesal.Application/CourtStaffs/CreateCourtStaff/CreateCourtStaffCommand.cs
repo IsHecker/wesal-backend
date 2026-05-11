@@ -7,4 +7,5 @@ public record struct CreateCourtStaffCommand(
     Guid CourtId,
     string Email,
     string FullName,
+    string Role,
     string? Phone) : ICommand<UserCredentialResponse>;

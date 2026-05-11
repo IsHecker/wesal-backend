@@ -12,4 +12,5 @@ public record struct ComplaintResponse(
     string Description,
     DateTime FiledAt,
     DateTime? ResolvedAt,
-    string? ResolutionNotes);
+    DateTime? RejectedAt,
+    string? Notes);

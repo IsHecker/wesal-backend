@@ -16,7 +16,7 @@ internal sealed class GetCourtStaffProfile : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet(ApiEndpoints.CourtStaffs.GetById, async (
+        app.MapGet(ApiEndpoints.CourtStaffs.Me, async (
             ClaimsPrincipal user,
             ISender sender) =>
         {
@@ -29,6 +29,6 @@ internal sealed class GetCourtStaffProfile : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(GetCourtStaffProfile))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CourtStaffOnly);
     }
 }

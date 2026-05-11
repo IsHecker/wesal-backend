@@ -26,6 +26,8 @@ internal sealed class ListFamiliesByCourt : IEndpoint
         {
             var result = await sender.Send(new ListFamiliesByCourtQuery(
                 user.GetCourtId(),
+                user.GetRoleId(),
+                user.GetRole(),
                 query.NationalId,
                 pagination));
 
@@ -35,7 +37,7 @@ internal sealed class ListFamiliesByCourt : IEndpoint
         .Produces<PagedResponse<FamilyResponse>>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(ListFamiliesByCourt))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 
     internal record struct QueryParams(string? NationalId = null);

@@ -15,10 +15,9 @@ internal sealed class VisitCenterStaffConfiguration : IEntityTypeConfiguration<V
             .HasForeignKey<VisitCenterStaff>(staff => staff.UserId)
             .OnDelete(DeleteBehavior.NoAction);
 
-
         builder.HasOne<VisitationLocation>()
-            .WithOne()
-            .HasForeignKey<VisitCenterStaff>(staff => staff.LocationId)
+            .WithMany()
+            .HasForeignKey(staff => staff.LocationId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasIndex(staff => staff.Email).IsUnique();

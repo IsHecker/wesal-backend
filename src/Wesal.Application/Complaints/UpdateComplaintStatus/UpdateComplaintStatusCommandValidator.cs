@@ -20,10 +20,8 @@ internal sealed class UpdateComplaintStatusCommandValidator : AbstractValidator<
             .MustBeEnumValue<UpdateComplaintStatusCommand, ComplaintStatus>();
 
         RuleFor(x => x.ResolutionNotes)
-            .MaximumLength(1000)
-            .WithMessage("Resolution notes cannot exceed 1000 characters")
-            .MinimumLength(10)
-            .WithMessage("Resolution notes must be at least 10 characters")
-            .When(x => !string.IsNullOrWhiteSpace(x.ResolutionNotes));
+            .NotEmpty()
+            .WithMessage("Notes are required when resolving or rejecting a complaint")
+            .When(x => x.Status == nameof(ComplaintStatus.Resolved) || x.Status == nameof(ComplaintStatus.Rejected));
     }
 }

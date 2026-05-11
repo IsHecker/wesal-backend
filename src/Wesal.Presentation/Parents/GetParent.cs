@@ -32,6 +32,6 @@ internal sealed class GetParent : IEndpoint
         .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(GetParent))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 }

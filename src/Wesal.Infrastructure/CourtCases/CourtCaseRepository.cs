@@ -11,13 +11,13 @@ internal sealed class CourtCaseRepository(WesalDbContext context)
 {
     public Task<bool> ExistsByCaseNumberAsync(string caseNumber, CancellationToken cancellationToken = default)
     {
-        return context.CourtCases
+        return _context.CourtCases
             .AnyAsync(courtCase => courtCase.CaseNumber == caseNumber, cancellationToken);
     }
 
     public Task<bool> HasOpenCaseByFamilyIdAsync(Guid familyId, CancellationToken cancellationToken = default)
     {
-        return context.CourtCases
+        return _context.CourtCases
             .AnyAsync(courtCase => courtCase.FamilyId == familyId
                 && courtCase.Status == CourtCaseStatus.Open, cancellationToken);
 

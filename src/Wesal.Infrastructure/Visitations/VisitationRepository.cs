@@ -13,7 +13,7 @@ internal sealed class VisitationRepository(WesalDbContext context)
         Guid courtCaseId,
         CancellationToken cancellationToken = default)
     {
-        await context.Visitations
+        await _context.Visitations
             .Where(visitation => visitation.VisitationSchedule.CourtCaseId == courtCaseId
                 && visitation.Status == VisitationStatus.Scheduled).ExecuteDeleteAsync(cancellationToken);
     }
@@ -22,14 +22,14 @@ internal sealed class VisitationRepository(WesalDbContext context)
         Guid scheduleId,
         CancellationToken cancellationToken = default)
     {
-        await context.Visitations
+        await _context.Visitations
             .Where(visitation => visitation.VisitationScheduleId == scheduleId
                 && visitation.Status == VisitationStatus.Scheduled).ExecuteDeleteAsync(cancellationToken);
     }
 
     public Task<bool> ExistsByLocationIdAsync(Guid locationId, CancellationToken cancellationToken = default)
     {
-        return context.Visitations
+        return _context.Visitations
             .AnyAsync(visitation => visitation.LocationId == locationId, cancellationToken);
     }
 
@@ -37,7 +37,7 @@ internal sealed class VisitationRepository(WesalDbContext context)
         Guid scheduleId,
         CancellationToken cancellationToken = default)
     {
-        return context.Visitations
+        return _context.Visitations
             .AnyAsync(visitation => visitation.VisitationScheduleId == scheduleId
                 && visitation.Status != VisitationStatus.Scheduled, cancellationToken);
     }

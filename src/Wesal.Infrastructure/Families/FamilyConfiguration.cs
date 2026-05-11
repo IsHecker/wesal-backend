@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Wesal.Domain.Entities.Children;
+using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Families;
 
 namespace Wesal.Infrastructure.Families;
@@ -22,5 +22,10 @@ internal sealed class FamilyConfiguration : IEntityTypeConfiguration<Family>
         builder.HasMany(family => family.Children)
             .WithOne()
             .HasForeignKey(child => child.FamilyId);
+
+        builder.HasOne<CourtStaff>()
+            .WithMany()
+            .HasForeignKey(family => family.AssignedStaffId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

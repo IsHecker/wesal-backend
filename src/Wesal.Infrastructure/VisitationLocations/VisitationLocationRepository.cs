@@ -14,7 +14,7 @@ internal sealed class VisitationLocationRepository(WesalDbContext context)
         string governorate,
         CancellationToken cancellationToken = default)
     {
-        return await context.VisitationLocations
+        return await _context.VisitationLocations
             .AnyAsync(location => location.Name == name && location.Governorate == governorate, cancellationToken);
     }
 }

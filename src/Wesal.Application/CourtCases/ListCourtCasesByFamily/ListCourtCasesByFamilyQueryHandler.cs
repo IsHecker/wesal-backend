@@ -27,6 +27,11 @@ internal sealed class ListCourtCasesByFamilyQueryHandler(
         var courtCases = context.CourtCases
             .Where(courtCase => courtCase.FamilyId == request.FamilyId);
 
+        // if (request.ClerkId.HasValue)
+        // {
+        //     courtCases = courtCases.Where(c => c.AssignedStaffId == request.ClerkId.Value);
+        // }
+
         var totalCount = await courtCases.CountAsync(cancellationToken);
 
         return await courtCases

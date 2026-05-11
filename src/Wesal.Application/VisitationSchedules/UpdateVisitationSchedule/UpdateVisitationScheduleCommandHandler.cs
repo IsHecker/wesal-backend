@@ -36,6 +36,9 @@ internal sealed class UpdateVisitationScheduleCommandHandler(
         if (courtCase!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
 
+        if (courtCase.AssignedStaffId != request.StaffId)
+            return Error.Forbidden("CourtCase.Ownership", "You are not assigned to this case.");
+
         var isLocationExist = await visitationLocationRepository.ExistsAsync(
             request.LocationId,
             cancellationToken);

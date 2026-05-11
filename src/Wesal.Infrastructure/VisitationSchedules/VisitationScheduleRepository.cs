@@ -13,7 +13,7 @@ internal sealed class VisitationScheduleRepository(WesalDbContext context)
         Guid courtCaseId,
         CancellationToken cancellationToken = default)
     {
-        return context.VisitationSchedules
+        return _context.VisitationSchedules
             .AnyAsync(schedule => schedule.CourtCaseId == courtCaseId, cancellationToken);
     }
 
@@ -21,7 +21,7 @@ internal sealed class VisitationScheduleRepository(WesalDbContext context)
         Guid courtCaseId,
         CancellationToken cancellationToken = default)
     {
-        return context.VisitationSchedules
+        return _context.VisitationSchedules
             .FirstOrDefaultAsync(schedule => schedule.CourtCaseId == courtCaseId, cancellationToken);
     }
 }

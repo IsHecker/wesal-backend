@@ -33,4 +33,18 @@ public sealed class FamilyCourt : Entity, IHasUserId
             ContactInfo = contactInfo,
         };
     }
+
+    public void Update(
+        string email,
+        string name,
+        string governorate,
+        string address,
+        string contactInfo)
+    {
+        Email = email;
+        Name = name;
+        Governorate = governorate;
+        Address = address;
+        ContactInfo = contactInfo;
+    }
 }

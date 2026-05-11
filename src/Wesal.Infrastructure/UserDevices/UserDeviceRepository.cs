@@ -14,7 +14,7 @@ internal sealed class UserDeviceRepository(WesalDbContext context)
         string deviceToken,
         CancellationToken cancellationToken = default)
     {
-        return context.UserDevices
+        return _context.UserDevices
             .FirstOrDefaultAsync(device =>
                 device.UserId == userId && device.DeviceToken == deviceToken, cancellationToken);
     }

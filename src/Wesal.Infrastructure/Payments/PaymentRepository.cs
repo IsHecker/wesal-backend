@@ -11,7 +11,7 @@ internal sealed class PaymentRepository(WesalDbContext context)
 {
     public Task<Payment?> GetByPaymentDueIdAsync(Guid paymentDueId, CancellationToken cancellationToken = default)
     {
-        return context.Payments
+        return _context.Payments
             .FirstOrDefaultAsync(p => p.PaymentDueId == paymentDueId, cancellationToken);
     }
 }

@@ -1,4 +1,6 @@
 using FluentValidation;
+using Wesal.Application.Extensions;
+using Wesal.Domain.Entities.CourtStaffs;
 
 namespace Wesal.Application.CourtStaffs.CreateCourtStaff;
 
@@ -22,5 +24,7 @@ public sealed class CreateCourtStaffCommandValidator : AbstractValidator<CreateC
             .MaximumLength(20)
             .WithMessage("Phone number must not exceed 20 characters")
             .When(x => !string.IsNullOrEmpty(x.Phone));
+
+        RuleFor(x => x.Role).MustBeEnumValue<CreateCourtStaffCommand, StaffRole>();
     }
 }

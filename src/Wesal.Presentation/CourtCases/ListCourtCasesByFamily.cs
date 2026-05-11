@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Wesal.Application.Authentication;
 using Wesal.Application.CourtCases.ListCourtCasesByFamily;
 using Wesal.Application.Data;
 using Wesal.Contracts.Common;
@@ -19,9 +21,13 @@ internal sealed class ListCourtCasesByFamily : IEndpoint
         app.MapGet(ApiEndpoints.CourtCases.ListByFamily, async (
             Guid familyId,
             [AsParameters] Pagination pagination,
+            ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new ListCourtCasesByFamilyQuery(familyId, pagination));
+            var result = await sender.Send(new ListCourtCasesByFamilyQuery(
+                familyId,
+                user.GetRoleId(),
+                pagination));
 
             return result.MatchResponse(Results.Ok, ApiResults.Problem);
         })

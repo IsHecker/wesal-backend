@@ -4,5 +4,6 @@ namespace Wesal.Application.CourtCases.CloseCourtCase;
 
 public record struct CloseCourtCaseCommand(
     Guid CourtId,
+    Guid StaffId,
     Guid CourtCaseId,
     string ClosureNotes) : ICommand;

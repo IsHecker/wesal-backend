@@ -20,7 +20,7 @@ internal sealed class DeleteAlimony : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new DeleteAlimonyCommand(user.GetCourtId(), alimoneyId));
+            var result = await sender.Send(new DeleteAlimonyCommand(user.GetCourtId(), user.GetRoleId(), alimoneyId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })
@@ -29,6 +29,6 @@ internal sealed class DeleteAlimony : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(DeleteAlimony))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CaseClerkOnly);
     }
 }

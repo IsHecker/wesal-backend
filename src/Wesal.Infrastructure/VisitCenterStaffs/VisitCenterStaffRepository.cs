@@ -11,7 +11,7 @@ internal sealed class VisitCenterStaffRepository(WesalDbContext context)
 {
     public Task<VisitCenterStaff?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return context.VisitCenterStaffs
+        return _context.VisitCenterStaffs
             .FirstOrDefaultAsync(school => school.UserId == userId, cancellationToken);
     }
 }

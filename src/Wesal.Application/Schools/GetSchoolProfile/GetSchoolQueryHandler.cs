@@ -4,13 +4,13 @@ using Wesal.Contracts.Schools;
 using Wesal.Domain.Entities.Schools;
 using Wesal.Domain.Results;
 
-namespace Wesal.Application.Schools.GetSchoolProfile;
+namespace Wesal.Application.Schools.GetSchool;
 
 internal sealed class GetSchoolQueryHandler(ISchoolRepository schoolRepository)
-    : IQueryHandler<GetSchoolProfileQuery, SchoolResponse>
+    : IQueryHandler<GetSchoolQuery, SchoolResponse>
 {
     public async Task<Result<SchoolResponse>> Handle(
-        GetSchoolProfileQuery request,
+        GetSchoolQuery request,
         CancellationToken cancellationToken)
     {
         var school = await schoolRepository.GetByIdAsync(request.SchoolId, cancellationToken);

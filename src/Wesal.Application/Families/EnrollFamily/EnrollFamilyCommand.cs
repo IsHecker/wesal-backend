@@ -6,6 +6,7 @@ namespace Wesal.Application.Families.EnrollFamily;
 
 public record struct EnrollFamilyCommand(
     Guid CourtId,
+    Guid AssignedStaffId,
     CreateParentDto Father,
     CreateParentDto Mother,
     IEnumerable<CreateChildDto>? Children = null) : ICommand<EnrollFamilyResponse>;

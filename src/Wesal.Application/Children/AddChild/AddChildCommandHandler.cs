@@ -22,6 +22,9 @@ internal sealed class AddChildCommandHandler(
         if (family!.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(Family));
 
+        if (family.AssignedStaffId != request.StaffId)
+            return Error.Forbidden("Family.Ownership", "You are not assigned to this family.");
+
         var child = Child.Create(
             request.FamilyId,
             request.FullName,

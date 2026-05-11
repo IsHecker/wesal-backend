@@ -4,6 +4,7 @@ using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Common;
 using Wesal.Contracts.Families;
+using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Results;
 
 namespace Wesal.Application.Families.ListFamiliesByCourt;
@@ -20,6 +21,9 @@ internal sealed class ListFamiliesByCourtQueryHandler(IWesalDbContext context)
             .Include(family => family.Mother)
             .Include(family => family.Children)
             .Where(family => family.CourtId == request.CourtId);
+
+        if (request.Role == StaffRole.SettlementSpecialist.ToString())
+            query = query.Where(family => family.AssignedStaffId == request.StaffId);
 
         if (!string.IsNullOrWhiteSpace(request.NationalId))
             query = query.Where(family => family.Father.NationalId == request.NationalId

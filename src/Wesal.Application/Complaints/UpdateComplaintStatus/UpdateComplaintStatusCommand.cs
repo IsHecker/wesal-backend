@@ -4,6 +4,7 @@ namespace Wesal.Application.Complaints.UpdateComplaintStatus;
 
 public record struct UpdateComplaintStatusCommand(
     Guid CourtId,
+    Guid StaffId,
     Guid ComplaintId,
     string Status,
     string ResolutionNotes) : ICommand;

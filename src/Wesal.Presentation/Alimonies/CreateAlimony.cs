@@ -22,6 +22,7 @@ internal sealed class CreateAlimony : IEndpoint
         {
             var result = await sender.Send(new CreateAlimonyCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 request.CourtCaseId,
                 request.Amount,
                 request.Frequency,
@@ -35,7 +36,7 @@ internal sealed class CreateAlimony : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(CreateAlimony))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CaseClerkOnly);
     }
 
     internal record struct Request(

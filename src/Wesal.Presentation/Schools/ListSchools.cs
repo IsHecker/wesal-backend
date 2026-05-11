@@ -31,7 +31,7 @@ internal sealed class ListSchools : IEndpoint
         .WithTags(Tags.Schools)
         .Produces<PagedResponse<SchoolResponse>>(StatusCodes.Status200OK)
         .WithOpenApiName(nameof(ListSchools))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 
     internal record struct QueryParams(string? Name = null);

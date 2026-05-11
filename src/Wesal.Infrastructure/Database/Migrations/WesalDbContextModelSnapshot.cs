@@ -128,6 +128,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AssignedStaffId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CourtId")
                         .HasColumnType("uniqueidentifier");
 
@@ -147,11 +150,14 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<DateTime>("FiledAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RejectedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("ReporterId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ResolutionNotes")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ResolvedAt")
                         .HasColumnType("datetime2");
@@ -168,6 +174,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssignedStaffId");
 
                     b.HasIndex("DocumentId")
                         .IsUnique()
@@ -243,6 +251,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AssignedStaffId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("CaseNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -281,6 +292,8 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssignedStaffId");
+
                     b.HasIndex("CourtId");
 
                     b.HasIndex("DocumentId");
@@ -310,7 +323,14 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -321,8 +341,7 @@ namespace Wesal.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourtId")
-                        .IsUnique();
+                    b.HasIndex("CourtId");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -331,6 +350,35 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsUnique();
 
                     b.ToTable("CourtStaffs");
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.CourtStaffs.StaffWorkload", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CourtStaffId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LoadCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourtStaffId", "Type")
+                        .IsUnique();
+
+                    b.ToTable("StaffWorkload");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Custodies.Custody", b =>
@@ -497,6 +545,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AssignedStaffId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CourtId")
                         .HasColumnType("uniqueidentifier");
 
@@ -509,10 +560,19 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.Property<Guid>("MotherId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssignedStaffId");
 
                     b.HasIndex("FatherId");
 
@@ -618,6 +678,9 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AssignedStaffId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CourtId")
                         .HasColumnType("uniqueidentifier");
 
@@ -659,6 +722,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssignedStaffId");
 
                     b.HasIndex("CourtId");
 
@@ -1070,8 +1135,7 @@ namespace Wesal.Infrastructure.Database.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("LocationId")
-                        .IsUnique();
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -1334,6 +1398,12 @@ namespace Wesal.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Wesal.Domain.Entities.Complaints.Complaint", b =>
                 {
+                    b.HasOne("Wesal.Domain.Entities.CourtStaffs.CourtStaff", "AssignedStaff")
+                        .WithMany()
+                        .HasForeignKey("AssignedStaffId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Wesal.Domain.Entities.Documents.Document", null)
                         .WithOne()
                         .HasForeignKey("Wesal.Domain.Entities.Complaints.Complaint", "DocumentId");
@@ -1343,6 +1413,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasForeignKey("ReporterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AssignedStaff");
 
                     b.Navigation("Reporter");
                 });
@@ -1370,6 +1442,12 @@ namespace Wesal.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Wesal.Domain.Entities.CourtCases.CourtCase", b =>
                 {
+                    b.HasOne("Wesal.Domain.Entities.CourtStaffs.CourtStaff", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedStaffId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Wesal.Domain.Entities.FamilyCourts.FamilyCourt", null)
                         .WithMany()
                         .HasForeignKey("CourtId")
@@ -1390,8 +1468,8 @@ namespace Wesal.Infrastructure.Database.Migrations
             modelBuilder.Entity("Wesal.Domain.Entities.CourtStaffs.CourtStaff", b =>
                 {
                     b.HasOne("Wesal.Domain.Entities.FamilyCourts.FamilyCourt", "Court")
-                        .WithOne()
-                        .HasForeignKey("Wesal.Domain.Entities.CourtStaffs.CourtStaff", "CourtId")
+                        .WithMany()
+                        .HasForeignKey("CourtId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1402,6 +1480,15 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Court");
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.CourtStaffs.StaffWorkload", b =>
+                {
+                    b.HasOne("Wesal.Domain.Entities.CourtStaffs.CourtStaff", null)
+                        .WithMany("Workloads")
+                        .HasForeignKey("CourtStaffId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Custodies.Custody", b =>
@@ -1477,6 +1564,11 @@ namespace Wesal.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Wesal.Domain.Entities.Families.Family", b =>
                 {
+                    b.HasOne("Wesal.Domain.Entities.CourtStaffs.CourtStaff", null)
+                        .WithMany()
+                        .HasForeignKey("AssignedStaffId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Wesal.Domain.Entities.Parents.Parent", "Father")
                         .WithMany()
                         .HasForeignKey("FatherId")
@@ -1514,6 +1606,12 @@ namespace Wesal.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("Wesal.Domain.Entities.ObligationAlerts.ObligationAlert", b =>
                 {
+                    b.HasOne("Wesal.Domain.Entities.CourtStaffs.CourtStaff", "AssignedStaff")
+                        .WithMany()
+                        .HasForeignKey("AssignedStaffId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Wesal.Domain.Entities.FamilyCourts.FamilyCourt", null)
                         .WithMany()
                         .HasForeignKey("CourtId")
@@ -1525,6 +1623,8 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .HasForeignKey("ParentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AssignedStaff");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Parents.Parent", b =>
@@ -1618,8 +1718,8 @@ namespace Wesal.Infrastructure.Database.Migrations
             modelBuilder.Entity("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", b =>
                 {
                     b.HasOne("Wesal.Domain.Entities.VisitationLocations.VisitationLocation", null)
-                        .WithOne()
-                        .HasForeignKey("Wesal.Domain.Entities.VisitCenterStaffs.VisitCenterStaff", "LocationId")
+                        .WithMany()
+                        .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1753,6 +1853,11 @@ namespace Wesal.Infrastructure.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("VisitationSchedule");
+                });
+
+            modelBuilder.Entity("Wesal.Domain.Entities.CourtStaffs.CourtStaff", b =>
+                {
+                    b.Navigation("Workloads");
                 });
 
             modelBuilder.Entity("Wesal.Domain.Entities.Families.Family", b =>

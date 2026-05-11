@@ -30,24 +30,28 @@ internal sealed class EmailPasswordAuthenticationStrategy(
                 credentials,
                 admin => null,
                 admin => admin.FullName,
+                admin => null,
                 cancellationToken),
 
             UserRole.FamilyCourt => await AuthenticateRoleAsync<FamilyCourt>(
                 credentials,
                 court => court.Id,
                 court => court.Name,
+                court => null,
                 cancellationToken),
 
             UserRole.CourtStaff => await AuthenticateRoleAsync<CourtStaff>(
                 credentials,
                 staff => staff.CourtId,
                 staff => staff.FullName,
+                staff => staff.Role.ToString(),
                 cancellationToken),
 
             UserRole.VisitCenterStaff => await AuthenticateRoleAsync<VisitCenterStaff>(
                 credentials,
                 staff => staff.CourtId,
                 staff => staff.FullName,
+                staff => null,
                 cancellationToken),
 
             _ => throw new InvalidOperationException()
@@ -62,13 +66,15 @@ internal sealed class EmailPasswordAuthenticationStrategy(
             authResult.Value.username,
             authResult.Value.roleId,
             authResult.Value.courtId,
+            staffRole: authResult.Value.staffRole,
             cancellationToken: cancellationToken);
     }
 
-    private async Task<Result<(Guid userId, Guid roleId, string username, Guid? courtId)>> AuthenticateRoleAsync<TEntity>(
+    private async Task<Result<(Guid userId, Guid roleId, string username, Guid? courtId, string? staffRole)>> AuthenticateRoleAsync<TEntity>(
         EmailPasswordCredentials credentials,
         Func<TEntity, Guid?> courtIdSelector,
         Func<TEntity, string> usernameSelector,
+        Func<TEntity, string?> staffRoleSelector,
         CancellationToken cancellationToken) where TEntity : Entity, IHasUserId
     {
         var entity = await dbContext.Set<TEntity>().FirstOrDefaultAsync(
@@ -78,6 +84,6 @@ internal sealed class EmailPasswordAuthenticationStrategy(
         if (entity is null)
             return UserErrors.InvalidCredentials;
 
-        return (entity.UserId, entity.Id, usernameSelector(entity), courtIdSelector(entity));
+        return (entity.UserId, entity.Id, usernameSelector(entity), courtIdSelector(entity), staffRoleSelector(entity));
     }
 }

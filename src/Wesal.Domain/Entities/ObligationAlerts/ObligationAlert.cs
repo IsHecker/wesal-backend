@@ -13,6 +13,8 @@ public sealed class ObligationAlert : Entity
     // ID of the record that caused the alert (e.g., VisitId or PaymentId).
     public Guid RelatedEntityId { get; private set; }
 
+    public Guid AssignedStaffId { get; private set; }
+
     public ViolationType ViolationType { get; private set; }
     public string Description { get; private set; } = null!;
 
@@ -24,6 +26,8 @@ public sealed class ObligationAlert : Entity
 
     public string? ResolutionNotes { get; private set; }
 
+    public CourtStaffs.CourtStaff? AssignedStaff { get; private set; }
+
     private ObligationAlert() { }
 
     public static ObligationAlert Create(
@@ -33,7 +37,8 @@ public sealed class ObligationAlert : Entity
         Guid relatedEntityId,
         ViolationType violationType,
         AlertStatus status,
-        string description)
+        string description,
+        Guid assignedStaffId)
     {
         return new ObligationAlert
         {
@@ -44,6 +49,7 @@ public sealed class ObligationAlert : Entity
             ViolationType = violationType,
             Description = description,
             Status = status,
+            AssignedStaffId = assignedStaffId,
             TriggeredAt = EgyptTime.Now,
             ResolvedAt = null,
             ResolutionNotes = null,

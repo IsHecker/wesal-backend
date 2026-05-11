@@ -16,5 +16,10 @@ internal sealed class ComplaintConfiguration : IEntityTypeConfiguration<Complain
         builder.HasOne<Document>()
             .WithOne()
             .HasForeignKey<Complaint>(complaint => complaint.DocumentId);
+
+        builder.HasOne(complaint => complaint.AssignedStaff)
+            .WithMany()
+            .HasForeignKey(complaint => complaint.AssignedStaffId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

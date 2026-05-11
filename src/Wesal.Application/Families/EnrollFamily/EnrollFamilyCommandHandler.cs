@@ -6,6 +6,7 @@ using Wesal.Application.Messaging;
 using Wesal.Contracts.Families;
 using Wesal.Contracts.Users;
 using Wesal.Domain.Entities.Children;
+using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Families;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Domain.Entities.Users;
@@ -16,6 +17,7 @@ namespace Wesal.Application.Families.EnrollFamily;
 internal sealed class EnrollFamilyCommandHandler(
     IParentRepository parentRepository,
     IFamilyRepository familyRepository,
+    ICourtStaffRepository courtStaffRepository,
     IUserService userService,
     IStripeGateway stripeGateway,
     IUnitOfWork unitOfWork) : ICommandHandler<EnrollFamilyCommand, EnrollFamilyResponse>
@@ -43,6 +45,10 @@ internal sealed class EnrollFamilyCommandHandler(
             request.Father.Job,
             request.Father.Email);
 
+        var staff = await courtStaffRepository.GetByIdWithWorkloadAsync(request.AssignedStaffId, cancellationToken);
+        if (staff is null)
+            return CourtStaffErrors.NotFound(request.AssignedStaffId);
+
         var mother = Parent.Create(
             motherUser.User.Id,
             request.CourtId,
@@ -56,7 +62,9 @@ internal sealed class EnrollFamilyCommandHandler(
             request.Mother.Job,
             request.Mother.Email);
 
-        var family = Family.Create(request.CourtId, father.Id, mother.Id);
+        var family = Family.Create(request.CourtId, father.Id, mother.Id, request.AssignedStaffId);
+
+        staff.IncrementLoad(AssignmentType.Family);
 
         foreach (var childDto in request.Children ?? [])
         {
@@ -117,7 +125,7 @@ internal sealed class EnrollFamilyCommandHandler(
 
             return Error.Validation("Family.EnrollmentFailed", "Failed to enroll family due to a database constraint violation.");
         }
-        
+
         return new EnrollFamilyResponse(
             family.Id,
             new UserCredentialResponse(father.Id, father.NationalId, fatherUser.TemporaryPassword),

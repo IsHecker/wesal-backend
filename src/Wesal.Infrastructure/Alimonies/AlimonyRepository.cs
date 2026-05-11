@@ -11,13 +11,13 @@ internal sealed class AlimonyRepository(WesalDbContext context)
 {
     public Task<bool> ExistsByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default)
     {
-        return context.Alimonies
+        return _context.Alimonies
             .AnyAsync(alimony => alimony.CourtCaseId == courtCaseId, cancellationToken);
     }
 
     public Task<Alimony?> GetByCourtCaseIdAsync(Guid courtCaseId, CancellationToken cancellationToken = default)
     {
-        return context.Alimonies
+        return _context.Alimonies
             .FirstOrDefaultAsync(alimony => alimony.CourtCaseId == courtCaseId, cancellationToken);
     }
 }

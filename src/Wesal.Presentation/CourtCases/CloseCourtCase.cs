@@ -22,6 +22,7 @@ internal sealed class CloseCourtCase : IEndpoint
         {
             var result = await sender.Send(new CloseCourtCaseCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 courtCaseId,
                 request.ClosureNotes));
 

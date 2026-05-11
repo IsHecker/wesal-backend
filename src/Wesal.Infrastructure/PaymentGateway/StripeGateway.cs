@@ -1,5 +1,6 @@
 using Wesal.Application.Abstractions.PaymentGateway;
 using Wesal.Domain.Entities.Parents;
+using Wesal.Domain.Entities.Payments;
 using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Domain.Results;
 
@@ -7,29 +8,42 @@ namespace Wesal.Infrastructure.PaymentGateway;
 
 internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGateway
 {
-    public async Task<string> CreatePaymentIntentAsync(
-        Parent payerParent,
+    public async Task<Result<string>> CreatePaymentIntentAsync(
+        Parent? payerParent,
         PaymentDue paymentDue,
         CancellationToken cancellationToken = default)
     {
-        var options = new Stripe.PaymentIntentCreateOptions
+        if (payerParent is null)
+            return Error.Failure("Payment.PayerNotFound", "The parent record for this payment was not found.");
+
+        try
         {
-            Amount = paymentDue.Amount,
-            Currency = "egp",
-            Customer = payerParent.StripeCustomerId,
-            AutomaticPaymentMethods = new Stripe.PaymentIntentAutomaticPaymentMethodsOptions
+            var options = new Stripe.PaymentIntentCreateOptions
             {
-                Enabled = true,
+                Amount = paymentDue.Amount,
+                Currency = "egp",
+                Customer = payerParent.StripeCustomerId,
+                TransferGroup = paymentDue.Id.ToString(),
+                AutomaticPaymentMethods = new Stripe.PaymentIntentAutomaticPaymentMethodsOptions
+                {
+                    Enabled = true,
+                }
             }
+            .WithKey(MetadataKeys.PayerId, payerParent.Id)
+            .WithKey(MetadataKeys.AlimonyId, paymentDue.AlimonyId)
+            .WithKey(MetadataKeys.PaymentDueId, paymentDue.Id);
+
+            var service = new Stripe.PaymentIntentService();
+            var intent = await service.CreateAsync(options, cancellationToken: cancellationToken);
+
+            return intent.ClientSecret;
         }
-        .WithKey(MetadataKeys.PayerId, payerParent.Id)
-        .WithKey(MetadataKeys.AlimonyId, paymentDue.AlimonyId)
-        .WithKey(MetadataKeys.PaymentDueId, paymentDue.Id);
-
-        var service = new Stripe.PaymentIntentService();
-        var intent = await service.CreateAsync(options, cancellationToken: cancellationToken);
-
-        return intent.ClientSecret;
+        catch (Stripe.StripeException ex)
+        {
+            return Error.Problem(
+                $"Stripe.PaymentIntent.{ex.StripeError?.Code ?? "Unknown"}",
+                ex.StripeError?.Message ?? ex.Message);
+        }
     }
 
     public async Task<Result<string>> CreateCustomerAsync(Parent parent, CancellationToken cancellationToken = default)
@@ -49,7 +63,7 @@ internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGatewa
         }
         catch (Stripe.StripeException ex)
         {
-            return Error.Failure("Stripe.CustomerCreationFailed", ex.Message);
+            return Error.Problem("Stripe.CustomerCreationFailed", ex.Message);
         }
     }
 
@@ -88,7 +102,7 @@ internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGatewa
         }
         catch (Stripe.StripeException ex)
         {
-            return Error.Failure("Stripe.AccountCreationFailed", ex.Message);
+            return Error.Problem("Stripe.AccountCreationFailed", ex.Message);
         }
     }
 
@@ -115,7 +129,7 @@ internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGatewa
         }
         catch (Stripe.StripeException ex)
         {
-            return Error.Failure("Stripe.ConnectFailed", ex.Message);
+            return Error.Problem("Stripe.ConnectFailed", ex.Message);
         }
     }
 
@@ -139,6 +153,9 @@ internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGatewa
                 new Stripe.PaymentIntentGetOptions { Expand = ["latest_charge.balance_transaction"] },
                 cancellationToken: cancellationToken);
 
+            if (paymentIntent.LatestCharge?.BalanceTransaction is null)
+                return WithdrawalErrors.PaymentNotReady;
+
             var settledAmount = paymentIntent.LatestCharge.BalanceTransaction.Amount;
             var settlementCurrency = paymentIntent.LatestCharge.BalanceTransaction.Currency;
 
@@ -147,6 +164,8 @@ internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGatewa
                 Amount = settledAmount,
                 Currency = settlementCurrency,
                 Destination = parent.StripeConnectAccountId,
+                SourceTransaction = paymentIntent.LatestCharge.Id,
+                TransferGroup = paymentDue.Id.ToString(),
                 Metadata = new Dictionary<string, string>
                 {
                     [MetadataKeys.PaymentDueId.Key] = paymentDue.Id.ToString(),
@@ -157,32 +176,32 @@ internal sealed class StripeGateway(StripeOptions stripeOptions) : IStripeGatewa
             var transfer = await new Stripe.TransferService()
                 .CreateAsync(options, cancellationToken: cancellationToken);
 
-            var payoutOptions = new Stripe.PayoutCreateOptions
-            {
-                Amount = settledAmount,
-                Currency = settlementCurrency,
-                Metadata = new Dictionary<string, string>
-                {
-                    [MetadataKeys.PaymentDueId.Key] = paymentDue.Id.ToString(),
-                    [MetadataKeys.RecipientId.Key] = parent.Id.ToString()
-                }
-            };
+            // var payoutOptions = new Stripe.PayoutCreateOptions
+            // {
+            //     Amount = settledAmount,
+            //     Currency = settlementCurrency,
+            //     Metadata = new Dictionary<string, string>
+            //     {
+            //         [MetadataKeys.PaymentDueId.Key] = paymentDue.Id.ToString(),
+            //         [MetadataKeys.RecipientId.Key] = parent.Id.ToString()
+            //     }
+            // };
 
-            await new Stripe.PayoutService().CreateAsync(
-                payoutOptions,
-                new Stripe.RequestOptions
-                {
-                    StripeAccount = parent.StripeConnectAccountId
-                },
-                cancellationToken);
+            // await new Stripe.PayoutService().CreateAsync(
+            //     payoutOptions,
+            //     new Stripe.RequestOptions
+            //     {
+            //         StripeAccount = parent.StripeConnectAccountId
+            //     },
+            //     cancellationToken);
 
             return Result.Success;
         }
         catch (Stripe.StripeException ex)
         {
-            return Error.Failure(
-                $"Stripe.Transfer.{ex.StripeError.Code}",
-                ex.StripeError.Message);
+            return Error.Problem(
+                $"Stripe.Transfer.{ex.StripeError?.Code ?? "Unknown"}",
+                ex.StripeError?.Message ?? ex.Message);
         }
     }
 

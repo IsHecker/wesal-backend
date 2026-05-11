@@ -8,6 +8,9 @@ public static class PaymentDueErrors
     public static Error NotFound(Guid id) =>
         Error.NotFound("PaymentDue.NotFound", $"Payment due with ID '{id}' was not found");
 
+    public static Error AlimonyNotFound(Guid id) =>
+        Error.NotFound("PaymentDue.AlimonyNotFound", $"Alimony with ID '{id}' was not found");
+
     public static Error IsAlreadyPaid =>
         Error.Validation("PaymentDue.IsAlreadyPaid", $"Payment due is already paid");
 

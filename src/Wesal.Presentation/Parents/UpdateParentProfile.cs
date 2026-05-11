@@ -23,6 +23,7 @@ internal sealed class UpdateParentProfile : IEndpoint
         {
             var result = await sender.Send(new UpdateParentProfileCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 parentId,
                 request.Email,
                 request.Phone,
@@ -36,7 +37,7 @@ internal sealed class UpdateParentProfile : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(UpdateParentProfile))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 
     internal record struct Request(

@@ -17,7 +17,7 @@ internal sealed class ComplianceMetricsRepository(WesalDbContext context)
     {
         date = new DateOnly(date.Year, date.Month, 1);
 
-        return context.ComplianceMetrics
+        return _context.ComplianceMetrics
             .AsTracking()
             .FirstOrDefaultAsync(metric =>
                 metric.FamilyId == familyId

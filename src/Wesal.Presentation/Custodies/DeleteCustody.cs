@@ -20,7 +20,7 @@ internal sealed class DeleteCustody : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new DeleteCustodyCommand(user.GetCourtId(), custodyId));
+            var result = await sender.Send(new DeleteCustodyCommand(user.GetCourtId(), user.GetRoleId(), custodyId));
 
             return result.MatchResponse(Results.NoContent, ApiResults.Problem);
         })
@@ -29,6 +29,6 @@ internal sealed class DeleteCustody : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(DeleteCustody))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.CaseClerkOnly);
     }
 }

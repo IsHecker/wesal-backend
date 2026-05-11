@@ -23,6 +23,7 @@ internal sealed class AddChild : IEndpoint
         {
             var result = await sender.Send(new AddChildCommand(
                 user.GetCourtId(),
+                user.GetRoleId(),
                 familyId,
                 request.SchoolId,
                 request.FullName,
@@ -36,7 +37,7 @@ internal sealed class AddChild : IEndpoint
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithOpenApiName(nameof(AddChild))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 
     internal record struct Request(

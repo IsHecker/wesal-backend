@@ -67,3 +67,8 @@ wwwroot/
 *.vs/
 secrets.json
 src.rar
+
+## Document files
+*.pdf
+*.resolved
+*.txt

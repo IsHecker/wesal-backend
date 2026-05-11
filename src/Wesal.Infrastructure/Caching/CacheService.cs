@@ -2,7 +2,6 @@
 using Wesal.Application.Caching;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Wesal.Infrastructure.Caching;
 
@@ -16,13 +15,13 @@ internal sealed class CacheService(IDistributedCache cache) : ICacheService
         TypeNameHandling = TypeNameHandling.All,
         MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
         Formatting = Formatting.None,
-        ContractResolver = new DefaultContractResolver
-        {
-            DefaultMembersSearchFlags =
-            System.Reflection.BindingFlags.Public |
-            System.Reflection.BindingFlags.NonPublic |
-            System.Reflection.BindingFlags.Instance
-        }
+        // ContractResolver = new DefaultContractResolver
+        // {
+        //     DefaultMembersSearchFlags =
+        //     BindingFlags.Public |
+        //     BindingFlags.NonPublic |
+        //     BindingFlags.Instance
+        // }
     };
 
 

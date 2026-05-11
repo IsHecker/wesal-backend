@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Wesal.Application.Authentication;
-using Wesal.Application.CourtCases.CreateCourtCase;
+using Wesal.Application.CourtCases.EscalateToCourtCase;
 using Wesal.Presentation.EndpointResults;
 using Wesal.Presentation.Endpoints;
 using Wesal.Presentation.Extensions;
 
 namespace Wesal.Presentation.CourtCases;
 
-internal sealed class CreateCourtCase : IEndpoint
+internal sealed class EscalateToCourtCase : IEndpoint
 {
     public void MapEndpoint(IEndpointRouteBuilder app)
     {
@@ -20,7 +20,8 @@ internal sealed class CreateCourtCase : IEndpoint
             ClaimsPrincipal user,
             ISender sender) =>
         {
-            var result = await sender.Send(new CreateCourtCaseCommand(
+            var result = await sender.Send(new EscalateToCourtCaseCommand(
+                user.GetCourtId(),
                 user.GetRoleId(),
                 request.FamilyId,
                 request.DocumentId,
@@ -32,9 +33,10 @@ internal sealed class CreateCourtCase : IEndpoint
         .WithTags(Tags.CourtCases)
         .Produces<Guid>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
-        .WithOpenApiName(nameof(CreateCourtCase))
-        .RequireAuthorization(CustomPolicies.CourtManagement);
+        .WithOpenApiName(nameof(EscalateToCourtCase))
+        .RequireAuthorization(CustomPolicies.SettlementSpecialistOnly);
     }
 
     internal readonly record struct Request(

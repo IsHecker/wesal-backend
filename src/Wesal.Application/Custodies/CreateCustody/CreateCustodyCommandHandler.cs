@@ -56,6 +56,9 @@ internal sealed class CreateCustodyCommandHandler(
         if (courtCase.CourtId != request.CourtId)
             return FamilyCourtErrors.NotBelongToCourt(nameof(CourtCase));
 
+        if (courtCase.AssignedStaffId != request.StaffId)
+            return Error.Forbidden("CourtCase.Ownership", "You are not assigned to this case.");
+
         var custodyExists = await custodyRepository.ExistsByCourtCaseIdAsync(request.CourtCaseId, cancellationToken);
         if (custodyExists)
             return CustodyErrors.AlreadyExists(request.CourtCaseId);

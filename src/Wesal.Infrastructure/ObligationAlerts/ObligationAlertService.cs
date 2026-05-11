@@ -1,17 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Wesal.Application.Abstractions.Services;
+using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.ObligationAlerts;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Parents;
 using Wesal.Infrastructure.Database;
+using Wesal.Domain.Entities.CourtStaffs;
 
 namespace Wesal.Infrastructure.ObligationAlerts;
 
 internal sealed class ObligationAlertService(
     IOptions<ObligationAlertOptions> alertOptions,
     INotificationService notificationService,
+    ICourtStaffRepository courtStaffRepository,
+    IAutoAssignmentService autoAssignmentService,
     WesalDbContext dbContext) : IObligationAlertService
 {
     private readonly ObligationAlertOptions alertOptions = alertOptions.Value;
@@ -28,8 +32,13 @@ internal sealed class ObligationAlertService(
 
         parent.RecordViolation();
 
-        var hasReachedMaxViolations = !alertOptions.EnforceMaxViolationsThreshold || 
-                                      parent.ViolationCount >= alertOptions.MaxViolationsCount;
+        var hasReachedMaxViolations = !alertOptions.EnforceMaxViolationsThreshold ||
+            parent.ViolationCount >= alertOptions.MaxViolationsCount;
+
+        var assignedMonitor = await autoAssignmentService.GetBalancedComplianceMonitorAsync(
+            parent.CourtId,
+            AssignmentType.ObligationAlert,
+            cancellationToken);
 
         var obligationAlert = ObligationAlert.Create(
             parent.CourtId,
@@ -38,7 +47,11 @@ internal sealed class ObligationAlertService(
             relatedEntityId,
             violationType,
             hasReachedMaxViolations ? AlertStatus.Pending : AlertStatus.Drafted,
-            violationDescription);
+            violationDescription,
+            assignedMonitor.Id);
+
+        assignedMonitor.IncrementLoad(AssignmentType.ObligationAlert);
+        // courtStaffRepository.Update(assignedMonitor);
 
         await dbContext.ObligationAlerts.AddAsync(obligationAlert, cancellationToken);
 

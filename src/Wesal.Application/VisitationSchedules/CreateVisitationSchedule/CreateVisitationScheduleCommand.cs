@@ -4,6 +4,7 @@ namespace Wesal.Application.VisitationSchedules.CreateVisitationSchedule;
 
 public record struct CreateVisitationScheduleCommand(
     Guid CourtId,
+    Guid StaffId,
     Guid CourtCaseId,
     Guid LocationId,
     string Frequency,

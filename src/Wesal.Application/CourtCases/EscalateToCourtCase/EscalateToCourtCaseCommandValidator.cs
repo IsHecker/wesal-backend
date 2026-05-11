@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace Wesal.Application.CourtCases.CreateCourtCase;
+namespace Wesal.Application.CourtCases.EscalateToCourtCase;
 
-internal sealed class CreateCourtCaseCommandValidator : AbstractValidator<CreateCourtCaseCommand>
+internal sealed class EscalateToCourtCaseCommandValidator : AbstractValidator<EscalateToCourtCaseCommand>
 {
-    public CreateCourtCaseCommandValidator()
+    public EscalateToCourtCaseCommandValidator()
     {
         RuleFor(x => x.FamilyId)
             .NotEmpty()

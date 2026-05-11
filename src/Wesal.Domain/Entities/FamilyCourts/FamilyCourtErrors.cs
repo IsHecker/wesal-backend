@@ -9,4 +9,7 @@ public static class FamilyCourtErrors
 
     public static Error NotBelongToCourt(string entityName) =>
         Error.Forbidden("FamilyCourt.NotBelongToCourt", $"This {entityName} doesn't belong your court");
+
+    public static readonly Error HasReferences =
+        Error.Validation("FamilyCourt.HasReferences", "Cannot delete court because it is referenced by staff, families or other entities.");
 }

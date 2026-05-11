@@ -12,7 +12,7 @@ internal sealed class ComplaintRepository(WesalDbContext context)
 {
     public Task<int> GetMonthCountByParentIdAsync(Guid parentId, CancellationToken cancellationToken = default)
     {
-        return context.Complaints
+        return _context.Complaints
             .CountAsync(complaint => complaint.FiledAt.Month == EgyptTime.Now.Month, cancellationToken);
     }
 }

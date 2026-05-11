@@ -6,8 +6,8 @@ namespace Wesal.Application.Abstractions.PaymentGateway;
 
 public interface IStripeGateway
 {
-    Task<string> CreatePaymentIntentAsync(
-        Parent payerParent,
+    Task<Result<string>> CreatePaymentIntentAsync(
+        Parent? payerParent,
         PaymentDue paymentDue,
         CancellationToken cancellationToken = default);
 

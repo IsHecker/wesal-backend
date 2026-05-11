@@ -1,6 +1,6 @@
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Schools;
 
-namespace Wesal.Application.Schools.GetSchoolProfile;
+namespace Wesal.Application.Schools.GetSchool;
 
-public sealed record GetSchoolProfileQuery(Guid SchoolId) : IQuery<SchoolResponse>;
+public sealed record GetSchoolQuery(Guid SchoolId) : IQuery<SchoolResponse>;

@@ -61,6 +61,7 @@ using Wesal.Infrastructure.Authentication.Strategies;
 using Wesal.Application.Abstractions.Authentication;
 using Wesal.Infrastructure.Authentication.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Wesal.Application.Documents;
 using Wesal.Infrastructure.Visitations;
@@ -70,6 +71,7 @@ using Wesal.Application.Abstractions.PaymentGateway;
 using Wesal.Infrastructure.PaymentGateway.StripeEvents;
 using Wesal.Infrastructure.PaymentGateway.ProcessedStripeEvents;
 using Wesal.Infrastructure.CustodyRequests;
+using Wesal.Domain.Entities.CourtStaffs;
 
 namespace Wesal.Infrastructure;
 
@@ -169,6 +171,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IObligationAlertService, ObligationAlertService>();
         services.AddScoped<ComplianceMetricsService>();
+        services.AddScoped<IAutoAssignmentService, AutoAssignmentService>();
     }
 
     private static void AddBackgroundJobs(this IServiceCollection services, IConfiguration configuration)
@@ -318,12 +321,27 @@ public static class DependencyInjection
         services.AddAuthorizationBuilder()
             .AddPolicy(CustomPolicies.SystemAdminOnly, policy => policy.RequireRole(UserRole.SystemAdmin))
             .AddPolicy(CustomPolicies.FamilyCourtAdminOnly, policy => policy.RequireRole(UserRole.FamilyCourt))
-            .AddPolicy(CustomPolicies.CourtManagement, policy => policy.RequireRole(UserRole.FamilyCourt, UserRole.CourtStaff))
+            .AddPolicy(CustomPolicies.CourtAdminOnly, policy => policy.RequireRole(
+                UserRole.FamilyCourt, nameof(StaffRole.Manager)))
+            .AddPolicy(CustomPolicies.SettlementSpecialistOnly, policy => policy.RequireRole(
+                nameof(StaffRole.SettlementSpecialist)))
+            .AddPolicy(CustomPolicies.CaseClerkOnly, policy => policy.RequireRole(
+                nameof(StaffRole.CaseClerk)))
+            .AddPolicy(CustomPolicies.ComplianceMonitorOnly, policy => policy.RequireRole(
+                nameof(StaffRole.ComplianceMonitor)))
+            .AddPolicy(CustomPolicies.CourtStaffOnly, policy => policy.RequireRole(
+                nameof(StaffRole.Manager),
+                nameof(StaffRole.SettlementSpecialist),
+                nameof(StaffRole.CaseClerk),
+                nameof(StaffRole.ComplianceMonitor)))
             .AddPolicy(CustomPolicies.ParentsOnly, policy => policy.RequireRole(UserRole.Parent))
-            .AddPolicy(CustomPolicies.CourtAndParents, policy => policy.RequireRole(
-                UserRole.FamilyCourt,
-                UserRole.CourtStaff,
-                UserRole.Parent))
+            .AddPolicy(CustomPolicies.CourtAndParents, policy =>
+                policy.RequireRole(
+                    nameof(StaffRole.Manager),
+                    nameof(StaffRole.SettlementSpecialist),
+                    nameof(StaffRole.CaseClerk),
+                    nameof(StaffRole.ComplianceMonitor),
+                    UserRole.Parent))
             .AddPolicy(CustomPolicies.SchoolsOnly, policy => policy.RequireRole(UserRole.School))
             .AddPolicy(CustomPolicies.VisitCenterStaffOnly, policy => policy.RequireRole(UserRole.VisitCenterStaff));
 

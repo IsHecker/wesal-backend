@@ -9,6 +9,7 @@ public sealed class CourtCase : Entity
     public Guid CourtId { get; private set; }
     public Guid FamilyId { get; private set; }
     public Guid? DocumentId { get; private set; }
+    public Guid AssignedStaffId { get; private set; }
 
     public string CaseNumber { get; private set; } = null!;
     public DateTime FiledAt { get; private set; }
@@ -24,6 +25,7 @@ public sealed class CourtCase : Entity
         Guid familyId,
         string caseNumber,
         string decisionSummary,
+        Guid assignedStaffId,
         Guid? documentId = null)
     {
         return new CourtCase
@@ -31,6 +33,7 @@ public sealed class CourtCase : Entity
             CourtId = courtId,
             FamilyId = familyId,
             DocumentId = documentId,
+            AssignedStaffId = assignedStaffId,
             CaseNumber = caseNumber,
             Status = CourtCaseStatus.Open,
             DecisionSummary = decisionSummary,

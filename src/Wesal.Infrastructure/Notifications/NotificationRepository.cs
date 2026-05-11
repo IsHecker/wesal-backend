@@ -12,7 +12,7 @@ internal sealed class NotificationRepository(WesalDbContext context)
         Guid recipientId,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(context.Notifications
+        return Task.FromResult(_context.Notifications
             .Where(n => n.RecipientId == recipientId));
     }
 }

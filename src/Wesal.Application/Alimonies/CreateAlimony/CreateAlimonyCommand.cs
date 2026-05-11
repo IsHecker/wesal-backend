@@ -4,6 +4,7 @@ namespace Wesal.Application.Alimonies.CreateAlimony;
 
 public record struct CreateAlimonyCommand(
     Guid CourtId,
+    Guid StaffId,
     Guid CourtCaseId,
     long Amount,
     string Frequency,

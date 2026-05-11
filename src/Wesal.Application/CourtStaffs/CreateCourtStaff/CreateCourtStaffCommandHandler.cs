@@ -1,5 +1,6 @@
 using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
+using Wesal.Application.Extensions;
 using Wesal.Application.Messaging;
 using Wesal.Contracts.Users;
 using Wesal.Domain.Entities.CourtStaffs;
@@ -31,6 +32,7 @@ internal sealed class CreateCourtStaffCommandHandler(
             request.CourtId,
             request.Email,
             request.FullName,
+            request.Role.ToEnum<StaffRole>(),
             request.Phone);
 
         await courtStaffRepository.AddAsync(courtStaff, cancellationToken);

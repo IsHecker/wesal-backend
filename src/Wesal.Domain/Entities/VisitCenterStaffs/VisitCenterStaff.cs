@@ -34,4 +34,10 @@ public sealed class VisitCenterStaff : Entity, IHasUserId
             Phone = phone
         };
     }
+
+    public void UpdateProfile(string fullName, string? phone)
+    {
+        FullName = fullName;
+        Phone = phone;
+    }
 }

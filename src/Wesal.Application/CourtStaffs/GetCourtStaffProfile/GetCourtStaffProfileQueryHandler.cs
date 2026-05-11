@@ -23,6 +23,8 @@ internal sealed class GetCourtStaffProfileQueryHandler(
             staff.CourtId,
             staff.FullName,
             staff.Email,
-            staff.Phone);
+            staff.Phone,
+            staff.Role.ToString(),
+            staff.IsActive);
     }
 }

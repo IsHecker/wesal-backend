@@ -5,4 +5,6 @@ public record struct CourtStaffResponse(
     Guid CourtId,
     string FullName,
     string Email,
-    string? Phone);
+    string? Phone,
+    string Role,
+    bool IsActive);

@@ -17,7 +17,7 @@ internal sealed class ListObligationAlertsQueryHandler(IWesalDbContext context)
         IQueryable<ObligationAlert> alerts;
 
         alerts = context.ObligationAlerts
-            .Where(alert => alert.CourtId == request.CourtId && alert.Status != AlertStatus.Drafted);
+            .Where(alert => alert.AssignedStaffId == request.StaffId && alert.Status != AlertStatus.Drafted);
 
         var pendingCount = alerts.Count(a => a.Status == AlertStatus.Pending);
         var underReviewCount = alerts.Count(a => a.Status == AlertStatus.UnderReview);
