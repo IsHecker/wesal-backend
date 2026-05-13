@@ -14,7 +14,6 @@ namespace Wesal.Infrastructure.ObligationAlerts;
 internal sealed class ObligationAlertService(
     IOptions<ObligationAlertOptions> alertOptions,
     INotificationService notificationService,
-    ICourtStaffRepository courtStaffRepository,
     IAutoAssignmentService autoAssignmentService,
     WesalDbContext dbContext) : IObligationAlertService
 {
@@ -51,7 +50,6 @@ internal sealed class ObligationAlertService(
             assignedMonitor.Id);
 
         assignedMonitor.IncrementLoad(AssignmentType.ObligationAlert);
-        // courtStaffRepository.Update(assignedMonitor);
 
         await dbContext.ObligationAlerts.AddAsync(obligationAlert, cancellationToken);
 

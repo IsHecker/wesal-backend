@@ -51,7 +51,9 @@ internal sealed class ListPaymentsDueByAlimonyQueryHandler(
                 paymentDue.Amount,
                 paymentDue.DueDate,
                 paymentDue.Status.ToString(),
-                paymentDue.PaidAt))
+                paymentDue.PaidAt,
+                paymentDue.WithdrawalStatus.ToString(),
+                paymentDue.WithdrawnAt))
             .ToPagedResponseAsync(request.Pagination, totalCount);
     }
 }

@@ -4,7 +4,6 @@ using Wesal.Application.Data;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.Children;
 using Wesal.Domain.Entities.Complaints;
-using Wesal.Domain.Entities.Compliances;
 using Wesal.Domain.Entities.CourtCases;
 using Wesal.Domain.Entities.CourtStaffs;
 using Wesal.Domain.Entities.Custodies;
@@ -53,7 +52,6 @@ internal sealed class WesalDbContext(DbContextOptions<WesalDbContext> options)
    public DbSet<Payment> Payments { get; init; }
    public DbSet<Complaint> Complaints { get; init; }
    public DbSet<ObligationAlert> ObligationAlerts { get; init; }
-   public DbSet<ComplianceMetric> ComplianceMetrics { get; init; }
    public DbSet<Notification> Notifications { get; init; }
    public DbSet<Document> Documents { get; init; }
    public DbSet<UserDevice> UserDevices { get; init; }

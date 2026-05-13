@@ -18,13 +18,9 @@ IParentRepository parentRepository,
 IFamilyRepository familyRepository,
 IComplaintRepository complaintRepository,
 IRepository<Document> documentRepository,
-ICourtStaffRepository courtStaffRepository,
-IAutoAssignmentService autoAssignmentService,
-IOptions<ComplaintOptions> complaintOptions)
+IAutoAssignmentService autoAssignmentService)
 : ICommandHandler<CreateComplaintCommand, Guid>
 {
-    private readonly ComplaintOptions complaintOptions = complaintOptions.Value;
-
     public async Task<Result<Guid>> Handle(
         CreateComplaintCommand request,
         CancellationToken cancellationToken)
@@ -36,11 +32,6 @@ IOptions<ComplaintOptions> complaintOptions)
         var isInFamily = await familyRepository.IsParentInFamilyAsync(request.ParentId, request.FamilyId, cancellationToken);
         if (!isInFamily)
             return FamilyErrors.ParentNotInFamily;
-
-        // var count = await complaintRepository.GetMonthCountByParentIdAsync(request.ParentId, cancellationToken);
-
-        // if (count >= complaintOptions.MaxComplaintsInMonth)
-        //     return ComplaintErrors.MaxCountExceeded(complaintOptions.MaxComplaintsInMonth);
 
         if (request.DocumentId is not null)
         {
@@ -64,7 +55,6 @@ IOptions<ComplaintOptions> complaintOptions)
             request.DocumentId);
 
         assignedMonitor.IncrementLoad(AssignmentType.Complaint);
-        // courtStaffRepository.Update(assignedMonitor);
 
         await complaintRepository.AddAsync(complaint, cancellationToken);
 

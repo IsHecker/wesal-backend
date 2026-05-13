@@ -22,7 +22,6 @@ using Wesal.Infrastructure.Caching;
 using Wesal.Infrastructure.Children;
 using Wesal.Infrastructure.CloudinaryStorage;
 using Wesal.Infrastructure.Complaints;
-using Wesal.Infrastructure.ComplianceMetrics;
 using Wesal.Infrastructure.CourtCases;
 using Wesal.Infrastructure.CourtStaffs;
 using Wesal.Infrastructure.Custodies;
@@ -61,7 +60,6 @@ using Wesal.Infrastructure.Authentication.Strategies;
 using Wesal.Application.Abstractions.Authentication;
 using Wesal.Infrastructure.Authentication.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Wesal.Application.Documents;
 using Wesal.Infrastructure.Visitations;
@@ -159,7 +157,6 @@ public static class DependencyInjection
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped<IVisitCenterStaffRepository, VisitCenterStaffRepository>();
         services.AddScoped<IComplaintRepository, ComplaintRepository>();
-        services.AddScoped<IComplianceMetricsRepository, ComplianceMetricsRepository>();
         services.AddScoped<IUserDeviceRepository, UserDeviceRepository>();
         services.AddScoped<IFamilyCourtRepository, FamilyCourtRepository>();
         services.AddScoped<IVisitationScheduleRepository, VisitationScheduleRepository>();
@@ -170,7 +167,6 @@ public static class DependencyInjection
     private static void AddServices(this IServiceCollection services)
     {
         services.AddScoped<IObligationAlertService, ObligationAlertService>();
-        services.AddScoped<ComplianceMetricsService>();
         services.AddScoped<IAutoAssignmentService, AutoAssignmentService>();
     }
 
