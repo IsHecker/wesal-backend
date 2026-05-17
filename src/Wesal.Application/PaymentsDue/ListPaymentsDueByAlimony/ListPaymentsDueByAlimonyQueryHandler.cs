@@ -1,3 +1,4 @@
+using Wesal.Domain.Entities.PaymentsDue;
 using Microsoft.EntityFrameworkCore;
 using Wesal.Application.Abstractions.Data;
 using Wesal.Application.Abstractions.Repositories;

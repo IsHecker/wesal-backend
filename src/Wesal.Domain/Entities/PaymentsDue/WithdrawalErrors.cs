@@ -1,6 +1,6 @@
 using Wesal.Domain.Results;
 
-namespace Wesal.Domain.Entities.Payments;
+namespace Wesal.Domain.Entities.PaymentsDue;
 
 public static class WithdrawalErrors
 {

@@ -7,7 +7,7 @@ using Wesal.Application.Abstractions.Services;
 using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.ObligationAlerts;
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Infrastructure.Database;
 
@@ -65,7 +65,6 @@ internal sealed class DetectOverdueAlimonyPaymentsJob(
 
     private static readonly Expression<Func<PaymentDue, bool>> IsNotPaid =
         due => due.PaidAt == null
-            || due.PaymentId == null
             || due.Status != PaymentStatus.Paid;
 
     private static readonly Expression<Func<PaymentDue, bool>> IsDueDatePassed =

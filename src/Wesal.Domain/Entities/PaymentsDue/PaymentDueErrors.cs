@@ -1,4 +1,4 @@
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Results;
 
 namespace Wesal.Domain.Entities.PaymentsDue;
@@ -21,6 +21,9 @@ public static class PaymentDueErrors
         Error.Validation(
             $"PaymentDue.IsAlready{status}",
             $"This Payment due is already '{status}'");
+
+    public static Error Unauthorized(string message) =>
+        Error.Forbidden("Payment.Unauthorized", message);
 
     public static Error CannotTransition(PaymentStatus currentStatus, PaymentStatus targetStatus) =>
         Error.Validation(

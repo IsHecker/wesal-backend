@@ -10,7 +10,6 @@ internal static class MetadataKeys
     public static readonly StripeMetadataKey<Guid> ParentId = new("ParentId");
     public static readonly StripeMetadataKey<Guid> AlimonyId = new("AlimonyId");
     public static readonly StripeMetadataKey<Guid> PaymentDueId = new("PaymentDueId");
-    public static readonly StripeMetadataKey<Guid> PaymentId = new("PaymentId");
     public static readonly StripeMetadataKey<Guid> PayerId = new("PayerId");
     public static readonly StripeMetadataKey<Guid> RecipientId = new("RecipientId");
 

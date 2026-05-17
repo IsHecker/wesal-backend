@@ -1,7 +1,7 @@
 using Wesal.Domain.Common;
 using Wesal.Domain.DomainEvents;
 using Wesal.Domain.Entities.Alimonies;
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Results;
 
 namespace Wesal.Domain.Entities.PaymentsDue;
@@ -10,7 +10,8 @@ public sealed class PaymentDue : Entity
 {
     public Guid AlimonyId { get; private set; }
     public Guid FamilyId { get; private set; }
-    public Guid? PaymentId { get; private set; }
+    public string? PaymentIntentId { get; private set; }
+    public string? ReceiptUrl { get; private set; }
 
     public DateOnly DueDate { get; private set; }
 
@@ -23,7 +24,7 @@ public sealed class PaymentDue : Entity
 
     public bool IsNotified { get; private set; }
 
-    public bool IsPaid => PaidAt != null && PaymentId != null && Status == PaymentStatus.Paid;
+    public bool IsPaid => PaidAt != null && Status == PaymentStatus.Paid;
     public bool IsDueDatePassed => DueDate < EgyptTime.Today;
 
     public Alimony Alimony { get; init; } = null!;
@@ -40,7 +41,7 @@ public sealed class PaymentDue : Entity
         };
     }
 
-    public Result MarkAsPaid(Guid paymentId)
+    public Result MarkAsPaid(string paymentIntentId, string? receiptUrl)
     {
         var result = StatusTransition
             .Validate(Status, PaymentStatus.Pending, PaymentStatus.Paid);
@@ -48,7 +49,8 @@ public sealed class PaymentDue : Entity
         if (result.IsFailure)
             return result.Error;
 
-        PaymentId = paymentId;
+        PaymentIntentId = paymentIntentId;
+        ReceiptUrl = receiptUrl;
         Status = PaymentStatus.Paid;
         PaidAt = EgyptTime.Now;
 
@@ -73,7 +75,7 @@ public sealed class PaymentDue : Entity
 
     public void MarkAsWithdrawn()
     {
-        WithdrawalStatus = Payments.WithdrawalStatus.Completed;
+        WithdrawalStatus = PaymentsDue.WithdrawalStatus.Completed;
         WithdrawnAt = EgyptTime.Now;
     }
 }

@@ -3,7 +3,7 @@ using Wesal.Application.Abstractions.Repositories;
 using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Data;
 using Wesal.Domain.Entities.Notifications;
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Results;
 
 namespace Wesal.Infrastructure.PaymentGateway.StripeEvents.EventHandlers;

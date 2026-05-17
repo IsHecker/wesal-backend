@@ -14,7 +14,6 @@ using Wesal.Domain.Entities.FamilyCourts;
 using Wesal.Domain.Entities.Notifications;
 using Wesal.Domain.Entities.ObligationAlerts;
 using Wesal.Domain.Entities.Parents;
-using Wesal.Domain.Entities.Payments;
 using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Domain.Entities.SchoolReports;
 using Wesal.Domain.Entities.Schools;
@@ -49,7 +48,6 @@ internal sealed class WesalDbContext(DbContextOptions<WesalDbContext> options)
    public DbSet<VisitationLocation> VisitationLocations { get; init; }
    public DbSet<Alimony> Alimonies { get; init; }
    public DbSet<PaymentDue> PaymentsDue { get; init; }
-   public DbSet<Payment> Payments { get; init; }
    public DbSet<Complaint> Complaints { get; init; }
    public DbSet<ObligationAlert> ObligationAlerts { get; init; }
    public DbSet<Notification> Notifications { get; init; }

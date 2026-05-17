@@ -38,7 +38,6 @@ using Wesal.Infrastructure.Parents;
 using Wesal.Infrastructure.PaymentsDue;
 using Wesal.Infrastructure.PaymentsDue.PaymentDueReminder;
 using Wesal.Infrastructure.PaymentsDue.PaymentsDueGeneration;
-using Wesal.Infrastructure.Payments;
 using Wesal.Infrastructure.Schools;
 using Wesal.Infrastructure.UserDevices;
 using Wesal.Infrastructure.VisitationLocations;
@@ -161,7 +160,6 @@ public static class DependencyInjection
         services.AddScoped<IFamilyCourtRepository, FamilyCourtRepository>();
         services.AddScoped<IVisitationScheduleRepository, VisitationScheduleRepository>();
         services.AddScoped<ICustodyRequestRepository, CustodyRequestRepository>();
-        services.AddScoped<IPaymentRepository, PaymentRepository>();
     }
 
     private static void AddServices(this IServiceCollection services)

@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Quartz;
 using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Extensions;
 using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Notifications;
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Infrastructure.Database;
 

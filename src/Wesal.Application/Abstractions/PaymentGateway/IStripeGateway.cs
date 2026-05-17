@@ -34,4 +34,4 @@ public interface IStripeGateway
     Task DeleteAccount(string accountId);
     
     Task DeleteCustomer(string customerId);
-}
+}

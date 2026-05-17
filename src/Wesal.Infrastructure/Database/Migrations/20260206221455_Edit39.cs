@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Wesal.Domain.Entities.PaymentsDue;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 

@@ -1,4 +1,4 @@
-namespace Wesal.Domain.Entities.Payments;
+namespace Wesal.Domain.Entities.PaymentsDue;
 
 public enum PaymentStatus
 {

@@ -1,6 +1,6 @@
 using Wesal.Application.Abstractions.PaymentGateway;
 using Wesal.Domain.Entities.Parents;
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Entities.PaymentsDue;
 using Wesal.Domain.Results;
 

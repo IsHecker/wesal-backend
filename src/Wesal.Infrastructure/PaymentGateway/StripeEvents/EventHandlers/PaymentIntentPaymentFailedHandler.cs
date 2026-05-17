@@ -4,7 +4,7 @@ using Wesal.Application.Abstractions.Services;
 using Wesal.Application.Data;
 using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Notifications;
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Results;
 
 namespace Wesal.Infrastructure.PaymentGateway.StripeEvents.EventHandlers;
@@ -12,7 +12,6 @@ namespace Wesal.Infrastructure.PaymentGateway.StripeEvents.EventHandlers;
 [StripeEvent(EventTypes.PaymentIntentPaymentFailed)]
 internal sealed class PaymentIntentPaymentFailedHandler(
     IPaymentDueRepository paymentDueRepository,
-    IPaymentRepository paymentRepository,
     IUnitOfWork unitOfWork,
     INotificationService notificationService) : StripeEventHandler<PaymentIntent>
 {
@@ -24,14 +23,6 @@ internal sealed class PaymentIntentPaymentFailedHandler(
         var paymentDue = await paymentDueRepository.GetByIdAsync(paymentDueId)
             ?? throw new InvalidOperationException();
 
-        var payment = Payment.Create(
-            paymentDue.Id,
-            PaymentStatus.Failed,
-            paymentIntent.Id,
-            paymentIntent.LatestCharge.ReceiptUrl,
-            EgyptTime.Now);
-
-        await paymentRepository.AddAsync(payment);
         await unitOfWork.SaveChangesAsync();
 
         await notificationService

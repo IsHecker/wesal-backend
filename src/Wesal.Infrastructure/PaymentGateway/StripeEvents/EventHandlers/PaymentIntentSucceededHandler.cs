@@ -5,7 +5,7 @@ using Wesal.Application.Data;
 using Wesal.Domain.Common;
 using Wesal.Domain.Entities.Alimonies;
 using Wesal.Domain.Entities.Notifications;
-using Wesal.Domain.Entities.Payments;
+
 using Wesal.Domain.Results;
 
 namespace Wesal.Infrastructure.PaymentGateway.StripeEvents.EventHandlers;
@@ -14,7 +14,6 @@ namespace Wesal.Infrastructure.PaymentGateway.StripeEvents.EventHandlers;
 internal sealed class PaymentIntentSucceededHandler(
     IAlimonyRepository alimonyRepository,
     IPaymentDueRepository paymentDueRepository,
-    IPaymentRepository paymentRepository,
     IUnitOfWork unitOfWork,
     INotificationService notificationService) : StripeEventHandler<PaymentIntent>
 {
@@ -38,16 +37,8 @@ internal sealed class PaymentIntentSucceededHandler(
 
         var receiptUrl = paymentIntent.LatestCharge.ReceiptUrl;
 
-        var payment = Payment.Create(
-            paymentDueId,
-            PaymentStatus.Paid,
-            paymentIntent.Id,
-            receiptUrl,
-            EgyptTime.Now);
+        paymentDue.MarkAsPaid(paymentIntent.Id, receiptUrl);
 
-        paymentDue.MarkAsPaid(payment.Id);
-
-        await paymentRepository.AddAsync(payment);
         paymentDueRepository.Update(paymentDue);
 
         await unitOfWork.SaveChangesAsync();
